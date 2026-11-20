@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Port Health Division — Executive Command Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2335C8E8' d='M12 2l8 3v6c0 5-3.4 8.6-8 11-4.6-2.4-8-6-8-11V5z'/%3E%3Cpath fill='%2306121C' d='M8.5 12l2.4 2.4L16 9.3l-1.4-1.4-3.7 3.7-1-1z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PORT HEALTH DIVISION — EXECUTIVE COMMAND
+   Palette: deep-harbour navy field · signal cyan · jade · amber
+   beacon red · orchid (travel) · gold (permits) · violet (intel)
+   Rule: Anomalies scream. Normalcy whispers.
+   ============================================================ */
+:root{
+  --bg0:#060B12; --bg1:#0A1220; --sf:#0E1826; --sf2:#122032; --sf3:#16283E;
+  --line:rgba(148,190,215,.14); --line2:rgba(148,190,215,.26);
+  --ink:#E9F4F9; --muted:#A7BFCB; --faint:#7C95A6;
+  --cyan:#35C8E8; --teal:#2FD6B0; --jade:#3ED598; --amber:#FFB224;
+  --red:#FF5C5C; --orchid:#E879F9; --violet:#A78BFA; --gold:#F5D565; --sky:#4CC3FF;
+  --fd:'Space Grotesk','Noto Sans TC',sans-serif;
+  --fb:'Noto Sans TC','Space Grotesk',system-ui,sans-serif;
+  --fm:'Space Grotesk',ui-monospace,monospace;
+  --r:14px; --gap:14px;
+  --kpi-num:38px; --status-word:26px; --h-title:15px; --body:14.5px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg0); color:var(--ink);
+  font-family:var(--fb); font-size:var(--body); line-height:1.55;
+  overflow-x:hidden; min-height:100vh;
+}
+body[data-lang="zh"]{letter-spacing:.01em}
+::selection{background:rgba(53,200,232,.32)}
+/* ---- scrollbar in our own language ---- */
+*{scrollbar-width:thin;scrollbar-color:#1E4A5C var(--bg1)}
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:var(--bg1);border-radius:8px}
+*::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#1E5A70,#17435A);border-radius:8px;border:2px solid var(--bg1)}
+*::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--cyan),#1E7A96)}
+/* ---- layered atmosphere ---- */
+.bg{position:fixed;inset:0;z-index:-3;background:
+  radial-gradient(1100px 600px at 8% -8%, rgba(53,200,232,.10), transparent 60%),
+  radial-gradient(900px 700px at 100% 12%, rgba(47,214,176,.06), transparent 55%),
+  radial-gradient(1000px 800px at 85% 105%, rgba(232,121,249,.05), transparent 55%),
+  linear-gradient(180deg,var(--bg0),var(--bg1) 60%,var(--bg0))}
+.bg-grid{position:fixed;inset:0;z-index:-2;opacity:.5;background:
+  repeating-linear-gradient(0deg,transparent 0 79px,rgba(120,170,200,.045) 79px 80px),
+  repeating-linear-gradient(90deg,transparent 0 79px,rgba(120,170,200,.045) 79px 80px);
+  mask-image:radial-gradient(1200px 800px at 50% 0%,#000 30%,transparent 90%)}
+.bg-drift{position:fixed;z-index:-2;width:60vw;height:60vw;left:-15vw;top:-20vw;border-radius:50%;
+  background:radial-gradient(circle,rgba(53,200,232,.07),transparent 60%);
+  animation:drift 46s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate(14vw,10vh) scale(1.15)}}
+.bg-grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E")}
+/* ---- icons ---- */
+.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-3px}
+.ic.lg{width:26px;height:26px}.ic.xl{width:34px;height:34px}.ic.sm{width:14px;height:14px}
+/* ---- header ---- */
+header{position:sticky;top:0;z-index:50;background:rgba(7,12,20,.86);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line)}
+.topbar{max-width:1560px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{width:42px;height:42px;flex:none;border-radius:11px;display:grid;place-items:center;color:#052430;
+  background:linear-gradient(135deg,var(--cyan),var(--teal));box-shadow:0 0 22px rgba(53,200,232,.35)}
+.brand-mark .ic{width:24px;height:24px;stroke-width:2}
+.brand h1{font-family:var(--fd);font-size:17px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+body[data-lang="zh"] .brand h1{font-family:var(--fb);font-weight:900}
+.brand small{display:block;color:var(--faint);font-size:11px;font-weight:500;letter-spacing:.06em}
+.demo-chip{font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--gold);border:1px solid rgba(245,213,101,.4);
+  padding:3px 8px;border-radius:20px;background:rgba(245,213,101,.07);white-space:nowrap}
+nav{display:flex;gap:2px;margin-left:6px}
+nav a{color:var(--muted);text-decoration:none;font-size:12.5px;font-weight:500;padding:7px 11px;border-radius:9px;white-space:nowrap;transition:.2s}
+nav a:hover{color:var(--ink);background:rgba(53,200,232,.08)}
+nav a[aria-current="true"]{color:var(--cyan);background:rgba(53,200,232,.12)}
+.hd-clock{margin-left:auto;text-align:right;line-height:1.2}
+.hd-clock .t{font-family:var(--fm);font-size:21px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.hd-clock .d{font-size:11px;color:var(--faint)}
+.hd-live{display:flex;flex-direction:column;gap:4px;min-width:118px}
+.hd-live .row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--jade);box-shadow:0 0 8px var(--jade);animation:blink 2.4s infinite}
+.paused .live-dot{background:var(--amber);box-shadow:0 0 8px var(--amber);animation:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.refresh-track{height:3px;border-radius:3px;background:rgba(148,190,215,.15);overflow:hidden}
+.refresh-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--teal));transition:width 1s linear}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.seg button{background:transparent;border:0;color:var(--muted);font:600 12px var(--fb);padding:8px 12px;cursor:pointer;transition:.2s}
+.seg button.on{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#052430}
+.seg button:not(.on):hover{color:var(--ink);background:rgba(53,200,232,.1)}
+.ctl{display:inline-flex;align-items:center;gap:7px;background:var(--sf2);border:1px solid var(--line2);color:var(--muted);
+  font:600 12px var(--fb);padding:8px 12px;border-radius:10px;cursor:pointer;transition:.2s;white-space:nowrap}
+.ctl:hover{color:var(--ink);border-color:rgba(53,200,232,.5);box-shadow:0 0 14px rgba(53,200,232,.15)}
+.ctl.primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#052430;border-color:transparent}
+.ctl.primary:hover{box-shadow:0 0 20px rgba(53,200,232,.45);color:#052430}
+.ctl.warn-on{color:var(--amber);border-color:rgba(255,178,36,.5)}
+select.ctl{appearance:none;padding-right:26px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23A7BFCB' fill='none' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+select.ctl option{background:var(--sf);color:var(--ink)}
+/* ---- critical ticker ---- */
+.ticker{display:none;align-items:center;gap:12px;max-width:1560px;margin:0 auto;padding:9px 20px;
+  border-top:1px solid rgba(255,92,92,.25);background:linear-gradient(90deg,rgba(255,92,92,.14),rgba(255,92,92,.04) 60%,transparent);
+  color:#FFD9D9;font-size:13px;font-weight:500}
+.ticker.show{display:flex}
+.ticker .ic{color:var(--red);animation:blink 1.2s infinite}
+.ticker b{color:#fff;font-weight:700}
+.ticker .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ticker button{flex:none;background:var(--red);border:0;color:#2A0808;font:700 12px var(--fb);padding:7px 14px;border-radius:9px;cursor:pointer;transition:.2s}
+.ticker button:hover{box-shadow:0 0 16px rgba(255,92,92,.6);transform:translateY(-1px)}
+/* ---- layout ---- */
+main{max-width:1560px;margin:0 auto;padding:20px 20px 8px}
+section{scroll-margin-top:110px;margin-bottom:var(--gap)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gap)}
+.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}
+.s7{grid-column:span 7}.s8{grid-column:span 8}.s12{grid-column:span 12}
+.card{position:relative;background:linear-gradient(180deg,#101C2C,#0C1624);border:1px solid var(--line);
+  border-radius:var(--r);padding:18px;box-shadow:0 8px 26px rgba(0,0,0,.32);overflow:hidden}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--hair,var(--cyan)),transparent 70%);opacity:.75}
+.card-h{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+.card-h h2{font-family:var(--fd);font-size:var(--h-title);font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+body[data-lang="zh"] .card-h h2{font-family:var(--fb);font-weight:700}
+.card-h h2 .ic{color:var(--hair,var(--cyan))}
+.card-sub{color:var(--faint);font-size:12px;margin-bottom:12px}
+.card-h .right{margin-left:auto}
+/* ---- status beacon ---- */
+.status-card{display:flex;gap:16px;align-items:flex-start;--hair:var(--cyan)}
+.status-card.st-action{--hair:var(--red)} .status-card.st-handling{--hair:var(--amber)}
+.status-card.st-watch{--hair:var(--amber)} .status-card.st-good{--hair:var(--jade)}
+.beacon{position:relative;width:58px;height:58px;flex:none;border-radius:16px;display:grid;place-items:center}
+.beacon .ic{width:30px;height:30px;stroke-width:2}
+.st-action .beacon{background:rgba(255,92,92,.14);color:var(--red);border:1px solid rgba(255,92,92,.45)}
+.st-handling .beacon,.st-watch .beacon{background:rgba(255,178,36,.12);color:var(--amber);border:1px solid rgba(255,178,36,.4)}
+.st-good .beacon{background:rgba(62,213,152,.1);color:var(--jade);border:1px solid rgba(62,213,152,.35)}
+.st-action .beacon::after{content:"";position:absolute;inset:-6px;border-radius:20px;border:2px solid rgba(255,92,92,.5);animation:ring 1.6s ease-out infinite}
+@keyframes ring{0%{transform:scale(.85);opacity:1}100%{transform:scale(1.25);opacity:0}}
+.status-word{font-family:var(--fd);font-size:var(--status-word);font-weight:700;line-height:1.15;letter-spacing:.01em}
+body[data-lang="zh"] .status-word{font-family:var(--fb);font-weight:900}
+.st-action .status-word{color:var(--red)} .st-handling .status-word,.st-watch .status-word{color:var(--amber)} .st-good .status-word{color:var(--jade)}
+.status-meta{color:var(--muted);font-size:12.5px;margin-top:4px;display:flex;gap:12px;flex-wrap:wrap}
+.status-meta span{display:inline-flex;align-items:center;gap:5px}
+.status-cta{margin-top:12px}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line2);background:var(--sf2);color:var(--ink);
+  font:600 12.5px var(--fb);padding:9px 14px;border-radius:10px;cursor:pointer;transition:.2s;text-decoration:none}
+.btn:hover{border-color:rgba(53,200,232,.55);box-shadow:0 0 14px rgba(53,200,232,.18);transform:translateY(-1px)}
+.btn.red{background:linear-gradient(135deg,var(--red),#E8406B);border-color:transparent;color:#2A0808;font-weight:700}
+.btn.red:hover{box-shadow:0 0 20px rgba(255,92,92,.5)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 10px;font-size:11.5px}
+/* ---- narrative ---- */
+.narr-list{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:6px}
+.narr-list li{display:flex;gap:10px;font-size:13.5px;color:var(--ink);line-height:1.5}
+.narr-list li .ic{margin-top:3px}
+.narr-list li.hot{color:#FFE3E3}
+.narr-list li.hot .ic{color:var(--red)}
+.narr-list li.calm .ic{color:var(--teal)}
+.narr-list li.note .ic{color:var(--violet)}
+.narr-list b{font-weight:700}
+.brief-chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.05em;
+  padding:4px 10px;border-radius:20px;margin-bottom:2px}
+.brief-chip.need{color:var(--red);background:rgba(255,92,92,.12);border:1px solid rgba(255,92,92,.4)}
+.brief-chip.none{color:var(--jade);background:rgba(62,213,152,.09);border:1px solid rgba(62,213,152,.3)}
+/* ---- mini stats ---- */
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini{background:rgba(148,190,215,.05);border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+.mini .lab{display:flex;align-items:center;gap:6px;color:var(--faint);font-size:11px;font-weight:500}
+.mini .lab .ic{width:14px;height:14px;color:var(--cyan)}
+.mini .val{font-family:var(--fm);font-size:23px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
+.mini .val small{font-size:12px;color:var(--faint);font-weight:500}
+.mini .ctx{font-size:10.5px;color:var(--faint);margin-top:1px}
+.mini.ready .val{color:var(--jade);font-size:16px;font-family:var(--fb);display:flex;align-items:center;gap:6px;padding-top:5px}
+/* ---- KPI cards ---- */
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--gap);margin-top:var(--gap)}
+.kpi{--hair:var(--cyan);cursor:pointer;transition:transform .22s,border-color .22s,box-shadow .22s;padding:15px 15px 12px}
+.kpi:hover{transform:translateY(-3px);border-color:var(--line2);box-shadow:0 14px 32px rgba(0,0,0,.45),0 0 18px color-mix(in srgb,var(--hair) 16%,transparent)}
+.kpi:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.kpi-top{display:flex;align-items:center;gap:8px}
+.kpi-ic{width:32px;height:32px;flex:none;border-radius:9px;display:grid;place-items:center;color:var(--hair);
+  background:color-mix(in srgb,var(--hair) 12%,transparent);border:1px solid color-mix(in srgb,var(--hair) 32%,transparent)}
+.kpi-name{font-size:12.5px;font-weight:700;line-height:1.25}
+.kpi-sub{font-size:10.5px;color:var(--faint);font-weight:400}
+.kpi-num{font-family:var(--fm);font-size:var(--kpi-num);font-weight:700;line-height:1.05;margin-top:10px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi-unit{font-size:11.5px;color:var(--muted);margin-top:1px}
+.kpi-delta{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);
+  background:rgba(148,190,215,.07);border:1px solid var(--line);padding:2px 8px;border-radius:14px;margin-top:7px}
+.kpi-delta .ic{width:12px;height:12px}
+.kpi-spark{margin-top:9px}
+.kpi-ctx{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.45;border-top:1px dashed var(--line);padding-top:7px}
+.kpi-ctx b{color:var(--ink)}
+.kpi-foot{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.kpi-more{font-size:10.5px;color:var(--faint);display:inline-flex;align-items:center;gap:3px}
+.kpi.k-bad{border-color:rgba(255,92,92,.45);box-shadow:0 0 24px rgba(255,92,92,.12)}
+.kpi.k-bad .kpi-num{color:#FF8A8A}
+.kpi.k-bad::after{content:"";position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:blink 1.1s infinite}
+/* ---- status chips (shape + word + colour, never colour alone) ---- */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:14px;letter-spacing:.02em;white-space:nowrap}
+.chip .ic{width:13px;height:13px;stroke-width:2.2}
+.chip.ok{color:var(--jade);background:rgba(62,213,152,.09);border:1px solid rgba(62,213,152,.32)}
+.chip.warn{color:var(--amber);background:rgba(255,178,36,.09);border:1px solid rgba(255,178,36,.35)}
+.chip.crit{color:var(--red);background:rgba(255,92,92,.11);border:1px solid rgba(255,92,92,.4)}
+.chip.info{color:var(--sky);background:rgba(76,195,255,.09);border:1px solid rgba(76,195,255,.32)}
+.chip.mute{color:var(--faint);background:rgba(148,190,215,.06);border:1px solid var(--line)}
+/* ---- charts ---- */
+.chart-wrap{position:relative}
+.chart-wrap svg{display:block;width:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-bottom:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg-line{width:18px;height:0;border-top:2.5px solid var(--ink);border-radius:2px}
+.lg-band{width:18px;height:10px;border-radius:3px;background:rgba(148,190,215,.22);border:1px dashed rgba(148,190,215,.45)}
+.lg-dot{width:9px;height:9px;border-radius:50%}
+.anom-dot{animation:anom 1.4s ease-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes anom{0%,100%{opacity:1}50%{opacity:.35}}
+.share-bar{display:flex;height:16px;border-radius:8px;overflow:hidden;border:1px solid var(--line);margin-top:6px}
+.share-bar div{height:100%}
+.share-leg{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--muted)}
+.share-leg span{display:inline-flex;align-items:center;gap:6px}
+.share-leg b{color:var(--ink);font-family:var(--fm)}
+.share-title{font-size:11px;color:var(--faint);font-weight:600;letter-spacing:.06em;margin-top:14px}
+/* ---- alerts ---- */
+.alert-counts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.alert-list{display:flex;flex-direction:column;gap:10px;max-height:430px;overflow-y:auto;padding-right:4px}
+.alert{border:1px solid var(--line);border-radius:12px;background:rgba(148,190,215,.04);overflow:hidden;transition:.25s}
+.alert.sev-crit{border-color:rgba(255,92,92,.5);background:linear-gradient(180deg,rgba(255,92,92,.1),rgba(255,92,92,.03));box-shadow:0 0 20px rgba(255,92,92,.1)}
+.alert.sev-watch{border-color:rgba(255,178,36,.35)}
+.alert.sev-info{border-color:rgba(76,195,255,.25)}
+.alert-head{display:flex;align-items:flex-start;gap:10px;padding:12px 12px 10px;cursor:pointer}
+.alert-head .sev-ic{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center}
+.sev-crit .sev-ic{color:var(--red);background:rgba(255,92,92,.14)}
+.sev-crit .sev-ic .ic{animation:blink 1.2s infinite}
+.sev-watch .sev-ic{color:var(--amber);background:rgba(255,178,36,.12)}
+.sev-info .sev-ic{color:var(--sky);background:rgba(76,195,255,.1)}
+.alert-title{font-size:13px;font-weight:700;line-height:1.4}
+.alert-meta{font-size:11px;color:var(--faint);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.alert-chev{margin-left:auto;color:var(--faint);transition:transform .25s;flex:none;margin-top:4px}
+.alert.open .alert-chev{transform:rotate(90deg)}
+.alert-body{display:none;padding:0 12px 12px 52px;font-size:12.5px;color:var(--muted)}
+.alert.open .alert-body{display:block}
+.alert-signals{list-style:none;margin:6px 0;display:flex;flex-direction:column;gap:4px}
+.alert-signals li{display:flex;gap:7px;align-items:center;font-size:12px}
+.alert-signals .ic{width:12px;height:12px}
+.alert-action{background:rgba(53,200,232,.07);border:1px solid rgba(53,200,232,.22);border-radius:9px;padding:8px 10px;margin:8px 0;color:var(--ink);font-size:12px}
+.alert-action b{color:var(--cyan)}
+.alert-btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.alert.done{opacity:.62}
+.alert.done .alert-title{text-decoration:none}
+.acked-wrap{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.acked-wrap .lab{font-size:11px;color:var(--faint);font-weight:600;letter-spacing:.05em;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.acked-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:5px 0}
+.acked-item .ic{width:14px;height:14px}
+.alert-empty{display:flex;align-items:center;gap:10px;color:var(--jade);font-size:13px;padding:18px 6px}
+/* ---- bullet graphs (no speedometers, ever) ---- */
+.bullet-row{padding:10px 0;border-bottom:1px dashed var(--line)}
+.bullet-row:last-child{border-bottom:0}
+.bullet-lab{display:flex;align-items:baseline;gap:8px;font-size:12.5px;font-weight:600;flex-wrap:wrap}
+.bullet-lab .val{margin-left:auto;font-family:var(--fm);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.bullet-lab .tgt{font-size:11px;color:var(--faint);font-weight:400}
+.bullet-track{position:relative;height:14px;border-radius:7px;background:rgba(148,190,215,.08);margin-top:7px;overflow:visible}
+.bullet-zone{position:absolute;top:0;bottom:0;border-radius:7px}
+.bullet-val{position:absolute;top:3px;bottom:3px;left:0;border-radius:5px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.bullet-val.ok{background:linear-gradient(90deg,#1E8F6E,var(--jade))}
+.bullet-val.warn{background:linear-gradient(90deg,#B87A16,var(--amber))}
+.bullet-val.crit{background:linear-gradient(90deg,#B03030,var(--red))}
+.bullet-tick{position:absolute;top:-3px;bottom:-3px;width:2.5px;background:#fff;border-radius:2px;box-shadow:0 0 6px rgba(255,255,255,.7)}
+.bullet-mini .bullet-track{height:10px;margin-top:0}
+.bullet-mini .bullet-val{top:2px;bottom:2px}
+.bullet-mini .bullet-tick{top:-2px;bottom:-2px;width:2px}
+/* ---- watch list ---- */
+.watch-item{display:flex;gap:11px;padding:11px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+.watch-item:last-child{border-bottom:0}
+.watch-item .ic{margin-top:2px;color:var(--violet)}
+.watch-name{font-size:13px;font-weight:700}
+.watch-region{font-size:11px;color:var(--faint)}
+.watch-note{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}
+.watch-side{margin-left:auto;text-align:right;flex:none;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.watch-upd{font-size:10.5px;color:var(--faint)}
+/* ---- crossings table ---- */
+.table-tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.search{display:flex;align-items:center;gap:7px;background:var(--sf2);border:1px solid var(--line2);border-radius:10px;padding:7px 11px;min-width:190px}
+.search .ic{width:14px;height:14px;color:var(--faint)}
+.search input{background:transparent;border:0;outline:0;color:var(--ink);font:500 12.5px var(--fb);width:100%}
+.search input::placeholder{color:var(--faint)}
+.fchips{display:flex;gap:6px;flex-wrap:wrap}
+.fchip{display:inline-flex;align-items:center;gap:5px;background:transparent;border:1px solid var(--line2);color:var(--muted);
+  font:600 11.5px var(--fb);padding:6px 11px;border-radius:16px;cursor:pointer;transition:.2s}
+.fchip .ic{width:13px;height:13px}
+.fchip:hover{color:var(--ink);border-color:rgba(53,200,232,.5)}
+.fchip.on{background:rgba(53,200,232,.14);color:var(--cyan);border-color:rgba(53,200,232,.55)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:11px}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th{font-size:10.5px;font-weight:700;letter-spacing:.09em;color:var(--faint);text-align:left;padding:10px 12px;
+  background:rgba(148,190,215,.05);border-bottom:1px solid var(--line);white-space:nowrap;text-transform:uppercase}
+body[data-lang="zh"] th{letter-spacing:.12em}
+td{padding:10px 12px;border-bottom:1px solid rgba(148,190,215,.07);font-size:12.5px;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:rgba(53,200,232,.05)}
+tr.row-crit{background:linear-gradient(90deg,rgba(255,92,92,.1),transparent 70%);box-shadow:inset 3px 0 0 var(--red)}
+tr.row-crit:hover{background:linear-gradient(90deg,rgba(255,92,92,.16),rgba(53,200,232,.04) 70%)}
+tr.row-warn{box-shadow:inset 3px 0 0 var(--amber)}
+.cp-name{display:flex;align-items:center;gap:9px;font-weight:700;font-size:13px;white-space:nowrap}
+.cp-name .ic{color:var(--cyan)}
+.cp-mode{font-size:10.5px;color:var(--faint);font-weight:400}
+.num{font-family:var(--fm);font-variant-numeric:tabular-nums;font-weight:600}
+td .cov{display:flex;align-items:center;gap:9px;min-width:130px}
+td .cov .bullet-mini{flex:1}
+td .cov .num{font-size:12px;width:46px}
+.qcell{display:flex;align-items:center;gap:8px}
+.qcell .num{width:44px;font-size:12px}
+.tbl-count{font-size:11.5px;color:var(--faint);margin-top:9px}
+/* ---- bars ---- */
+.hbar-row{display:flex;align-items:center;gap:10px;padding:8px 0}
+.hbar-lab{width:170px;flex:none;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+.hbar-lab .ic{width:15px;height:15px;color:var(--gold)}
+.hbar-track{flex:1;height:13px;border-radius:7px;background:rgba(148,190,215,.08);position:relative;overflow:hidden}
+.hbar-fill{position:absolute;inset:0 auto 0 0;border-radius:7px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.hbar-val{width:44px;text-align:right;font-family:var(--fm);font-weight:700;font-size:14px}
+.stat-line{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;border-top:1px dashed var(--line);padding-top:11px}
+.stat-line .st{font-size:11.5px;color:var(--faint)}
+.stat-line .st b{display:block;font-family:var(--fm);font-size:19px;color:var(--ink);font-weight:700}
+.stat-line .st b.good{color:var(--jade)}
+/* ---- reference ---- */
+.ref-card{--hair:var(--violet)}
+.ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:8px}
+.ref-block h3{font-family:var(--fd);font-size:13.5px;font-weight:700;color:var(--cyan);display:flex;align-items:center;gap:8px;margin-bottom:10px;letter-spacing:.03em}
+body[data-lang="zh"] .ref-block h3{font-family:var(--fb)}
+.ref-block h3 .n{width:22px;height:22px;flex:none;border-radius:7px;background:rgba(53,200,232,.12);border:1px solid rgba(53,200,232,.35);display:grid;place-items:center;font-size:11px;color:var(--cyan)}
+.story{list-style:none;counter-reset:st;display:flex;flex-direction:column;gap:10px}
+.story li{display:flex;gap:11px;font-size:12.5px;color:var(--muted);line-height:1.55}
+.story li b{color:var(--ink)}
+.story .qn{counter-increment:st;flex:none;width:24px;height:24px;border-radius:50%;border:1px solid rgba(53,200,232,.4);color:var(--cyan);display:grid;place-items:center;font:700 11px var(--fm);margin-top:1px}
+.story .qn::before{content:counter(st)}
+.mand-table{width:100%;border-collapse:collapse;min-width:0}
+.mand-table th{padding:7px 9px;font-size:10px}
+.mand-table td{padding:8px 9px;font-size:12px;color:var(--muted);vertical-align:top}
+.mand-table td:first-child{color:var(--ink);font-weight:700;white-space:nowrap}
+.mand-table td .ic{width:14px;height:14px;margin-right:5px;color:var(--cyan)}
+.prin{list-style:none;display:flex;flex-direction:column;gap:8px}
+.prin li{display:flex;gap:9px;font-size:12.5px;color:var(--muted);line-height:1.5}
+.prin li .ic{color:var(--teal);margin-top:2px;width:15px;height:15px}
+.prin li b{color:var(--ink)}
+.wire{font:11.5px/1.5 ui-monospace,'Space Grotesk',monospace;color:var(--muted);background:rgba(6,11,18,.7);
+  border:1px solid var(--line);border-radius:11px;padding:14px;overflow-x:auto;white-space:pre}
+.ref-legal{font-size:12.5px;color:var(--muted);background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.25);border-radius:10px;padding:10px 13px;margin-bottom:16px;line-height:1.6}
+.ref-legal b{color:var(--violet)}
+/* ---- drawer ---- */
+.backdrop{position:fixed;inset:0;z-index:59;background:rgba(4,8,14,.62);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s}
+.backdrop.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:60;width:min(500px,94vw);background:linear-gradient(180deg,#101D2E,#0B1420);
+  border-left:1px solid var(--line2);box-shadow:-24px 0 60px rgba(0,0,0,.55);transform:translateX(105%);transition:transform .38s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+.drawer.show{transform:translateX(0)}
+.drawer-h{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line)}
+.drawer-h .kpi-ic{width:40px;height:40px}
+.drawer-h h3{font-family:var(--fd);font-size:17px;font-weight:700}
+body[data-lang="zh"] .drawer-h h3{font-family:var(--fb)}
+.drawer-h .sub{font-size:11.5px;color:var(--faint)}
+.drawer-x{margin-left:auto;width:36px;height:36px;border-radius:10px;border:1px solid var(--line2);background:var(--sf2);color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:.2s}
+.drawer-x:hover{color:var(--ink);border-color:rgba(255,92,92,.5)}
+.drawer-b{padding:20px;overflow-y:auto;flex:1}
+.drawer-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:16px}
+.drawer-sec{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--faint);text-transform:uppercase;margin:18px 0 9px;display:flex;align-items:center;gap:7px}
+.drawer-sec .ic{width:14px;height:14px;color:var(--cyan)}
+.drawer-good{font-size:12px;color:var(--jade);background:rgba(62,213,152,.07);border:1px solid rgba(62,213,152,.25);border-radius:10px;padding:9px 12px;margin-top:16px;display:flex;gap:8px;line-height:1.5}
+.drawer-good .ic{margin-top:2px;flex:none}
+.dr-alert{display:flex;gap:9px;font-size:12.5px;color:var(--muted);padding:7px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+.dr-alert:last-child{border:0}
+/* ---- tooltip / toast ---- */
+.tt{position:fixed;z-index:80;pointer-events:none;background:#0B1520;border:1px solid var(--line2);border-radius:9px;
+  padding:8px 12px;font-size:12px;color:var(--ink);box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .12s;max-width:270px;line-height:1.5}
+.tt.show{opacity:1}
+.tt .tl{color:var(--faint);font-size:10.5px;letter-spacing:.05em}
+.tt b{font-family:var(--fm)}
+.toasts{position:fixed;left:18px;bottom:18px;z-index:70;display:flex;flex-direction:column;gap:9px;max-width:min(400px,90vw)}
+.toast{display:flex;align-items:center;gap:10px;background:#0E1B2B;border:1px solid var(--line2);border-left:3px solid var(--cyan);
+  border-radius:11px;padding:11px 14px;font-size:12.5px;box-shadow:0 14px 40px rgba(0,0,0,.5);animation:tin .35s cubic-bezier(.2,.8,.2,1)}
+.toast.good{border-left-color:var(--jade)}.toast.good .ic{color:var(--jade)}
+.toast.warn{border-left-color:var(--amber)}.toast.warn .ic{color:var(--amber)}
+.toast .ic{color:var(--cyan)}
+.toast button{margin-left:auto;flex:none;background:transparent;border:1px solid rgba(53,200,232,.5);color:var(--cyan);font:700 11.5px var(--fb);padding:5px 11px;border-radius:8px;cursor:pointer}
+.toast button:hover{background:rgba(53,200,232,.12)}
+@keyframes tin{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.toast.out{transition:.3s;opacity:0;transform:translateY(8px)}
+/* ---- footer ---- */
+footer{max-width:1560px;margin:0 auto;padding:16px 20px 26px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;
+  color:var(--faint);font-size:11.5px;border-top:1px solid var(--line)}
+footer .ic{width:14px;height:14px;color:var(--gold)}
+footer span{display:inline-flex;align-items:center;gap:6px}
+footer .right{margin-left:auto}
+kbd{font:600 10.5px var(--fm);border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:var(--sf2);color:var(--muted)}
+/* ---- reveal ---- */
+.reveal{opacity:0;transform:translateY(16px)}
+.reveal.in{opacity:1;transform:none;transition:opacity .6s ease var(--d,0s),transform .6s cubic-bezier(.2,.8,.2,1) var(--d,0s)}
+.skip{position:absolute;left:-999px;top:8px;z-index:99;background:var(--cyan);color:#052430;padding:8px 14px;border-radius:8px;font-weight:700}
+.skip:focus{left:8px}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+/* ---- WALL MODE : dark, massive, zero-interaction ---- */
+.exit-wall{display:none;position:fixed;right:22px;bottom:22px;z-index:65}
+body.wall{--kpi-num:60px;--status-word:40px;--h-title:19px;--body:17px;--gap:18px}
+body.wall .desk-only,body.wall nav,body.wall .below-fold,body.wall .kpi-more,body.wall .table-tools,body.wall footer .keys{display:none!important}
+body.wall .exit-wall{display:inline-flex}
+body.wall .topbar{padding:16px 28px}
+body.wall .brand-mark{width:56px;height:56px}
+body.wall .brand h1{font-size:24px}
+body.wall .brand small{font-size:13px}
+body.wall .hd-clock .t{font-size:34px}
+body.wall .hd-clock .d{font-size:13px}
+body.wall .ticker{font-size:18px;padding:13px 28px}
+body.wall .ticker button{font-size:15px;padding:9px 18px}
+body.wall main{padding:24px 28px;max-width:1900px}
+body.wall .card{padding:22px}
+body.wall .kpi{cursor:default;pointer-events:none}
+body.wall .kpi-name{font-size:16px}.body.wall .kpi-sub{font-size:12px}
+body.wall .kpi-sub{font-size:12.5px}
+body.wall .kpi-unit{font-size:14px}
+body.wall .kpi-ctx{font-size:13.5px}
+body.wall .kpi-delta{font-size:13px}
+body.wall .chip{font-size:13.5px;padding:5px 12px}
+body.wall .narr-list li{font-size:17px}
+body.wall .status-meta{font-size:15px}
+body.wall .mini .val{font-size:30px}
+body.wall .mini .lab{font-size:13px}
+body.wall .alert-list{max-height:330px;pointer-events:none}
+body.wall .alert-btns,body.wall .alert-chev{display:none}
+body.wall .alert-body{display:block}
+body.wall .alert-title{font-size:16px}
+body.wall .alert-meta{font-size:12.5px}
+body.wall .card-sub{font-size:14px}
+body.wall .legend{font-size:14px}
+body.wall .share-leg{font-size:14.5px}
+body.wall .beacon{width:76px;height:76px}
+body.wall .beacon .ic{width:40px;height:40px}
+body.wall .status-cta{display:none}
+body.wall .demo-chip{font-size:12px}
+body.wall .brief-chip{font-size:13px}
+/* ---- responsive ---- */
+@media (max-width:1360px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .s4.status-col{grid-column:span 5}.s5.narr-col{grid-column:span 7}.s3.mini-col{grid-column:span 12}
+  .mini-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media (max-width:1080px){
+  .s8,.s7,.s5,.s4,.s6{grid-column:span 12}
+  .s4.status-col,.s5.narr-col{grid-column:span 12}
+  .ref-grid{grid-template-columns:1fr}
+  nav{order:5;width:100%;overflow-x:auto;padding-bottom:2px}
+  .hd-clock{margin-left:auto}
+  .alert-list{max-height:none}
+}
+@media (max-width:720px){
+  :root{--kpi-num:32px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .mini-grid{grid-template-columns:repeat(2,1fr)}
+  .topbar{gap:10px}
+  .controls{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .hd-live{display:none}
+  main{padding:14px 12px}
+  .hbar-lab{width:120px;font-size:11.5px}
+  .status-card{flex-direction:column}
+  body.wall .kpi-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:460px){.kpi-grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body data-lang="en">
+<a class="skip" href="#overview">Skip to content</a>
+<div class="bg"></div><div class="bg-grid"></div><div class="bg-drift"></div><div class="bg-grain"></div>
+
+<!-- ===== SVG ICON LIBRARY ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5.2c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6z"/><path d="M8.7 12l2.3 2.3 4.5-4.6"/></symbol>
+    <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M10 4a2 2 0 0 1 4 0v9.2a4.2 4.2 0 1 1-4 0z"/><path d="M12 9v7"/></symbol>
+    <symbol id="i-plane" viewBox="0 0 24 24"><path d="M21 3L3 10.5l6.2 2.3L11.5 19z"/><path d="M9.2 12.8L21 3"/></symbol>
+    <symbol id="i-train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="13" rx="3"/><path d="M5 10h14M8 16l-2 4M16 16l2 4"/><circle cx="8.5" cy="13" r=".6"/><circle cx="15.5" cy="13" r=".6"/></symbol>
+    <symbol id="i-ship" viewBox="0 0 24 24"><path d="M2.5 15h19l-2.8 5H5.3z"/><path d="M6 15V9h12v6M10 9V6h4v3"/></symbol>
+    <symbol id="i-anchor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21M5 12H3a9 9 0 0 0 18 0h-2M8.5 10.5h7"/></symbol>
+    <symbol id="i-syringe" viewBox="0 0 24 24"><path d="M18 2l4 4M19.5 6.5L10 16l-3.5 3L5 17.5 8.5 14 18 4.5M3 21l3.5-3.5M11.5 8.5l2 2M8.5 11.5l2 2"/></symbol>
+    <symbol id="i-stamp" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15l2 2 4-4.5"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.6 3 14.4 0 18-3-3.6-3-14.4 0-18z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5L2.5 20h19z"/><path d="M12 9.5v4.5M12 17.2v.4"/></symbol>
+    <symbol id="i-diamond" viewBox="0 0 24 24"><path d="M12 3l7 9-7 9-7-9z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.2l2.8 2.8L16.5 9"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M3.5 20c0-3.1 2.4-5.2 5.5-5.2s5.5 2.1 5.5 5.2M16 5.4a3 3 0 1 1 1.4 5.7M17.5 14.6c2.2.5 3.5 2.3 3.5 5"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8.5 5v14M15.5 5v14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7.5 5l11 7-11 7z"/></symbol>
+    <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 10v4h3.5l5 4V6l-5 4z"/><path d="M16 9.5a3.5 3.5 0 0 1 0 5M18.5 7a7.5 7.5 0 0 1 0 10"/></symbol>
+    <symbol id="i-volx" viewBox="0 0 24 24"><path d="M4 10v4h3.5l5 4V6l-5 4z"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></symbol>
+    <symbol id="i-wall" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 16v4M8 20h8"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v11M7 10l5 5 5-5M4.5 21h15"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M5.5 12.5L12 19l6.5-6.5"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-bug" viewBox="0 0 24 24"><ellipse cx="12" cy="13.5" rx="5" ry="6"/><path d="M12 7.5v12M9 5l2 3.2M15 5l-2 3.2M4 11h3M4 17h3M17 11h3M17 17h3"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 3H4z"/><path d="M10 21a2.2 2.2 0 0 0 4 0"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M4 10h10a5 5 0 0 1 0 10H9"/><path d="M8 6l-4 4 4 4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13.5 6l6 6-6 6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17.5H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 9c2.5 0 2.5-2.5 5-2.5S9.5 9 12 9s2.5-2.5 5-2.5S19.5 9 22 9M2 16c2.5 0 2.5-2.5 5-2.5s2.5 2.5 5 2.5 2.5-2.5 5-2.5 2.5 2.5 5 2.5"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12v.3"/></symbol>
+  </defs>
+</svg>
+
+<!-- ===== HEADER ===== -->
+<header id="topbar">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark"><svg class="ic"><use href="#i-shield"/></svg></div>
+      <div>
+        <h1 data-t="brand1">Port Health Division</h1>
+        <small data-t="brand2">Department of Health · HKSAR</small>
+      </div>
+      <span class="demo-chip" data-t="demo">SIMULATED DATA</span>
+    </div>
+    <nav class="desk-only" aria-label="Sections">
+      <a href="#overview" data-t="nav.overview" data-spy="overview">Overview</a>
+      <a href="#attention" data-t="nav.attention" data-spy="attention">Attention</a>
+      <a href="#service" data-t="nav.service" data-spy="service">Service</a>
+      <a href="#crossings" data-t="nav.crossings" data-spy="crossings">Crossings</a>
+      <a href="#demand" data-t="nav.demand" data-spy="demand">Demand</a>
+      <a href="#reference" data-t="nav.reference" data-spy="reference">Reference</a>
+    </nav>
+    <div class="hd-clock">
+      <div class="t" id="clock">--:--:--</div>
+      <div class="d"><span id="dateLine">—</span> · HKT</div>
+    </div>
+    <div class="hd-live desk-only" id="liveBox">
+      <div class="row"><span class="live-dot"></span><span id="freshness">—</span></div>
+      <div class="refresh-track"><div class="refresh-fill" id="refreshFill"></div></div>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Language">
+        <button data-action="lang" data-lang="en" id="langEn">EN</button>
+        <button data-action="lang" data-lang="zh" id="langZh">繁體</button>
+      </div>
+      <select class="ctl desk-only" id="refreshSel" data-ta="ctl.refreshTitle" aria-label="Refresh rate">
+        <option value="5000">⟳ 5s</option>
+        <option value="15000" selected>⟳ 15s</option>
+        <option value="30000">⟳ 30s</option>
+        <option value="60000">⟳ 60s</option>
+      </select>
+      <button class="ctl desk-only" data-action="pause" id="pauseBtn"><svg class="ic sm"><use href="#i-pause"/></svg><span data-t="ctl.pause">Pause</span></button>
+      <button class="ctl" data-action="sound" id="soundBtn"><svg class="ic sm"><use href="#i-vol"/></svg><span data-t="ctl.soundOn">Sound on</span></button>
+      <button class="ctl desk-only" data-action="wall" id="wallBtn"><svg class="ic sm"><use href="#i-wall"/></svg><span data-t="ctl.wall">Wall view</span></button>
+      <button class="ctl primary desk-only" data-action="export"><svg class="ic sm"><use href="#i-download"/></svg><span data-t="ctl.export">Export brief</span></button>
+    </div>
+  </div>
+  <div class="ticker" id="ticker" role="alert">
+    <svg class="ic"><use href="#i-alert"/></svg>
+    <span class="grow" id="tickerText"></span>
+    <button data-action="review" data-t="tick.review">Review &amp; decide</button>
+  </div>
+</header>
+
+<main>
+  <!-- ===== ROW 0 · COMMAND STRIP (critical health top-left) ===== -->
+  <section id="overview">
+    <div class="grid">
+      <div class="card status-card s4 status-col reveal" id="statusCard" style="--d:.02s"></div>
+      <div class="card s5 narr-col reveal" style="--hair:var(--teal);--d:.08s">
+        <div class="card-h"><h2><svg class="ic"><use href="#i-activity"/></svg><span data-t="brief.title">Today in one minute</span></h2></div>
+        <div id="briefChip"></div>
+        <ul class="narr-list" id="narrativeList"></ul>
+      </div>
+      <div class="card s3 mini-col reveal" style="--hair:var(--sky);--d:.14s">
+        <div class="card-h"><h2><svg class="ic"><use href="#i-users"/></svg><span data-t="mini.title">Duty picture</span></h2></div>
+        <div class="mini-grid" id="miniGrid"></div>
+      </div>
+    </div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+  </section>
+
+  <!-- ===== ROW 1 · PRESSURE + ATTENTION ===== -->
+  <section id="attention">
+    <div class="grid">
+      <div class="card s8 reveal" style="--hair:var(--sky)">
+        <div class="card-h"><h2><svg class="ic"><use href="#i-wave"/></svg><span data-t="flow.title">Border pressure — arrivals, last 24 hours</span></h2></div>
+        <div class="card-sub" data-t="flow.sub">Travellers arriving each hour, against the usual range for that time of day.</div>
+        <div class="legend">
+          <span><span class="lg-line"></span><span data-t="flow.actual">Actual arrivals</span></span>
+          <span><span class="lg-band"></span><span data-t="flow.usual">Usual range</span></span>
+          <span><span class="lg-dot" style="background:var(--red);box-shadow:0 0 8px var(--red)"></span><span data-t="flow.anomLeg">Above usual — check staffing</span></span>
+        </div>
+        <div class="chart-wrap" id="flowWrap"></div>
+        <div class="share-title" data-t="flow.share">TODAY'S MIX BY CROSSING TYPE</div>
+        <div class="share-bar" id="shareBar"></div>
+        <div class="share-leg" id="shareLeg"></div>
+      </div>
+      <div class="card s4 reveal" style="--hair:var(--red);--d:.08s">
+        <div class="card-h"><h2><svg class="ic"><use href="#i-bell"/></svg><span data-t="alerts.title">Needs your attention</span></h2></div>
+        <div class="card-sub" data-t="alerts.sub">Grouped by area — acknowledge to mark as handled.</div>
+        <div class="alert-counts" id="alertCounts"></div>
+        <div class="alert-list" id="alertList"></div>
+        <div class="acked-wrap" id="ackedWrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ROW 2 · SERVICE PROMISES + GLOBAL WATCH ===== -->
+  <section id="service" class="below-fold">
+    <div class="grid">
+      <div class="card s7 reveal" style="--hair:var(--jade)">
+        <div class="card-h"><h2><svg class="ic"><use href="#i-target"/></svg><span data-t="prom.title">Service promises kept today</span></h2></div>
+        <div class="card-sub" data-t="prom.sub">Each bar is today's result. The white tick is the promise. Left of the tick (or above it, for %) is good.</div>
+        <div id="promiseList"></div>
+      </div>
+      <div class="card s5 reveal" style="--hair:var(--violet);--d:.08s">
+        <div class="card-h"><h2><svg class="ic"><use href="#i-globe"/></svg><span data-t="watch.title">Global outbreak watch</span></h2></div>
+        <div class="card-sub" data-t="watch.sub">From WHO and regional partners — and what each means for Hong Kong.</div>
+        <div id="watchList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ROW 3 · CONTROL-POINT BOARD ===== -->
+  <section id="crossings" class="below-fold">
+    <div class="card s12 reveal" style="--hair:var(--cyan)">
+      <div class="card-h"><h2><svg class="ic"><use href="#i-train"/></svg><span data-t="cross.title">Control-point board</span></h2>
+        <span class="right chip mute" id="crossLive"></span></div>
+      <div class="card-sub" data-t="cross.sub">Live status at the ten busiest crossings. Red rail = act now · amber rail = watch.</div>
+      <div class="table-tools desk-only">
+        <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="crossSearch" type="text" data-tp="cross.search" placeholder="Search control points…"></label>
+        <div class="fchips" id="filterChips"></div>
+        <select class="ctl" id="sortSel" data-ta="cross.sort" aria-label="Sort">
+          <option value="pressure" data-t="cross.sort.pressure">Sort: pressure first</option>
+          <option value="arrivals" data-t="cross.sort.arrivals">Sort: arrivals</option>
+          <option value="name" data-t="cross.sort.name">Sort: name</option>
+        </select>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th data-t="cross.col.point">Control point</th><th data-t="cross.col.status">Status</th>
+          <th data-t="cross.col.arrivals">Arrivals today</th><th data-t="cross.col.coverage">Screening coverage</th>
+          <th data-t="cross.col.queue">Queue</th><th data-t="cross.col.officers">Officers</th>
+        </tr></thead>
+        <tbody id="crossBody"></tbody>
+      </table></div>
+      <div class="tbl-count" id="crossCount"></div>
+    </div>
+  </section>
+
+  <!-- ===== ROW 4 · DEMAND ===== -->
+  <section id="demand" class="below-fold">
+    <div class="grid">
+      <div class="card s6 reveal" style="--hair:var(--orchid)">
+        <div class="card-h"><h2><svg class="ic"><use href="#i-syringe"/></svg><span data-t="vax.title">Travel health — this week</span></h2></div>
+        <div class="card-sub" data-t="vax.sub">Vaccinations given each day, against what the two centres can comfortably deliver.</div>
+        <div class="chart-wrap" id="vaxWrap"></div>
+        <div class="stat-line" id="vaxStats"></div>
+      </div>
+      <div class="card s6 reveal" style="--hair:var(--gold);--d:.08s">
+        <div class="card-h"><h2><svg class="ic"><use href="#i-stamp"/></svg><span data-t="perm.title">Permits &amp; certificates — this week</span></h2></div>
+        <div class="card-sub" data-t="perm.sub">What the public and trade asked us for, and how fast we answered.</div>
+        <div id="permitWrap"></div>
+        <div class="stat-line" id="permitStats"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ROW 5 · EXECUTIVE REFERENCE ===== -->
+  <section id="reference" class="below-fold">
+    <div class="card s12 ref-card reveal">
+      <div class="card-h"><h2><svg class="ic"><use href="#i-book"/></svg><span data-t="ref.title">Executive reference &amp; design notes</span></h2></div>
+      <div class="card-sub" data-t="ref.sub">What this division does, the storyline of this dashboard, and how to read it — kept in plain language.</div>
+      <div class="ref-legal" data-th="ref.legal"></div>
+      <div class="ref-grid">
+        <div class="ref-block">
+          <h3><span class="n">A</span><span data-t="ref.story.title">The storyline — five questions, top to bottom</span></h3>
+          <ol class="story" id="storyList"></ol>
+          <h3 style="margin-top:20px"><span class="n">B</span><span data-t="ref.read.title">Read it in 30 seconds</span></h3>
+          <ol class="story" id="readList"></ol>
+        </div>
+        <div class="ref-block">
+          <h3><span class="n">C</span><span data-t="ref.prin.title">Design rules applied</span></h3>
+          <ul class="prin" id="prinList"></ul>
+          <h3 style="margin-top:20px"><span class="n">D</span><span data-t="ref.env.title">Viewing environments &amp; refresh</span></h3>
+          <p style="font-size:12.5px;color:var(--muted);line-height:1.6" data-t="ref.env.body"></p>
+        </div>
+      </div>
+      <div class="ref-block" style="margin-top:22px">
+        <h3><span class="n">E</span><span data-t="ref.mand.title">Our mandate in plain language — and where you see it above</span></h3>
+        <div class="tbl-wrap"><table class="mand-table" style="min-width:640px">
+          <thead><tr><th data-t="ref.mand.h1">Area</th><th data-t="ref.mand.h2">What we do (simply)</th><th data-t="ref.mand.h3">Where you see it</th></tr></thead>
+          <tbody id="mandBody"></tbody>
+        </table></div>
+      </div>
+      <div class="ref-block" style="margin-top:22px">
+        <h3><span class="n">F</span><span data-t="ref.wire.title">Layout blueprint</span></h3>
+        <pre class="wire" id="wirePre"></pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span><svg class="ic"><use href="#i-info"/></svg><span data-t="foot.note">Simulated demonstration data for design reference — not official Department of Health statistics.</span></span>
+  <span class="keys desk-only"><span data-t="foot.keys">Shortcuts:</span> <kbd>W</kbd> <span data-t="foot.wall">wall view</span> · <kbd>Esc</kbd> <span data-t="foot.esc">close / exit</span></span>
+  <span class="right" data-t="foot.credit">Designed for senior management · Port Health Division</span>
+</footer>
+
+<button class="btn exit-wall" data-action="exit-wall" id="exitWallBtn"><svg class="ic sm"><use href="#i-x"/></svg><span data-t="ctl.exitWall">Exit wall view (Esc)</span></button>
+
+<div class="backdrop" id="backdrop" data-action="close-drawer"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+  <div class="drawer-h" id="drawerHead"></div>
+  <div class="drawer-b" id="drawerBody"></div>
+</aside>
+<div class="tt" id="tt"></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+"use strict";
+/* ================================================================
+   STATE, SEED & HELPERS
+================================================================ */
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let seed=20261117;
+const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+const rr=(a,b)=>a+rnd()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const genWalk=(n,start,min,max,step)=>{const a=[];let v=start;for(let i=0;i<n;i++){v=clamp(v+rr(-step,step),min,max);a.push(v)}return a};
+
+const S={
+  lang:store.get('phd-lang','en'),
+  sound:store.get('phd-sound',true),
+  wall:false,paused:false,refresh:15000,acc:0,tick:0,lastUpdate:Date.now(),
+  filter:store.get('phd-filter','all'),sort:store.get('phd-sort','pressure'),search:'',
+  drawer:null,collapsed:{},spawned:false,
+};
+const bi=o=>o[S.lang];
+const fmt=n=>new Intl.NumberFormat(S.lang==='zh'?'zh-Hant-HK':'en-HK').format(Math.round(n));
+const pc=(n,d=1)=>n.toFixed(d)+'%';
+const ic=(n,c='')=>`<svg class="ic ${c}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const nowHKT=()=>new Date();
+const timeStr=(d,sec=false)=>new Intl.DateTimeFormat(S.lang==='zh'?'zh-Hant-HK':'en-GB',{timeZone:'Asia/Hong_Kong',hour:'2-digit',minute:'2-digit',...(sec?{second:'2-digit'}:{}),hour12:false}).format(d);
+const dateStr=d=>new Intl.DateTimeFormat(S.lang==='zh'?'zh-Hant-HK':'en-GB',{timeZone:'Asia/Hong_Kong',weekday:'short',day:'numeric',month:'short',year:'numeric'}).format(d);
+const minsAgo=m=>timeStr(new Date(Date.now()-m*60000));
+
+/* ================================================================
+   I18N DICTIONARY — every static string, both languages
+================================================================ */
+const DICT={
+'brand1':{en:'Port Health Division',zh:'港口衞生科'},
+'brand2':{en:'Department of Health · HKSAR',zh:'香港特別行政區政府 衞生署'},
+'demo':{en:'SIMULATED DATA',zh:'模擬數據'},
+'nav.overview':{en:'Overview',zh:'總覽'},'nav.attention':{en:'Attention',zh:'待辦事項'},
+'nav.service':{en:'Service',zh:'服務承諾'},'nav.crossings':{en:'Crossings',zh:'口岸狀況'},
+'nav.demand':{en:'Demand',zh:'服務需求'},'nav.reference':{en:'Reference',zh:'參考說明'},
+'ctl.refreshTitle':{en:'Data refresh rate',zh:'數據更新頻率'},
+'ctl.pause':{en:'Pause',zh:'暫停'},'ctl.resume':{en:'Resume',zh:'繼續'},
+'ctl.soundOn':{en:'Sound on',zh:'聲音開啟'},'ctl.soundOff':{en:'Muted',zh:'已靜音'},
+'ctl.wall':{en:'Wall view',zh:'大屏模式'},'ctl.exitWall':{en:'Exit wall view (Esc)',zh:'離開大屏模式（Esc）'},
+'ctl.export':{en:'Export brief',zh:'匯出簡報'},
+'hdr.updated':{en:'Updated {s}s ago',zh:'{s} 秒前更新'},'hdr.paused':{en:'Paused — data frozen',zh:'已暫停 — 數據靜止'},
+'tick.review':{en:'Review & decide',zh:'檢視並決策'},
+'st.action':{en:'Action needed',zh:'需要決策'},'st.handling':{en:'Action underway',zh:'處理中'},
+'st.watch':{en:'Watch closely',zh:'密切留意'},'st.good':{en:'All protected',zh:'全面受控'},
+'st.action.sub':{en:'One area is below its safety line. A proposed fix awaits your approval.',zh:'一個範疇低於安全水平，建議方案正等候審批。'},
+'st.handling.sub':{en:'The fix you approved is in progress. Recovery is being tracked live.',zh:'已批核的措施正在執行，系統正實時監察恢復進度。'},
+'st.watch.sub':{en:'Nothing dangerous right now — two situations are being kept an eye on.',zh:'目前沒有危險情況，兩項事項正持續留意。'},
+'st.good.sub':{en:'Every border, ship, flight and service is inside its safety line.',zh:'所有口岸、船舶、航班及服務均處於安全水平之內。'},
+'cnt.crit':{en:'critical',zh:'緊急'},'cnt.watch':{en:'watch',zh:'關注'},'cnt.info':{en:'info',zh:'資訊'},
+'status.since':{en:'Since',zh:'始於'},'status.viewBtn':{en:'Review & decide',zh:'檢視並決策'},
+'status.protected':{en:'Borders protected under Cap. 599 & International Health Regulations',zh:'依據第599章及《國際衞生條例》守護各口岸'},
+'brief.title':{en:'Today in one minute',zh:'一分鐘掌握今日'},
+'brief.need':{en:'{n} decision awaiting you',zh:'{n} 項決策等候閣下'},
+'brief.none':{en:'No decisions awaiting you',zh:'暫無待批決策'},
+'mini.title':{en:'Duty picture',zh:'當值概況'},
+'mini.officers':{en:'Officers on duty',zh:'當值人員'},
+'mini.bcp':{en:'Control points open',zh:'口岸開放'},
+'mini.vessels':{en:'Vessels awaiting clearance',zh:'輪候檢疫船舶'},
+'mini.vessels.ctx':{en:'comfortable ≤ 10',zh:'舒適水平 ≤ 10'},
+'mini.medteam':{en:'Airport emergency team',zh:'機場緊急醫療隊'},
+'mini.ready':{en:'Ready · 24h',zh:'隨時候命 · 24小時'},
+'mini.across':{en:'across all crossings',zh:'遍佈各口岸'},
+'mini.allOpen':{en:'all operating normally',zh:'全部正常運作'},
+'kpi.screening':{en:'Border screening',zh:'旅客健康篩查'},'kpi.screening.sub':{en:'Every arriving traveller',zh:'每位入境旅客'},
+'kpi.sea':{en:'Seaport & ships',zh:'海港及船舶'},'kpi.sea.sub':{en:'Quarantine clearance',zh:'船舶檢疫放行'},
+'kpi.air':{en:'Airport & flights',zh:'機場及航班'},'kpi.air.sub':{en:'Hygiene & vector checks',zh:'衞生及病媒檢查'},
+'kpi.travel':{en:'Travel health',zh:'旅遊健康'},'kpi.travel.sub':{en:'Advice & vaccination',zh:'諮詢及疫苗接種'},
+'kpi.permits':{en:'Permits & certificates',zh:'許可證及證明書'},'kpi.permits.sub':{en:'Public & trade services',zh:'公共及業界服務'},
+'kpi.intel':{en:'Global intelligence',zh:'全球疫情情報'},'kpi.intel.sub':{en:'WHO & partner alerts',zh:'世衞及夥伴通報'},
+'kpi.travellers':{en:'travellers processed today',zh:'今日已處理旅客'},
+'kpi.vesselsCleared':{en:'vessels cleared today',zh:'今日已放行船舶'},
+'kpi.flights':{en:'flights checked today',zh:'今日已檢查航班'},
+'kpi.vaccinated':{en:'travellers vaccinated today',zh:'今日已接種旅客'},
+'kpi.issuedWeek':{en:'permits issued this week',zh:'本週已簽發許可證'},
+'kpi.watchItems':{en:'outbreaks being watched',zh:'監察中的疫情'},
+'kpi.vsYday':{en:'vs yesterday',zh:'較昨日'},'kpi.vsLweek':{en:'vs last week',zh:'較上週'},
+'kpi.new24':{en:'new in 24h',zh:'24小時新增'},
+'kpi.coverage':{en:'Coverage',zh:'覆蓋率'},'kpi.safeLine':{en:'safety line',zh:'安全線'},
+'kpi.promise':{en:'promise',zh:'承諾'},'kpi.usual':{en:'usual',zh:'一般'},
+'kpi.avgClear':{en:'Avg clearance',zh:'平均放行時間'},'kpi.min':{en:'min',zh:'分鐘'},
+'kpi.fever':{en:'Fever referrals',zh:'發燒轉介'},'kpi.today':{en:'today',zh:'今日'},
+'kpi.wait':{en:'Wait',zh:'輪候'},'kpi.onTime':{en:'On time',zh:'準時率'},
+'kpi.newAdv':{en:'New advisories',zh:'新通報'},'kpi.details':{en:'Details',zh:'詳情'},
+'stt.good':{en:'On track',zh:'達標'},'stt.warn':{en:'Attention',zh:'留意'},'stt.bad':{en:'Action',zh:'行動'},'stt.info':{en:'Update',zh:'更新'},
+'flow.title':{en:'Border pressure — arrivals, last 24 hours',zh:'口岸壓力 — 過去24小時入境人次'},
+'flow.sub':{en:'Travellers arriving each hour, against the usual range for that time of day.',zh:'每小時入境人次，與該時段的一般水平比較。'},
+'flow.actual':{en:'Actual arrivals',zh:'實際人次'},'flow.usual':{en:'Usual range',zh:'一般範圍'},
+'flow.anomLeg':{en:'Above usual — check staffing',zh:'高於一般 — 留意人手'},
+'flow.share':{en:"TODAY'S MIX BY CROSSING TYPE",zh:'今日入境比例（按口岸類別）'},
+'flow.air':{en:'Air',zh:'空路'},'flow.land':{en:'Land',zh:'陸路'},'flow.sea':{en:'Sea',zh:'海路'},
+'flow.anom':{en:'+18% above usual',zh:'高於一般 +18%'},
+'flow.arrivals':{en:'Arrivals',zh:'入境人次'},'flow.usualRange':{en:'Usual',zh:'一般範圍'},
+'alerts.title':{en:'Needs your attention',zh:'需要閣下關注'},
+'alerts.sub':{en:'Grouped by area — acknowledge to mark as handled.',zh:'按範疇分組 — 按「確認」標記為已處理。'},
+'alerts.ack':{en:'Acknowledge',zh:'確認處理'},'alerts.acked':{en:'Acknowledged',zh:'已確認'},
+'alerts.resolved':{en:'Resolved',zh:'已解決'},'alerts.undo':{en:'Undo',zh:'復原'},
+'alerts.action':{en:'Recommended action',zh:'建議行動'},
+'alerts.empty':{en:'Nothing needs attention right now.',zh:'目前沒有需要關注的事項。'},
+'alerts.doneLab':{en:'Handled & resolved',zh:'已處理及已解決'},
+'alerts.started':{en:'started',zh:'開始於'},'alerts.new':{en:'NEW',zh:'新增'},
+'toast.ack':{en:'Acknowledged — marked as handled.',zh:'已確認 — 標記為已處理。'},
+'toast.restored':{en:'Restored to the attention list.',zh:'已還原至關注清單。'},
+'toast.resolved':{en:'Resolved: Lok Ma Chau coverage is back above the safety line.',zh:'已解決：落馬洲覆蓋率已回升至安全線以上。'},
+'toast.export':{en:'Executive brief downloaded.',zh:'管理層簡報已下載。'},
+'prom.title':{en:'Service promises kept today',zh:'今日服務承諾達標情況'},
+'prom.sub':{en:"Each bar is today's result. The white tick is the promise. Shorter is better for time; longer is better for percentages.",zh:'每條橫棒代表今日表現，白色刻度代表承諾。時間愈短愈好；百分比愈高愈好。'},
+'prom.ship':{en:'Ship clearance (Free Pratique)',zh:'船舶檢疫放行（無疫通行）'},
+'prom.fever':{en:'Fever case response at airport',zh:'機場發燒個案應變'},
+'prom.permit':{en:'Import permit — oldest pending',zh:'進口許可證 — 最舊待批個案'},
+'prom.cremation':{en:'Cremation permits handled same day',zh:'火葬許可證即日辦妥'},
+'prom.vax':{en:'Vaccination wait at travel centres',zh:'旅遊健康中心接種輪候'},
+'prom.min':{en:'min',zh:'分鐘'},'prom.days':{en:'days',zh:'工作天'},
+'prom.target':{en:'promise',zh:'承諾'},
+'watch.title':{en:'Global outbreak watch',zh:'全球疫情監察'},
+'watch.sub':{en:'From WHO and regional partners — and what each means for Hong Kong.',zh:'來自世衞及區域夥伴 — 以及對香港的影響。'},
+'watch.high':{en:'High',zh:'高'},'watch.mod':{en:'Moderate',zh:'中'},'watch.low':{en:'Low',zh:'低'},
+'watch.upd':{en:'updated',zh:'更新於'},
+'cross.title':{en:'Control-point board',zh:'口岸狀況一覽'},
+'cross.sub':{en:'Live status at the ten busiest crossings. Red rail = act now · amber rail = watch.',zh:'十個最繁忙口岸的實時狀況。紅色邊線＝立即行動；琥珀色邊線＝留意。'},
+'cross.search':{en:'Search control points…',zh:'搜尋口岸…'},
+'cross.all':{en:'All',zh:'全部'},'cross.air':{en:'Air',zh:'空路'},'cross.land':{en:'Land',zh:'陸路'},'cross.sea':{en:'Sea',zh:'海路'},
+'cross.sort':{en:'Sort order',zh:'排序'},
+'cross.sort.pressure':{en:'Sort: pressure first',zh:'排序：壓力優先'},
+'cross.sort.arrivals':{en:'Sort: arrivals',zh:'排序：入境人次'},
+'cross.sort.name':{en:'Sort: name',zh:'排序：名稱'},
+'cross.col.point':{en:'Control point',zh:'管制站'},'cross.col.status':{en:'Status',zh:'狀況'},
+'cross.col.arrivals':{en:'Arrivals today',zh:'今日入境'},'cross.col.coverage':{en:'Screening coverage',zh:'篩查覆蓋率'},
+'cross.col.queue':{en:'Queue',zh:'輪候'},'cross.col.officers':{en:'Officers',zh:'當值人員'},
+'cross.count':{en:'{n} of 10 key control points shown · line = 98% coverage',zh:'顯示 {n}／10 個主要管制站 · 安全線＝98% 覆蓋率'},
+'cross.live':{en:'LIVE',zh:'實時'},'cross.min':{en:'min',zh:'分'},
+'vax.title':{en:'Travel health — this week',zh:'旅遊健康 — 本週'},
+'vax.sub':{en:'Vaccinations given each day, against what the two centres can comfortably deliver.',zh:'兩間中心每日接種劑數，與可應付的舒適容量比較。'},
+'vax.cap':{en:'Daily capacity',zh:'每日容量'},'vax.doses':{en:'doses',zh:'劑'},
+'vax.week':{en:'doses this week',zh:'本週接種劑數'},'vax.wait':{en:'avg wait today',zh:'今日平均輪候'},
+'vax.certs':{en:'certificates issued',zh:'已簽發證明書'},'vax.today':{en:'Today',zh:'今日'},
+'perm.title':{en:'Permits & certificates — this week',zh:'許可證及證明書 — 本週'},
+'perm.sub':{en:'What the public and trade asked us for, and how fast we answered.',zh:'市民及業界的申請類別，以及我們的處理速度。'},
+'perm.bio':{en:'Biological materials',zh:'生物物料'},'perm.agents':{en:'Infectious agents',zh:'病原體'},
+'perm.remains':{en:'Human remains import',zh:'遺體進口'},'perm.cremation':{en:'Cremation permits',zh:'火葬許可證'},
+'perm.onTime':{en:'on time',zh:'準時'},'perm.pending':{en:'pending now',zh:'現正待批'},
+'perm.oldest':{en:'oldest pending',zh:'最舊待批'},'perm.promise':{en:'promise ≥ 95% on time',zh:'承諾 ≥ 95% 準時'},
+'perm.days':{en:'days',zh:'天'},
+'ref.title':{en:'Executive reference & design notes',zh:'管理層參考及設計說明'},
+'ref.sub':{en:'What this division does, the storyline of this dashboard, and how to read it — kept in plain language.',zh:'本科的職責、本儀表板的敘事主線，以及閱讀方法 — 全部以淺白語言表達。'},
+'ref.legal':{en:'<b>Our one-sentence mission:</b> stop infectious diseases from crossing our borders, in or out — by sea, land and air. This is a legal duty under the Prevention and Control of Disease Ordinance (Cap. 599) and the International Health Regulations.',zh:'<b>一句話使命：</b>防止傳染病經海、陸、空口岸傳入或傳出香港。這是《預防及控制疾病條例》（第599章）及《國際衞生條例》下的法定責任。'},
+'ref.story.title':{en:'The storyline — five questions, top to bottom',zh:'敘事主線 — 由上而下回答五個問題'},
+'ref.read.title':{en:'Read it in 30 seconds',zh:'30秒閱讀法'},
+'ref.prin.title':{en:'Design rules applied',zh:'採用的設計原則'},
+'ref.env.title':{en:'Viewing environments & refresh',zh:'使用場景與更新頻率'},
+'ref.env.body':{en:'Desktop review is the default: full detail, drill-down drawers, filters and export. Press “Wall view” (or W) for a NOC wall screen: dark theme, massive type, zero interaction — only status, the one-minute brief, the six shields, pressure and alerts remain. Refresh is selectable (5/15/30/60s; default 15s) with a visible countdown, and Pause freezes the picture for discussion.',zh:'預設為桌面檢視：完整細節、詳情抽屜、篩選及匯出。按「大屏模式」（或 W 鍵）切換至指揮中心大屏：深色主題、特大字體、零互動 — 只保留狀況、一分鐘簡報、六大防線、壓力圖及待辦事項。更新頻率可選（5/15/30/60秒；預設15秒），附可見倒數；按「暫停」可定格畫面以便討論。'},
+'ref.mand.title':{en:'Our mandate in plain language — and where you see it above',zh:'職責淺白摘要 — 及對應的儀表板位置'},
+'ref.mand.h1':{en:'Area',zh:'範疇'},'ref.mand.h2':{en:'What we do (simply)',zh:'我們做甚麼（淺白版）'},'ref.mand.h3':{en:'Where you see it',zh:'對應位置'},
+'ref.wire.title':{en:'Layout blueprint',zh:'版面藍圖'},
+'drawer.trend':{en:'14-day trend',zh:'14天趨勢'},'drawer.subs':{en:'Key service measures',zh:'主要服務指標'},
+'drawer.related':{en:'Related alerts',zh:'相關事項'},'drawer.good':{en:'What good looks like',zh:'達標的定義'},
+'drawer.close':{en:'Close',zh:'關閉'},'drawer.none':{en:'No related alerts — this area is quiet.',zh:'沒有相關事項 — 此範疇平靜。'},
+'foot.note':{en:'Simulated demonstration data for design reference — not official Department of Health statistics.',zh:'模擬示範數據，僅供設計參考 — 並非衞生署官方統計。'},
+'foot.keys':{en:'Shortcuts:',zh:'快捷鍵：'},'foot.wall':{en:'wall view',zh:'大屏模式'},'foot.esc':{en:'close / exit',zh:'關閉／離開'},
+'foot.credit':{en:'Designed for senior management · Port Health Division',zh:'為管理層而設 · 港口衞生科'},
+'app.title':{en:'Port Health Division — Executive Command Dashboard',zh:'港口衞生科 — 管理層指揮中心'},
+};
+const t=k=>DICT[k]?DICT[k][S.lang]:k;
+const tf=(k,o)=>t(k).replace(/\{(\w+)\}/g,(m,p)=>o[p]!==undefined?o[p]:m);
+
+/* ================================================================
+   SEEDED DATA
+================================================================ */
+const flow=(()=>{ // 24h rolling arrivals vs usual band
+  const base=[];for(let h=0;h<24;h++){const hour=(nowHKT().getHours()-23+h+48)%24;
+    let v=3800+9800*Math.exp(-Math.pow(hour-9.5,2)/7)+12500*Math.exp(-Math.pow(hour-18,2)/9)+3000*Math.exp(-Math.pow(hour-13,2)/14);
+    base.push(v)}
+  const exp=base.map(v=>({lo:v*0.88,hi:v*1.12}));
+  const act=base.map((v,i)=>v*rr(0.94,1.06));
+  act[18]=exp[18].hi*1.18; // the anomaly: recent peak ran hot
+  return {exp,act,labels:base.map((_,i)=>{const d=new Date(Date.now()-(23-i)*3600000);return timeStr(d).slice(0,2)+':00'})};
+})();
+
+const K={
+  screening:{hue:'var(--sky)',icon:'thermo',value:294200,delta:6.4,coverage:97.9,
+    spark:[98.8,98.7,98.9,98.6,98.8,98.7,98.5,98.6,98.4,98.5,98.3,98.2,98.0,97.9],band:[98,100],
+    trend:genWalk(14,98.8,97.6,99.6,.3)},
+  sea:{hue:'var(--teal)',icon:'anchor',value:142,delta:3,clear:22,
+    spark:genWalk(14,23,16,29,2.4),band:[15,30],trend:genWalk(14,23,16,30,2.5)},
+  air:{hue:'var(--cyan)',icon:'plane',value:538,delta:-2.1,fever:4,
+    spark:[3,4,2,5,3,6,4,3,5,2,4,3,5,4],band:[2,6],trend:genWalk(14,4,1,7,1.2)},
+  travel:{hue:'var(--orchid)',icon:'syringe',value:268,delta:12,wait:14,certs:96,
+    spark:genWalk(14,14,8,19,2),band:[8,20],trend:genWalk(14,240,170,300,25)},
+  permits:{hue:'var(--gold)',icon:'stamp',value:183,delta:9,onTime:97.4,pending:21,oldest:2.1,
+    spark:[96.2,97.1,96.8,97.5,98.0,97.2,97.6,97.9,97.3,97.8,97.5,97.7,97.2,97.4],band:[95,100],
+    trend:genWalk(14,175,140,205,14)},
+  intel:{hue:'var(--violet)',icon:'globe',value:12,delta:2,
+    spark:[1,0,2,1,3,0,2,1,1,2,0,1,2,2],band:[0,3],trend:genWalk(14,10,7,14,1.4)},
+};
+
+const crossings=[
+ {id:'hkia',name:{en:'Hong Kong Int’l Airport',zh:'香港國際機場'},mode:'air',arr:38400,cov:99.7,q:6,off:96,qh:genWalk(14,6,3,10,1.4)},
+ {id:'lowu',name:{en:'Lo Wu',zh:'羅湖'},mode:'land',arr:62100,cov:99.1,q:12,off:74,qh:genWalk(14,12,7,17,1.8)},
+ {id:'lmc',name:{en:'Lok Ma Chau',zh:'落馬洲'},mode:'land',arr:48700,cov:91.2,q:28,off:66,qh:genWalk(14,15,9,29,3)},
+ {id:'spur',name:{en:'Lok Ma Chau Spur Line',zh:'落馬洲支線'},mode:'land',arr:21400,cov:98.6,q:14,off:38,qh:genWalk(14,13,8,18,1.6)},
+ {id:'szbay',name:{en:'Shenzhen Bay',zh:'深圳灣'},mode:'land',arr:33900,cov:98.9,q:22,off:58,qh:genWalk(14,19,13,25,2)},
+ {id:'hzmb',name:{en:'HK–Zhuhai–Macau Bridge',zh:'港珠澳大橋'},mode:'land',arr:29800,cov:99.3,q:9,off:52,qh:genWalk(14,9,5,13,1.4)},
+ {id:'hyw',name:{en:'Heung Yuen Wai',zh:'香園圍'},mode:'land',arr:18200,cov:99.0,q:11,off:34,qh:genWalk(14,11,6,15,1.5)},
+ {id:'wkl',name:{en:'West Kowloon (HSR)',zh:'高鐵西九龍'},mode:'land',arr:24600,cov:99.4,q:8,off:44,qh:genWalk(14,8,4,12,1.3)},
+ {id:'ferry',name:{en:'HK–Macau Ferry Terminal',zh:'港澳客運碼頭'},mode:'sea',arr:12900,cov:99.2,q:10,off:30,qh:genWalk(14,10,5,14,1.5)},
+ {id:'cruise',name:{en:'Kai Tak Cruise Terminal',zh:'啟德郵輪碼頭'},mode:'sea',arr:4200,cov:99.8,q:5,off:22,qh:genWalk(14,5,2,8,1.1)},
+];
+crossings.forEach(c=>c.qh[c.qh.length-1]=c.q);
+
+let alerts=[
+ {id:'a-lmc',sev:'crit',domain:'screening',ack:false,resolved:false,fresh:false,ts:minsAgo(38),
+  title:{en:'Lok Ma Chau: health screening coverage dropped to 91%',zh:'落馬洲：健康篩查覆蓋率跌至91%'},
+  detail:{en:'Two arrival lanes went unscreened during the evening rush. Queue is now about 28 minutes.',zh:'傍晚高峰期間兩條入境通道未能進行篩查，輪候時間現約28分鐘。'},
+  signals:[{sev:'crit',en:'Coverage 91.2% — safety line is 98%',zh:'覆蓋率91.2% — 安全線為98%'},
+           {sev:'watch',en:'Queue 28 min — usually under 15',zh:'輪候28分鐘 — 一般少於15分鐘'}],
+  action:{en:'Redeploy 6 officers from Lo Wu until 21:00 — awaiting duty manager approval.',zh:'建議由羅湖調派6名人員支援至21:00 — 正等候當值經理批核。'}},
+ {id:'a-vector',sev:'watch',domain:'air',ack:false,resolved:false,fresh:false,ts:minsAgo(95),
+  title:{en:'Mosquitoes found on 2 arriving flights (SE Asia)',zh:'兩班抵港航班（東南亞）發現蚊蟲'},
+  detail:{en:'Aircraft disinsection completed. No crew or passenger illness reported.',zh:'已完成飛機滅蟲處理，未有機組人員或乘客不適報告。'},
+  signals:[{sev:'watch',en:'2 flights affected — both now cleared',zh:'兩班航班受影響 — 均已放行'}],
+  action:{en:'Routine follow-up inspection scheduled for tomorrow morning.',zh:'已安排明早例行跟進巡查。'}},
+ {id:'a-stock',sev:'watch',domain:'travel',ack:false,resolved:false,fresh:false,ts:minsAgo(160),
+  title:{en:'Yellow-fever vaccine stock low at Kowloon centre',zh:'九龍中心黃熱病疫苗存量偏低'},
+  detail:{en:'140 doses left — below the two-week buffer of 200.',zh:'餘下140劑 — 低於兩週緩衝存量200劑。'},
+  signals:[{sev:'watch',en:'140 doses · buffer 200',zh:'140劑 · 緩衝存量200劑'}],
+  action:{en:'Replenishment order drafted — approval needed today.',zh:'補貨訂單已擬妥 — 需於今日批核。'}},
+ {id:'a-cholera',sev:'info',domain:'intel',ack:false,resolved:false,fresh:false,ts:minsAgo(210),
+  title:{en:'WHO refreshed the multi-country cholera advisory',zh:'世衞更新多國霍亂通報'},
+  detail:{en:'No change to Hong Kong entry requirements. Travel advice has been updated.',zh:'香港入境要求維持不變，旅遊健康建議已更新。'},
+  signals:[{sev:'info',en:'Travel advice updated · no entry changes',zh:'旅遊建議已更新 · 入境要求不變'}],
+  action:{en:'For noting — no decision required.',zh:'僅供知悉 — 無需決策。'}},
+];
+
+const watchItems=[
+ {icon:'bug',risk:'high',upd:42,name:{en:'Mpox (clade Ib)',zh:'猴痘（Ib分支）'},region:{en:'Central & East Africa',zh:'中非及東非'},
+  note:{en:'Enhanced advisory for travellers from affected areas; no entry restrictions.',zh:'已向來自受影響地區旅客發出加強建議；不設入境限制。'}},
+ {icon:'wave',risk:'mod',upd:210,name:{en:'Cholera — multi-country',zh:'霍亂 — 多國'},region:{en:'Africa & Eastern Mediterranean',zh:'非洲及東地中海地區'},
+  note:{en:'Food and water hygiene advice refreshed at travel centres.',zh:'旅遊健康中心已更新飲食及食水衞生建議。'}},
+ {icon:'thermo',risk:'mod',upd:380,name:{en:'Measles resurgence',zh:'麻疹回升'},region:{en:'Nearby region',zh:'鄰近地區'},
+  note:{en:'Check vaccination status before travel; centres offering catch-up doses.',zh:'外遊前宜確認接種紀錄；中心提供補種服務。'}},
+ {icon:'plane',risk:'low',upd:520,name:{en:'Avian influenza A(H5N1)',zh:'禽流感 A(H5N1)'},region:{en:'Sporadic human cases',zh:'零星人類個案'},
+  note:{en:'Monitoring with WHO; no impact on borders or flights.',zh:'與世衞共同監察；對口岸及航班無影響。'}},
+];
+
+const vax={days:[198,214,232,205,176,241,268],cap:300};
+const permits=[
+ {key:'bio',icon:'stamp',n:64,onTime:98,hue:'var(--gold)'},
+ {key:'agents',icon:'bug',n:18,onTime:100,hue:'var(--orchid)'},
+ {key:'remains',icon:'ship',n:12,onTime:100,hue:'var(--sky)'},
+ {key:'cremation',icon:'stamp',n:89,onTime:96,hue:'var(--teal)'},
+];
+const promises=[
+ {key:'prom.ship',get:()=>K.sea.clear,target:30,max:60,dir:'low',unit:'prom.min'},
+ {key:'prom.fever',get:()=>11,target:15,max:30,dir:'low',unit:'prom.min'},
+ {key:'prom.permit',get:()=>K.permits.oldest,target:3,max:5,dir:'low',unit:'prom.days',dec:1},
+ {key:'prom.cremation',get:()=>99.1,target:98,max:100,dir:'high',unit:'%',dec:1},
+ {key:'prom.vax',get:()=>K.travel.wait,target:20,max:40,dir:'low',unit:'prom.min'},
+];
+
+/* Drawer configs — plain-language drill-down for each shield */
+const DRAWERS={
+ screening:{trend:'trend',band:[98,100],unit:'%',
+  desc:{en:'Every person arriving by air, land or sea is temperature-screened and health-checked. This is the front door of Hong Kong’s disease defence.',zh:'每位經空、陸、海路抵港的人士均接受體溫篩查及健康檢查。這是香港防疫的第一道大門。'},
+  good:{en:'At least 98% of arrivals screened at every crossing, queues under 15 minutes.',zh:'每個口岸至少98%入境旅客完成篩查，輪候少於15分鐘。'},
+  subs:[{lab:{en:'Overall coverage',zh:'整體覆蓋率'},get:()=>K.screening.coverage,target:98,max:100,dir:'high',unit:'%',dec:1},
+        {lab:{en:'Average queue',zh:'平均輪候'},get:()=>13,target:15,max:30,dir:'low',unit:'prom.min'},
+        {lab:{en:'Fever referrals today',zh:'今日發燒轉介'},get:()=>9,target:12,max:20,dir:'low',unit:''}]},
+ sea:{band:[15,30],unit:'prom.min',
+  desc:{en:'Ships get quarantine clearance (“Free Pratique”) before cargo and crew come ashore. We also inspect ship hygiene, watch for disease-carrying pests, and give radio medical advice at sea.',zh:'船舶須先取得檢疫放行（「無疫通行」）才可上落貨及登岸。我們亦巡查船舶衞生、監察病媒，並透過無線電提供海上醫療建議。'},
+  good:{en:'Clearance within 30 minutes; every scheduled sanitation inspection done.',zh:'30分鐘內完成放行；按計劃完成所有衞生巡查。'},
+  subs:[{lab:{en:'Avg clearance time',zh:'平均放行時間'},get:()=>K.sea.clear,target:30,max:60,dir:'low',unit:'prom.min'},
+        {lab:{en:'Sanitation inspections (of 20 planned)',zh:'衞生巡查（計劃20次）'},get:()=>17,target:20,max:20,dir:'high',unit:''},
+        {lab:{en:'Radio medical advices today',zh:'今日無線電醫療建議'},get:()=>3,target:6,max:10,dir:'low',unit:''}]},
+ air:{band:[2,6],unit:'',
+  desc:{en:'We check arriving aircraft for mosquitoes, keep inflight catering and airport hygiene under surveillance, and run a 24-hour emergency medical team for suspected cases.',zh:'我們檢查抵港航班的蚊蟲、監察機上膳食及機場衞生，並設有24小時緊急醫療隊處理懷疑個案。'},
+  good:{en:'Every flight vector-checked; fever cases seen within 15 minutes.',zh:'每班航班完成病媒檢查；發燒個案15分鐘內獲處理。'},
+  subs:[{lab:{en:'Flights vector-checked',zh:'航班病媒檢查率'},get:()=>100,target:98,max:100,dir:'high',unit:'%'},
+        {lab:{en:'Catering audits (of 12 planned)',zh:'膳食衞生審核（計劃12次）'},get:()=>12,target:12,max:12,dir:'high',unit:''},
+        {lab:{en:'Fever response time',zh:'發燒個案應變時間'},get:()=>11,target:15,max:30,dir:'low',unit:'prom.min'}]},
+ travel:{band:[170,300],unit:'',
+  desc:{en:'Two Travel Health Centres prepare people before they go: risk advice, vaccinations, anti-malarial medicine and international vaccination certificates.',zh:'兩間旅遊健康中心為外遊人士做好準備：風險評估、疫苗接種、抗瘧疾藥物及國際預防接種證明書。'},
+  good:{en:'Waits under 20 minutes; vaccine stocks above the two-week buffer.',zh:'輪候少於20分鐘；疫苗存量高於兩週緩衝水平。'},
+  subs:[{lab:{en:'Average wait',zh:'平均輪候'},get:()=>K.travel.wait,target:20,max:40,dir:'low',unit:'prom.min'},
+        {lab:{en:'Capacity used today',zh:'今日容量使用率'},get:()=>89,target:90,max:110,dir:'low',unit:'%'},
+        {lab:{en:'Certificates issued (plan 90)',zh:'證明書簽發（計劃90張）'},get:()=>K.travel.certs,target:90,max:110,dir:'high',unit:''}]},
+ permits:{band:[95,100],unit:'%',
+  desc:{en:'Controlled permissions keep risky things safe: importing human remains, infectious agents and biological materials, plus cremation permits for families.',zh:'透過審批制度確保高風險事項安全進行：遺體、病原體及生物物料進口許可，以及為家屬辦理火葬許可證。'},
+  good:{en:'95%+ issued on time; nothing waits longer than 3 working days.',zh:'95%以上準時簽發；沒有個案輪候超過3個工作天。'},
+  subs:[{lab:{en:'On-time rate',zh:'準時率'},get:()=>K.permits.onTime,target:95,max:100,dir:'high',unit:'%',dec:1},
+        {lab:{en:'Oldest pending case',zh:'最舊待批個案'},get:()=>K.permits.oldest,target:3,max:5,dir:'low',unit:'prom.days',dec:1},
+        {lab:{en:'Cases pending',zh:'待批個案'},get:()=>K.permits.pending,target:25,max:40,dir:'low',unit:''}]},
+ intel:{band:[0,3],unit:'',
+  desc:{en:'We trade outbreak intelligence with WHO and neighbouring health authorities, so Hong Kong hears about threats before they arrive at the border.',zh:'我們與世衞及鄰近衞生當局互通疫情情報，讓香港在威脅抵達口岸前已有所準備。'},
+  good:{en:'Every advisory answered the same day; travel advice updated within hours.',zh:'每項通報即日回覆；旅遊建議數小時內更新。'},
+  subs:[{lab:{en:'Advisories answered same day',zh:'通報即日回覆率'},get:()=>100,target:95,max:100,dir:'high',unit:'%'},
+        {lab:{en:'Liaison exchanges today (plan 4)',zh:'今日情報交流（計劃4次）'},get:()=>5,target:4,max:8,dir:'high',unit:''},
+        {lab:{en:'Outbreaks on watch',zh:'監察中疫情'},get:()=>K.intel.value,target:15,max:20,dir:'low',unit:''}]},
+};
+const KPI_META={
+ screening:{name:'kpi.screening',sub:'kpi.screening.sub',unit:'kpi.travellers'},
+ sea:{name:'kpi.sea',sub:'kpi.sea.sub',unit:'kpi.vesselsCleared'},
+ air:{name:'kpi.air',sub:'kpi.air.sub',unit:'kpi.flights'},
+ travel:{name:'kpi.travel',sub:'kpi.travel.sub',unit:'kpi.vaccinated'},
+ permits:{name:'kpi.permits',sub:'kpi.permits.sub',unit:'kpi.issuedWeek'},
+ intel:{name:'kpi.intel',sub:'kpi.intel.sub',unit:'kpi.watchItems'},
+};
+
+/* ================================================================
+   SVG BUILDERS — sparklines with baseline bands, bullets, charts
+================================================================ */
+function sparkSVG(data,band,hue,w=160,h=42){
+  const lo=Math.min(...data,band?band[0]:Infinity), hi=Math.max(...data,band?band[1]:-Infinity);
+  const pad=(hi-lo)*0.15||1, mn=lo-pad, mx=hi+pad;
+  const X=i=>i*(w/(data.length-1)), Y=v=>h-((v-mn)/(mx-mn))*h;
+  let bandRect='';
+  if(band){const y1=Y(band[1]),y2=Y(band[0]);
+    bandRect=`<rect x="0" y="${y1.toFixed(1)}" width="${w}" height="${Math.max(2,y2-y1).toFixed(1)}" fill="rgba(148,190,215,.13)" rx="2"/>
+    <line x1="0" x2="${w}" y1="${((y1+y2)/2).toFixed(1)}" y2="${((y1+y2)/2).toFixed(1)}" stroke="rgba(148,190,215,.35)" stroke-width="1" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>`}
+  const pts=data.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  const last=data[data.length-1], lx=X(data.length-1), ly=Y(last);
+  const out=band&&(last<band[0]||last>band[1]);
+  let anoms='';
+  if(band)data.forEach((v,i)=>{if(v<band[0]||v>band[1])anoms+=`<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="2.6" fill="var(--red)" class="${i===data.length-1?'anom-dot':''}"/>`});
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="height:${h}px" aria-hidden="true">
+    ${bandRect}<polyline points="${pts}" fill="none" stroke="${hue}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    ${anoms}<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="3" fill="${out?'var(--red)':hue}" ${out?'class="anom-dot"':''}/></svg>`;
+}
+function bulletHTML(value,target,max,dir,dec=0,mini=false){
+  let st;
+  if(dir==='low')st=value<=target?'ok':value<=target*1.25?'warn':'crit';
+  else st=value>=target?'ok':value>=target*0.97?'warn':'crit';
+  const vp=clamp(value/max*100,0,100), tp=clamp(target/max*100,0,100);
+  let zones;
+  if(dir==='low')zones=`<span class="bullet-zone" style="left:0;width:${tp}%;background:rgba(62,213,152,.09)"></span>
+    <span class="bullet-zone" style="left:${tp}%;width:${clamp(tp*1.25,0,100)-tp}%;background:rgba(255,178,36,.09)"></span>
+    <span class="bullet-zone" style="left:${clamp(tp*1.25,0,100)}%;right:0;background:rgba(255,92,92,.08)"></span>`;
+  else zones=`<span class="bullet-zone" style="left:0;width:${clamp(target*0.97,0,100)}%;background:rgba(255,92,92,.08)"></span>
+    <span class="bullet-zone" style="left:${clamp(target*0.97,0,100)}%;width:${tp-clamp(target*0.97,0,100)}%;background:rgba(255,178,36,.09)"></span>
+    <span class="bullet-zone" style="left:${tp}%;right:0;background:rgba(62,213,152,.09)"></span>`;
+  const vv=dec?value.toFixed(dec):fmt(value);
+  if(mini)return `<div class="bullet-mini" style="min-width:70px"><div class="bullet-track">${zones}<span class="bullet-val ${st}" style="width:${vp}%"></span><span class="bullet-tick" style="left:${tp}%"></span></div></div>`;
+  return {html:`<div class="bullet-track">${zones}<span class="bullet-val ${st}" style="width:${vp}%"></span><span class="bullet-tick" style="left:${tp}%"></span></div>`,st,vv};
+}
+function statusChip(st,small=false){
+  const map={ok:['check','stt.good'],warn:['diamond','stt.warn'],crit:['alert','stt.bad'],info:['info','stt.info']};
+  const [i,k]=map[st];return `<span class="chip ${st==='crit'?'crit':st==='warn'?'warn':st==='info'?'info':'ok'}">${ic(i)}${t(k)}</span>`;
+}
+
+/* ================================================================
+   RENDER — command strip
+================================================================ */
+function overall(){
+  const act=alerts.filter(a=>!a.resolved);
+  const crit=act.filter(a=>a.sev==='crit'&&!a.ack);
+  const handling=act.filter(a=>a.sev==='crit'&&a.ack);
+  const watch=act.filter(a=>a.sev==='watch');
+  if(crit.length)return{st:'action',key:'st.action',icon:'alert',cls:'st-action',crit,watch,info:act.filter(a=>a.sev==='info')};
+  if(handling.length)return{st:'handling',key:'st.handling',icon:'clock',cls:'st-handling',crit:[],watch,info:act.filter(a=>a.sev==='info')};
+  if(watch.length)return{st:'watch',key:'st.watch',icon:'diamond',cls:'st-watch',crit:[],watch,info:act.filter(a=>a.sev==='info')};
+  return{st:'good',key:'st.good',icon:'shield',cls:'st-good',crit:[],watch:[],info:act.filter(a=>a.sev==='info')};
+}
+function renderStatus(){
+  const o=overall();const el=$('statusCard');
+  el.className=el.className.replace(/st-\w+/g,'').trim()+' '+o.cls;
+  const counts=[];
+  if(o.crit.length)counts.push(`<span style="color:var(--red)">${ic('alert','sm')} ${o.crit.length} ${t('cnt.crit')}</span>`);
+  if(o.watch.length)counts.push(`<span style="color:var(--amber)">${ic('diamond','sm')} ${o.watch.length} ${t('cnt.watch')}</span>`);
+  if(o.info.length)counts.push(`<span style="color:var(--sky)">${ic('info','sm')} ${o.info.length} ${t('cnt.info')}</span>`);
+  el.innerHTML=`<div class="beacon">${ic(o.icon)}</div>
+   <div style="min-width:0">
+     <div class="status-word">${t(o.key)}</div>
+     <div style="font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5">${t(o.key+'.sub')}</div>
+     <div class="status-meta">${counts.join('')}<span>${ic('clock','sm')} ${t('status.since')} ${alerts[0].resolved?minsAgo(4):alerts[0].ts}</span></div>
+     <div class="status-meta" style="margin-top:6px"><span style="color:var(--faint);font-size:11px">${ic('shield','sm')} ${t('status.protected')}</span></div>
+     ${(o.st==='action')?`<div class="status-cta"><button class="btn red" data-action="review">${ic('arrow','sm')} ${t('status.viewBtn')}</button></div>`:''}
+   </div>`;
+}
+function renderTicker(){
+  const c=alerts.find(a=>a.sev==='crit'&&!a.ack&&!a.resolved);
+  const tk=$('ticker');
+  if(c&&!S.wallHideTicker){tk.classList.add('show');
+    $('tickerText').innerHTML=`<b>${S.lang==='zh'?'行動':'ACTION'}:</b> ${bi(c.title)} — ${bi(c.action)}`;}
+  else tk.classList.remove('show');
+}
+function renderNarrative(){
+  const lmc=crossings.find(c=>c.id==='lmc');
+  const rec=lmc.cov>=98;
+  const items=[];
+  if(!rec){
+    const acked=alerts.find(a=>a.id==='a-lmc').ack;
+    items.push({cls:'hot',icon:'alert',html:S.lang==='zh'
+      ?`<b>陸路口岸需要留意：</b>落馬洲篩查覆蓋率跌至 <b>${pc(lmc.cov)}</b>（安全線98%）。${acked?'調派人手<b>已批核</b>，覆蓋率正在回升。':'建議調派6名人員支援 — <b>等候閣下批核</b>。'}`
+      :`<b>Land crossings need attention:</b> screening at Lok Ma Chau dipped to <b>${pc(lmc.cov)}</b> (safety line 98%). ${acked?'Redeployment <b>approved</b> — coverage is recovering.':'A 6-officer redeployment is proposed — <b>awaiting your approval</b>.'}`});
+  }else{
+    items.push({cls:'calm',icon:'check',html:S.lang==='zh'
+      ?`<b>落馬洲已恢復：</b>篩查覆蓋率回升至 <b>${pc(lmc.cov)}</b>，重越98%安全線。整體覆蓋率 ${pc(K.screening.coverage)}。`
+      :`<b>Lok Ma Chau has recovered:</b> coverage is back to <b>${pc(lmc.cov)}</b>, above the 98% safety line. Overall coverage ${pc(K.screening.coverage)}.`});
+  }
+  items.push({cls:'calm',icon:'anchor',html:S.lang==='zh'
+    ?`船舶平均 <b>${Math.round(K.sea.clear)}分鐘</b> 完成檢疫放行 — 比30分鐘承諾<b>快${Math.round(30-K.sea.clear)}分鐘</b>。`
+    :`Ships are cleared in <b>${Math.round(K.sea.clear)} minutes</b> on average — <b>${Math.round(30-K.sea.clear)} minutes faster</b> than our 30-minute promise.`});
+  items.push({cls:'note',icon:'globe',html:S.lang==='zh'
+    ?`過去24小時收到 <b>2項</b> 海外疫情新通報；<b>無需更改</b>入境要求。`
+    :`<b>2 new</b> overseas outbreak advisories in 24 hours; <b>no changes</b> to entry requirements.`});
+  $('narrativeList').innerHTML=items.map(i=>`<li class="${i.cls}">${ic(i.icon,'sm')}<span>${i.html}</span></li>`).join('');
+  const need=alerts.filter(a=>a.sev==='crit'&&!a.ack&&!a.resolved).length;
+  $('briefChip').innerHTML=need
+    ?`<span class="brief-chip need">${ic('alert','sm')} ${tf('brief.need',{n:need})}</span>`
+    :`<span class="brief-chip none">${ic('check','sm')} ${t('brief.none')}</span>`;
+}
+function renderMini(){
+  const off=crossings.reduce((s,c)=>s+c.off,0);
+  $('miniGrid').innerHTML=`
+   <div class="mini"><div class="lab">${ic('users')} ${t('mini.officers')}</div><div class="val">${fmt(off)}</div><div class="ctx">${t('mini.across')}</div></div>
+   <div class="mini"><div class="lab">${ic('shield')} ${t('mini.bcp')}</div><div class="val">14<small> / 14</small></div><div class="ctx">${t('mini.allOpen')}</div></div>
+   <div class="mini"><div class="lab">${ic('anchor')} ${t('mini.vessels')}</div><div class="val">6</div><div class="ctx">${t('mini.vessels.ctx')}</div></div>
+   <div class="mini ready"><div class="lab">${ic('thermo')} ${t('mini.medteam')}</div><div class="val">${ic('check','sm')} ${t('mini.ready')}</div></div>`;
+}
+
+/* ================================================================
+   RENDER — six shields (KPI cards)
+================================================================ */
+function kpiStatus(id){
+  if(id==='screening')return K.screening.coverage>=98?'ok':K.screening.coverage>=96?'crit':'crit';
+  if(id==='sea')return K.sea.clear<=30?'ok':'warn';
+  if(id==='air')return K.air.fever<=6?'ok':'warn';
+  if(id==='travel'){const stock=alerts.find(a=>a.id==='a-stock');return (stock&&!stock.ack&&!stock.resolved)?'warn':'ok'}
+  if(id==='permits')return K.permits.onTime>=95?'ok':'warn';
+  return 'info';
+}
+function kpiCtx(id){
+  if(id==='screening')return `${t('kpi.coverage')} <b>${pc(K.screening.coverage)}</b> · ${t('kpi.safeLine')} ≥98%`;
+  if(id==='sea')return `${t('kpi.avgClear')} <b>${Math.round(K.sea.clear)} ${t('kpi.min')}</b> · ${t('kpi.promise')} ≤30`;
+  if(id==='air')return `${t('kpi.fever')} <b>${K.air.fever}</b> ${t('kpi.today')} · ${t('kpi.usual')} 2–6`;
+  if(id==='travel')return `${t('kpi.wait')} <b>${Math.round(K.travel.wait)} ${t('kpi.min')}</b> · ${t('kpi.promise')} ≤20`;
+  if(id==='permits')return `${t('kpi.onTime')} <b>${pc(K.permits.onTime)}</b> · ${t('kpi.promise')} ≥95%`;
+  return `${t('kpi.newAdv')} <b>2</b> · ${t('kpi.usual')} 0–3`;
+}
+function renderKPIs(){
+  $('kpiGrid').innerHTML=Object.keys(K).map((id,idx)=>{
+    const k=K[id],m=KPI_META[id],st=kpiStatus(id);
+    const dUp=k.delta>=0;
+    const dTxt=id==='sea'||id==='permits'||id==='intel'?`${dUp?'+':''}${Math.round(k.delta)}`:`${dUp?'+':''}${k.delta.toFixed(1)}%`;
+    const vs=(id==='permits')?t('kpi.vsLweek'):t('kpi.vsYday');
+    return `<div class="card kpi reveal in ${st==='crit'?'k-bad':''}" style="--hair:${k.hue};--d:${.05+idx*.05}s" role="button" tabindex="0" data-action="kpi" data-id="${id}" aria-label="${t(m.name)} — ${t('kpi.details')}">
+      <div class="kpi-top"><div class="kpi-ic">${ic(k.icon)}</div>
+        <div><div class="kpi-name">${t(m.name)}</div><div class="kpi-sub">${t(m.sub)}</div></div></div>
+      <div class="kpi-num">${fmt(k.value)}</div>
+      <div class="kpi-unit">${t(m.unit)}</div>
+      <span class="kpi-delta">${ic(dUp?'up':'down')} ${dTxt} · ${vs}</span>
+      <div class="kpi-spark">${sparkSVG(k.spark,k.band,k.hue)}</div>
+      <div class="kpi-ctx">${kpiCtx(id)}</div>
+      <div class="kpi-foot">${statusChip(st)}<span class="kpi-more">${t('kpi.details')} ${ic('chev','sm')}</span></div>
+    </div>`;
+  }).join('');
+}
+
+/* ================================================================
+   RENDER — flow chart, mode share
+================================================================ */
+function renderFlow(){
+  const W=760,H=S.wall?230:250,P={l:44,r:14,t:14,b:24};
+  const n=flow.act.length;
+  const all=[...flow.act,...flow.exp.map(e=>e.hi)];
+  const mx=Math.max(...all)*1.08,mn=0;
+  const X=i=>P.l+i*(W-P.l-P.r)/(n-1), Y=v=>P.t+(H-P.t-P.b)*(1-(v-mn)/(mx-mn));
+  const hiPts=flow.exp.map((e,i)=>`${X(i).toFixed(1)},${Y(e.hi).toFixed(1)}`);
+  const loPts=flow.exp.map((e,i)=>`${X(i).toFixed(1)},${Y(e.lo).toFixed(1)}`).reverse();
+  const actPts=flow.act.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  const area=`M${X(0)},${Y(flow.act[0])} `+flow.act.map((v,i)=>`L${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ')+` L${X(n-1)},${H-P.b} L${X(0)},${H-P.b} Z`;
+  let grid='';for(let g=1;g<=3;g++){const v=mx*g/4,y=Y(v);
+    grid+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(148,190,215,.1)" stroke-dasharray="2 5"/>
+    <text x="${P.l-7}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="Space Grotesk">${Math.round(v/1000)}k</text>`}
+  let xl='';for(let i=0;i<n;i+=4)xl+=`<text x="${X(i).toFixed(1)}" y="${H-7}" text-anchor="middle" font-size="10" fill="var(--faint)" font-family="Space Grotesk">${flow.labels[i]}</text>`;
+  let anoms='';flow.act.forEach((v,i)=>{if(v>flow.exp[i].hi){
+    anoms+=`<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="4.5" fill="var(--red)" class="anom-dot"/>
+    <circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="9" fill="none" stroke="rgba(255,92,92,.5)" stroke-width="1.5" class="anom-dot"/>
+    <text x="${(X(i)-10).toFixed(1)}" y="${(Y(v)-14).toFixed(1)}" text-anchor="end" font-size="11" font-weight="700" fill="var(--red)" font-family="Space Grotesk">${t('flow.anom')}</text>`}});
+  $('flowWrap').innerHTML=`<svg id="flowSvg" data-chart="flow" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px;cursor:crosshair">
+    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(53,200,232,.28)"/><stop offset="1" stop-color="rgba(53,200,232,0)"/></linearGradient></defs>
+    ${grid}${xl}
+    <polygon points="${hiPts.join(' ')} ${loPts.join(' ')}" fill="rgba(148,190,215,.14)" stroke="rgba(148,190,215,.3)" stroke-width="1" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>
+    <path d="${area}" fill="url(#ag)"/>
+    <polyline points="${actPts}" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    ${anoms}
+    <line id="flowCursor" x1="0" x2="0" y1="${P.t}" y2="${H-P.b}" stroke="rgba(53,200,232,.6)" stroke-width="1" opacity="0"/>
+  </svg>`;
+  const tot=crossings.reduce((s,c)=>s+c.arr,0);
+  const mix=['land','air','sea'].map(m=>({m,v:crossings.filter(c=>c.mode===m).reduce((s,c)=>s+c.arr,0)}));
+  const hues={land:'var(--violet)',air:'var(--sky)',sea:'var(--teal)'};
+  const icons={land:'train',air:'plane',sea:'ship'};
+  $('shareBar').innerHTML=mix.map(x=>`<div style="width:${(x.v/tot*100).toFixed(1)}%;background:${hues[x.m]}" data-tt="<span class='tl'>${t('flow.'+x.m)}</span><br><b>${fmt(x.v)}</b> · ${(x.v/tot*100).toFixed(1)}%"></div>`).join('');
+  $('shareLeg').innerHTML=mix.map(x=>`<span>${ic(icons[x.m],'sm')}<span class="lg-dot" style="background:${hues[x.m]}"></span>${t('flow.'+x.m)} <b>${(x.v/tot*100).toFixed(1)}%</b></span>`).join('');
+}
+
+/* ================================================================
+   RENDER — grouped alerts
+================================================================ */
+const sevMeta={crit:{icon:'alert',chip:'crit',lab:'cnt.crit'},watch:{icon:'diamond',chip:'warn',lab:'cnt.watch'},info:{icon:'info',chip:'info',lab:'cnt.info'}};
+function renderAlerts(){
+  const active=alerts.filter(a=>!a.resolved&&!a.ack);
+  const done=alerts.filter(a=>a.resolved||a.ack);
+  const order={crit:0,watch:1,info:2};
+  active.sort((a,b)=>order[a.sev]-order[b.sev]);
+  $('alertCounts').innerHTML=['crit','watch','info'].map(s=>{
+    const n=active.filter(a=>a.sev===s).length;const m=sevMeta[s];
+    return `<span class="chip ${m.chip}">${ic(m.icon)} ${n} ${t(m.lab)}</span>`}).join('');
+  if(!active.length){$('alertList').innerHTML=`<div class="alert-empty">${ic('check')} ${t('alerts.empty')}</div>`}
+  else $('alertList').innerHTML=active.map(a=>{
+    const m=sevMeta[a.sev];const open=S.collapsed[a.id]===false||a.sev==='crit';
+    return `<div class="alert sev-${a.sev} ${open?'open':''}" id="al-${a.id}">
+      <div class="alert-head" data-action="toggle-group" data-id="${a.id}" role="button" tabindex="0" aria-expanded="${open}">
+        <div class="sev-ic">${ic(m.icon)}</div>
+        <div style="min-width:0">
+          <div class="alert-title">${bi(a.title)} ${a.fresh?`<span class="chip info" style="font-size:9px;padding:1px 7px">${t('alerts.new')}</span>`:''}</div>
+          <div class="alert-meta"><span class="chip ${m.chip}" style="font-size:10px;padding:1px 8px">${t(m.lab)}</span><span>${ic('clock','sm')} ${t('alerts.started')} ${a.ts}</span></div>
+        </div>
+        ${ic('chev','alert-chev')}
+      </div>
+      <div class="alert-body">
+        <div>${bi(a.detail)}</div>
+        <ul class="alert-signals">${a.signals.map(s=>`<li style="color:${s.sev==='crit'?'var(--red)':s.sev==='watch'?'var(--amber)':'var(--sky)'}">${ic(sevMeta[s.sev].icon)}<span style="color:var(--muted)">${bi(s)}</span></li>`).join('')}</ul>
+        <div class="alert-action"><b>${t('alerts.action')}:</b> ${bi(a.action)}</div>
+        <div class="alert-btns"><button class="btn sm ${a.sev==='crit'?'red':''}" data-action="ack" data-id="${a.id}">${ic('check','sm')} ${t('alerts.ack')}</button></div>
+      </div>
+    </div>`}).join('');
+  $('ackedWrap').innerHTML=done.length?`<div class="lab">${ic('check','sm')} ${t('alerts.doneLab')} (${done.length})</div>`+
+    done.map(a=>`<div class="acked-item"><span style="color:${a.resolved?'var(--jade)':'var(--muted)'}">${ic(a.resolved?'check':'clock')}</span>
+      <span style="flex:1;min-width:0">${bi(a.title)}</span>
+      <span class="chip ${a.resolved?'ok':'mute'}" style="font-size:10px">${a.resolved?t('alerts.resolved'):t('alerts.acked')}</span>
+      ${!a.resolved?`<button class="btn ghost sm" data-action="unack" data-id="${a.id}" style="padding:3px 8px">${ic('undo','sm')}</button>`:''}</div>`).join(''):'';
+}
+
+/* ================================================================
+   RENDER — promises, watch, crossings, demand
+================================================================ */
+function renderPromises(){
+  $('promiseList').innerHTML=promises.map(p=>{
+    const v=p.get();const b=bulletHTML(v,p.target,p.max,p.dir,p.dec||0);
+    const unit=p.unit==='%'?'%':t(p.unit);
+    const tv=p.dec?p.target.toFixed(p.dec):p.target;
+    return `<div class="bullet-row"><div class="bullet-lab"><span>${t(p.key)}</span>
+      <span class="tgt">${t('prom.target')} ${p.dir==='low'?'≤':'≥'} ${tv}${unit}</span>
+      <span class="val" style="color:${b.st==='ok'?'var(--jade)':b.st==='warn'?'var(--amber)':'var(--red)'}">${b.vv}<small style="font-size:11px;color:var(--faint)"> ${unit}</small></span></div>
+      ${b.html}</div>`}).join('');
+}
+function renderWatch(){
+  const riskChip={high:`<span class="chip crit">${ic('alert')} ${t('watch.high')}</span>`,
+    mod:`<span class="chip warn">${ic('diamond')} ${t('watch.mod')}</span>`,
+    low:`<span class="chip ok">${ic('check')} ${t('watch.low')}</span>`};
+  $('watchList').innerHTML=watchItems.map(w=>`<div class="watch-item">${ic(w.icon)}
+    <div style="min-width:0"><div class="watch-name">${bi(w.name)}</div><div class="watch-region">${bi(w.region)}</div>
+    <div class="watch-note">${bi(w.note)}</div></div>
+    <div class="watch-side">${riskChip[w.risk]}<span class="watch-upd">${t('watch.upd')} ${minsAgo(w.upd)}</span></div></div>`).join('');
+}
+function crossStatus(c){if(c.cov<98)return'crit';if(c.q>20)return'warn';return'ok'}
+function renderFilters(){
+  const modes=[['all','shield'],['air','plane'],['land','train'],['sea','ship']];
+  $('filterChips').innerHTML=modes.map(([m,i])=>`<button class="fchip ${S.filter===m?'on':''}" data-action="filter" data-val="${m}">${ic(i)} ${t('cross.'+m)}</button>`).join('');
+}
+function renderTable(){
+  let rows=crossings.filter(c=>S.filter==='all'||c.mode===S.filter);
+  if(S.search){const q=S.search.toLowerCase();rows=rows.filter(c=>c.name.en.toLowerCase().includes(q)||c.name.zh.includes(S.search))}
+  const rank={crit:0,warn:1,ok:2};
+  if(S.sort==='pressure')rows.sort((a,b)=>rank[crossStatus(a)]-rank[crossStatus(b)]||b.q-a.q);
+  else if(S.sort==='arrivals')rows.sort((a,b)=>b.arr-a.arr);
+  else rows.sort((a,b)=>bi(a.name).localeCompare(bi(b.name),S.lang==='zh'?'zh-Hant':'en'));
+  const icons={air:'plane',land:'train',sea:'ship'};
+  $('crossBody').innerHTML=rows.map(c=>{
+    const st=crossStatus(c);
+    return `<tr class="${st==='crit'?'row-crit':st==='warn'?'row-warn':''}">
+      <td><div class="cp-name">${ic(icons[c.mode])}<span>${bi(c.name)}<div class="cp-mode">${t('cross.'+c.mode)}</div></span></div></td>
+      <td>${statusChip(st)}</td>
+      <td class="num">${fmt(c.arr)}</td>
+      <td><div class="cov">${bulletHTML(c.cov,98,100,'high',1,true)}<span class="num" style="color:${c.cov<98?'var(--red)':'var(--ink)'}">${pc(c.cov)}</span></div></td>
+      <td><div class="qcell"><span class="num" style="color:${c.q>20?'var(--amber)':c.q>25?'var(--red)':'var(--ink)'}">${Math.round(c.q)}${t('cross.min')}</span>${sparkSVG(c.qh,[0,15],c.q>20?'var(--amber)':'var(--teal)',86,24)}</div></td>
+      <td class="num">${c.off}</td></tr>`}).join('');
+  $('crossCount').textContent=tf('cross.count',{n:rows.length});
+  $('crossLive').innerHTML=`<span class="live-dot" style="width:6px;height:6px"></span> ${t('cross.live')} · ${timeStr(nowHKT())}`;
+}
+function renderVax(){
+  const W=560,H=S.wall?200:190,P={l:36,r:10,t:16,b:26};
+  const mx=Math.max(vax.cap*1.1,...vax.days);
+  const n=vax.days.length,bw=(W-P.l-P.r)/n;
+  const Y=v=>P.t+(H-P.t-P.b)*(1-v/mx);
+  const labels=vax.days.map((_,i)=>{const d=new Date(Date.now()-(6-i)*86400000);
+    return i===6?t('vax.today'):new Intl.DateTimeFormat(S.lang==='zh'?'zh-Hant-HK':'en-GB',{timeZone:'Asia/Hong_Kong',weekday:'short'}).format(d)});
+  let bars='';vax.days.forEach((v,i)=>{
+    const x=P.l+i*bw+bw*0.2,w=bw*0.6,y=Y(v),today=i===6;
+    bars+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${(H-P.b-y).toFixed(1)}" rx="4"
+      fill="${today?'url(#vg)':'rgba(232,121,249,.32)'}" stroke="${today?'var(--orchid)':'rgba(232,121,249,.45)'}" stroke-width="1"
+      data-tt="<span class='tl'>${labels[i]}</span><br><b>${fmt(v)}</b> ${t('vax.doses')} · ${t('vax.cap')} ${vax.cap}"/>
+    <text x="${(x+w/2).toFixed(1)}" y="${(y-5).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="${today?700:500}" fill="${today?'var(--orchid)':'var(--faint)'}" font-family="Space Grotesk">${v}</text>
+    <text x="${(x+w/2).toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="10" fill="${today?'var(--orchid)':'var(--faint)'}">${labels[i]}</text>`});
+  const cy=Y(vax.cap);
+  $('vaxWrap').innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px">
+    <defs><linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--orchid)"/><stop offset="1" stop-color="rgba(232,121,249,.25)"/></linearGradient></defs>
+    ${bars}<line x1="${P.l}" x2="${W-P.r}" y1="${cy.toFixed(1)}" y2="${cy.toFixed(1)}" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="5 5"/>
+    <text x="${W-P.r}" y="${(cy-6).toFixed(1)}" text-anchor="end" font-size="10.5" font-weight="700" fill="var(--gold)">${t('vax.cap')} ${vax.cap}</text></svg>`;
+  const week=vax.days.reduce((a,b)=>a+b,0);
+  $('vaxStats').innerHTML=`<div class="st"><b>${fmt(week)}</b>${t('vax.week')}</div>
+    <div class="st"><b>${Math.round(K.travel.wait)} ${t('prom.min')}</b>${t('vax.wait')} · ${t('kpi.promise')} ≤20</div>
+    <div class="st"><b class="good">${fmt(K.travel.certs)}</b>${t('vax.certs')}</div>`;
+}
+function renderPermits(){
+  const mx=Math.max(...permits.map(p=>p.n))*1.15;
+  $('permitWrap').innerHTML=permits.map(p=>`<div class="hbar-row">
+    <div class="hbar-lab">${ic(p.icon)} ${t('perm.'+p.key)}</div>
+    <div class="hbar-track"><div class="hbar-fill" style="width:${(p.n/mx*100).toFixed(1)}%;background:linear-gradient(90deg,color-mix(in srgb,${p.hue} 55%,#0C1624),${p.hue})"
+      data-tt="<span class='tl'>${t('perm.'+p.key)}</span><br><b>${p.n}</b> · ${p.onTime}% ${t('perm.onTime')}"></div></div>
+    <div class="hbar-val">${p.n}</div>
+    <span class="chip ${p.onTime>=95?'ok':'warn'}" style="width:86px;justify-content:center">${p.onTime>=95?ic('check'):ic('diamond')} ${p.onTime}%</span></div>`).join('');
+  const b=bulletHTML(K.permits.onTime,95,100,'high',1);
+  $('permitStats').innerHTML=`<div class="st" style="flex:1;min-width:200px"><div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--faint)"><span>${t('kpi.onTime')} · ${t('perm.promise')}</span><b style="font-family:var(--fm);color:var(--jade);font-size:14px">${pc(K.permits.onTime)}</b></div>${b.html}</div>
+    <div class="st"><b>${K.permits.pending}</b>${t('perm.pending')}</div>
+    <div class="st"><b>${K.permits.oldest.toFixed(1)} ${t('perm.days')}</b>${t('perm.oldest')} · ≤3</div>`;
+}
+
+/* ================================================================
+   RENDER — reference (the requested summary, embedded & bilingual)
+================================================================ */
+function renderReference(){
+  const story=S.lang==='zh'?[
+   ['今天安全嗎？','左上角的燈號一眼作答：需要決策／處理中／密切留意／全面受控。'],
+   ['今天有甚麼變化？','「一分鐘掌握今日」以三句淺白語言總結重點，異常永遠排第一。'],
+   ['哪裡需要我行動？','事項按範疇分組，附建議方案；一按「確認」即標記處理，可隨時復原。'],
+   ['服務承諾守住了嗎？','橫棒圖對照每項公開承諾 — 白色刻度就是承諾，絕無儀錶盤。'],
+   ['壓力正在哪裡累積？','口岸狀況表、旅遊健康需求及全球疫情監察，顯示下一步風險。'],
+  ]:[
+   ['Are we protected today?','The beacon at the top left answers in one glance: Action needed / Underway / Watch / All protected.'],
+   ['What changed today?','“Today in one minute” tells the story in three plain sentences — the anomaly always comes first.'],
+   ['Where must I act?','Items are grouped by area with a recommended action; one tap acknowledges, with undo.'],
+   ['Are our promises kept?','Bullet bars compare every public service promise — the white tick is the promise. No speedometers, ever.'],
+   ['Where is pressure building?','The crossing board, travel-health demand and the global watch show tomorrow’s risks today.'],
+  ];
+  $('storyList').innerHTML=story.map(s=>`<li><span class="qn"></span><span><b>${s[0]}</b> — ${s[1]}</span></li>`).join('');
+  const read=S.lang==='zh'?[
+   ['先看左上角','紅／琥珀／綠燈號＋文字，0.5秒內掌握全局。'],
+   ['讀三句簡報','異常置頂，全部有基準或承諾作對照。'],
+   ['掃描六道防線','每個數字附趨勢線、一般範圍及達標與否（圖形＋文字，不只靠顏色）。'],
+   ['只在有事時深入','點卡片看詳情；沒事時一切安靜低調 — 「異常高呼，正常低語」。'],
+  ]:[
+   ['Start top-left','Beacon + words give the whole picture within half a second.'],
+   ['Read the three-sentence brief','Anomaly first; every number carries a baseline or a promise.'],
+   ['Scan the six shields','Each number has a sparkline, a usual range and a shape-plus-word verdict — never colour alone.'],
+   ['Drill in only when needed','Tap a card for detail; when all is well the screen stays quiet — anomalies scream, normalcy whispers.'],
+  ];
+  $('readList').innerHTML=read.map(s=>`<li><span class="qn"></span><span><b>${s[0]}</b> — ${s[1]}</span></li>`).join('');
+  const prin=S.lang==='zh'?[
+   ['0.5秒法則','最重要的健康狀況永遠置於左上角，半秒內可判讀。'],
+   ['異常高呼，正常低語','只有偏離安全線的事項發光、跳動；正常數據保持低調。'],
+   ['每個數字都有背景','趨勢線＋一般範圍帶＋承諾刻度，沒有孤立的數字。'],
+   ['拒絕儀錶盤','以橫棒圖（bullet graph）及趨勢線取代速度錶，更快、更準、更省空間。'],
+   ['圖形＋文字＋顏色','▲緊急 ◆關注 ●資訊 ✓達標 — 色盲也能瞬間分辨。'],
+   ['分組防疲勞','事項按範疇合併，附建議行動；確認後移入已處理區，可復原。'],
+   ['雙場景設計','桌面檢視＋大屏模式（深色、特大字、零互動），更新頻率可選及可暫停。'],
+   ['淺白語言','「船舶檢疫放行」而非「Free Pratique」；管理層語言，不是工程語言。'],
+  ]:[
+   ['The 0.5-second rule','Overall health always sits top-left and reads in half a second.'],
+   ['Anomalies scream, normalcy whispers','Only deviations glow and pulse; healthy data stays quiet.'],
+   ['Every number has context','Sparkline + usual-range band + promise tick. No naked numbers.'],
+   ['No speedometers','Bullet graphs and sparklines replace gauges — faster, sharper, denser.'],
+   ['Shape + word + colour','▲ critical ◆ watch ● info ✓ on track — instantly readable without colour.'],
+   ['Grouped alerts defeat fatigue','Items merge by area with a recommended action; acknowledge moves them aside, with undo.'],
+   ['Two viewing environments','Desktop review + wall mode (dark, massive type, zero interaction); selectable refresh and pause.'],
+   ['Plain language first','“Ship clearance”, not “Free Pratique”. Management language, not engineering language.'],
+  ];
+  $('prinList').innerHTML=prin.map(p=>`<li>${ic('check')}<span><b>${p[0]}</b> — ${p[1]}</span></li>`).join('');
+  const mand=S.lang==='zh'?[
+   ['thermo','邊境管制站（海陸空）','為每位入境旅客量體溫、查申報、做檢疫；机场設24小時緊急醫療隊；監察口岸環境衞生。','「旅客健康篩查」防線 · 壓力圖 · 口岸狀況表'],
+   ['anchor','海港','為抵港船舶簽發檢疫放行（無疫通行）；巡查船舶衞生及病媒，簽發船舶衞生證明書；提供海上無線電醫療建議。','「海港及船舶」防線 · 服務承諾（放行時間）'],
+   ['plane','機場','監察機上膳食、客機及機場衞生；檢查抵港航班蚊蟲等病媒。','「機場及航班」防線 · 病媒事項'],
+   ['syringe','旅遊健康服務','兩間中心提供外遊風險評估、疫苗、抗瘧疾藥物及國際預防接種證明書。','「旅遊健康」防線 · 本週需求圖 · 疫苗存量事項'],
+   ['stamp','許可證及證明書','簽發遺體、病原體及生物物料進口許可證；辦理火葬許可證。','「許可證及證明書」防線 · 本週簽發圖'],
+   ['globe','情報與協作','與世衞及鄰近衞生當局互通疫情情報，及早預警。','「全球疫情情報」防線 · 全球疫情監察'],
+  ]:[
+   ['thermo','Boundary control points (sea, land, air)','Temperature-screen and health-check every arrival, handle declarations and quarantine; a 24-hour emergency medical team at the airport; keep crossings hygienic.','“Border screening” shield · pressure chart · crossing board'],
+   ['anchor','Seaport','Grant ships quarantine clearance (Free Pratique); inspect ship sanitation and vectors, issue sanitation certificates; give radio medical advice at sea.','“Seaport & ships” shield · clearance-time promise'],
+   ['plane','Airport','Watch inflight catering, aircraft and airport hygiene; inspect arriving flights for mosquitoes and other vectors.','“Airport & flights” shield · vector alert'],
+   ['syringe','Travel Health Service','Two centres give pre-travel risk advice, vaccinations, anti-malarial medicine and international vaccination certificates.','“Travel health” shield · weekly demand · stock alert'],
+   ['stamp','Permits & certificates','Issue import permits for human remains, infectious agents and biological materials; handle cremation permits.','“Permits & certificates” shield · weekly issuance'],
+   ['globe','Intelligence & collaboration','Exchange outbreak intelligence with WHO and neighbouring health authorities for early warning.','“Global intelligence” shield · outbreak watch'],
+  ];
+  $('mandBody').innerHTML=mand.map(m=>`<tr><td>${ic(m[0])}${m[1]}</td><td>${m[2]}</td><td>${m[3]}</td></tr>`).join('');
+  $('wirePre').textContent=
+`┌──────────────────────────────────────────────────────────────────────┐
+│ ◤ OVERALL STATUS (top-left) │ Today in 1 minute      │ Duty picture  │
+├──────────────────────────────────────────────────────────────────────┤
+│ 6 × SHIELD CARDS — big number · delta · sparkline + usual band ·      │
+│                    context line · shape+word verdict                 │
+├───────────────────────────────────────────────┬──────────────────────┤
+│ Border pressure: arrivals vs usual range 24h  │ ⚠ Grouped alerts     │
+│ (anomaly pulses) + today's air/land/sea mix   │   ▲ crit ◆ watch ●   │
+├───────────────────────────────────────────────┼──────────────────────┤
+│ Service promises — bullet bars vs white tick  │ Global outbreak watch│
+├───────────────────────────────────────────────┴──────────────────────┤
+│ Control-point board — search · filter · sort · coverage bullets      │
+├──────────────────────────────────┬───────────────────────────────────┤
+│ Travel health demand (7d bars)   │ Permits & certificates (h-bars)   │
+├──────────────────────────────────┴───────────────────────────────────┤
+│ Executive reference — storyline · mandate map · design rules         │
+└──────────────────────────────────────────────────────────────────────┘
+  WALL MODE = rows 1–3 only · massive type · zero interaction`;
+}
+
+/* ================================================================
+   DRAWER
+================================================================ */
+let lastFocus=null;
+function openDrawer(id){
+  if(S.wall)return;
+  S.drawer=id;lastFocus=document.activeElement;
+  renderDrawer();
+  $('backdrop').classList.add('show');$('drawer').classList.add('show');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>{const x=$('drawerClose');if(x)x.focus()},80);
+}
+function closeDrawer(){
+  S.drawer=null;$('backdrop').classList.remove('show');$('drawer').classList.remove('show');
+  document.body.style.overflow='';
+  if(lastFocus&&lastFocus.focus)lastFocus.focus();
+}
+function renderDrawer(){
+  const id=S.drawer;if(!id)return;
+  const k=K[id],m=KPI_META[id],d=DRAWERS[id],st=kpiStatus(id);
+  $('drawerHead').innerHTML=`<div class="kpi-ic" style="--hair:${k.hue};width:42px;height:42px">${ic(k.icon,'lg')}</div>
+    <div><h3 id="drawerTitle">${t(m.name)}</h3><div class="sub">${t(m.sub)} · ${fmt(k.value)} ${t(m.unit)}</div></div>
+    <button class="drawer-x" id="drawerClose" data-action="close-drawer" data-ta="drawer.close" aria-label="${t('drawer.close')}">${ic('x')}</button>`;
+  const trend=k.trend;
+  const W=440,H=150,P={l:8,r:8,t:12,b:12};
+  const lo=Math.min(...trend,d.band[0]),hi=Math.max(...trend,d.band[1]);
+  const pad=(hi-lo)*.18||1,mn=lo-pad,mx=hi+pad;
+  const X=i=>P.l+i*(W-P.l-P.r)/(trend.length-1),Y=v=>P.t+(H-P.t-P.b)*(1-(v-mn)/(mx-mn));
+  const pts=trend.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  const y1=Y(d.band[1]),y2=Y(d.band[0]);
+  const unit=d.unit==='%'?'%':d.unit?t(d.unit):'';
+  const trendSvg=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:150px;width:100%">
+    <rect x="${P.l}" y="${y1.toFixed(1)}" width="${W-P.l-P.r}" height="${Math.max(2,y2-y1).toFixed(1)}" fill="rgba(148,190,215,.12)" rx="3"/>
+    <line x1="${P.l}" x2="${W-P.r}" y1="${((y1+y2)/2).toFixed(1)}" y2="${((y1+y2)/2).toFixed(1)}" stroke="rgba(148,190,215,.35)" stroke-dasharray="3 4"/>
+    <polyline points="${pts}" fill="none" stroke="${k.hue}" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    ${trend.map((v,i)=>(v<d.band[0]||v>d.band[1])?`<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="3" fill="var(--red)"/>`:'').join('')}
+    <circle cx="${X(trend.length-1).toFixed(1)}" cy="${Y(trend[trend.length-1]).toFixed(1)}" r="3.5" fill="${k.hue}"/></svg>
+    <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--faint);margin-top:4px"><span>${S.lang==='zh'?'14天前':'14 days ago'}</span><span>${t('flow.usual')}: ${d.band[0]}–${d.band[1]}${unit}</span><span>${t('vax.today')}</span></div>`;
+  const subs=d.subs.map(s=>{
+    const v=s.get();const b=bulletHTML(v,s.target,s.max,s.dir,s.dec||0);
+    const unit=s.unit==='%'?'%':s.unit?t(s.unit):'';
+    return `<div class="bullet-row"><div class="bullet-lab"><span>${bi(s.lab)}</span>
+      <span class="tgt">${t('prom.target')} ${s.dir==='low'?'≤':'≥'} ${s.target}${unit}</span>
+      <span class="val" style="color:${b.st==='ok'?'var(--jade)':b.st==='warn'?'var(--amber)':'var(--red)'}">${b.vv}<small style="font-size:11px;color:var(--faint)"> ${unit}</small></span></div>${b.html}</div>`}).join('');
+  const rel=alerts.filter(a=>a.domain===id);
+  const relHtml=rel.length?rel.map(a=>`<div class="dr-alert"><span style="color:${a.sev==='crit'?'var(--red)':a.sev==='watch'?'var(--amber)':'var(--sky)'}">${ic(sevMeta[a.sev].icon,'sm')}</span>
+    <span>${bi(a.title)} ${a.resolved?`<span class="chip ok" style="font-size:9.5px">${t('alerts.resolved')}</span>`:a.ack?`<span class="chip mute" style="font-size:9.5px">${t('alerts.acked')}</span>`:''}</span></div>`).join('')
+    :`<div style="font-size:12.5px;color:var(--faint)">${t('drawer.none')}</div>`;
+  $('drawerBody').innerHTML=`
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">${statusChip(st)}<span class="chip mute">${ic('clock','sm')} ${timeStr(nowHKT())} HKT</span></div>
+    <p class="drawer-desc">${bi(d.desc)}</p>
+    <div class="drawer-sec">${ic('activity')} ${t('drawer.trend')}</div>${trendSvg}
+    <div class="drawer-sec">${ic('target')} ${t('drawer.subs')}</div>${subs}
+    <div class="drawer-sec">${ic('bell')} ${t('drawer.related')}</div>${relHtml}
+    <div class="drawer-good">${ic('check','sm')}<span><b>${t('drawer.good')}:</b> ${bi(d.good)}</span></div>`;
+}
+
+/* ================================================================
+   TOOLTIP & TOAST & SOUND
+================================================================ */
+const tt=$('tt');
+function showTT(html,x,y){tt.innerHTML=html;tt.classList.add('show');
+  const r=tt.getBoundingClientRect();
+  tt.style.left=clamp(x+14,8,innerWidth-r.width-10)+'px';
+  tt.style.top=clamp(y-r.height-12,8,innerHeight-r.height-8)+'px'}
+function hideTT(){tt.classList.remove('show')}
+document.addEventListener('pointerover',e=>{const el=e.target.closest('[data-tt]');if(el&&!S.wall)showTT(el.getAttribute('data-tt'),e.clientX,e.clientY)});
+document.addEventListener('pointerout',e=>{if(e.target.closest('[data-tt]'))hideTT()});
+document.addEventListener('pointermove',e=>{
+  const el=e.target.closest('[data-tt]');if(el&&!S.wall){showTT(el.getAttribute('data-tt'),e.clientX,e.clientY);return}
+  const svg=e.target.closest('[data-chart="flow"]');
+  if(svg&&!S.wall){
+    const r=svg.getBoundingClientRect();const n=flow.act.length;
+    const i=clamp(Math.round((e.clientX-r.left)/r.width*(n-1)),0,n-1);
+    const cur=$('flowCursor');if(cur){const cx=44+i*(760-44-14)/(n-1);cur.setAttribute('x1',cx);cur.setAttribute('x2',cx);cur.setAttribute('opacity','1')}
+    showTT(`<span class="tl">${flow.labels[i]}</span><br>${t('flow.arrivals')}: <b>${fmt(flow.act[i])}</b><br>${t('flow.usualRange')}: <b>${fmt(flow.exp[i].lo)}–${fmt(flow.exp[i].hi)}</b>${flow.act[i]>flow.exp[i].hi?`<br><span style="color:var(--red)">▲ ${t('flow.anom')}</span>`:''}`,e.clientX,e.clientY);
+  } else if(!el){const cur=$('flowCursor');if(cur)cur.setAttribute('opacity','0');if(!e.target.closest('.tt'))hideTT()}
+});
+function toast(msg,type='info',undoFn=null){
+  const box=$('toasts');const el=document.createElement('div');
+  el.className='toast '+type;
+  el.innerHTML=`${ic(type==='good'?'check':type==='warn'?'diamond':'info','sm')}<span>${msg}</span>${undoFn?`<button>${t('alerts.undo')}</button>`:''}`;
+  if(undoFn)el.querySelector('button').addEventListener('click',()=>{undoFn();kill()});
+  box.appendChild(el);
+  while(box.children.length>3)box.firstChild.remove();
+  const kill=()=>{el.classList.add('out');setTimeout(()=>el.remove(),320)};
+  setTimeout(kill,5200);
+}
+let AC=null;
+function ensureAudio(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume().catch(()=>{})}
+document.addEventListener('pointerdown',ensureAudio,{once:true});
+function tone(f,at,dur,g=0.09,type='sine'){if(!AC)return;
+  const o=AC.createOscillator(),gn=AC.createGain();o.type=type;o.frequency.value=f;
+  gn.gain.setValueAtTime(0.0001,AC.currentTime+at);
+  gn.gain.exponentialRampToValueAtTime(g,AC.currentTime+at+0.02);
+  gn.gain.exponentialRampToValueAtTime(0.0001,AC.currentTime+at+dur);
+  o.connect(gn).connect(AC.destination);o.start(AC.currentTime+at);o.stop(AC.currentTime+at+dur+0.05)}
+function chime(kind){if(!S.sound||!AC)return;
+  if(kind==='crit'){tone(880,0,.22,.1);tone(622,.2,.34,.1)}
+  else if(kind==='watch'){tone(587,0,.25,.06)}
+  else if(kind==='good'){tone(659,0,.16,.07);tone(880,.14,.28,.07)}
+  else if(kind==='ack'){tone(440,0,.12,.05,'triangle')}
+  else if(kind==='info'){tone(523,0,.14,.04)}}
+
+/* ================================================================
+   LIVE ENGINE — one clock drives freshness, countdown & ticks
+================================================================ */
+function tickData(){
+  S.tick++;S.lastUpdate=Date.now();
+  // jitter shields
+  K.screening.value+=Math.round(rr(150,650));
+  K.sea.value+=rnd()<.4?1:0;K.sea.clear=clamp(K.sea.clear+rr(-1.2,1.2),17,29);
+  K.air.value+=rnd()<.5?1:0;
+  K.travel.value+=rnd()<.5?Math.round(rr(0,3)):0;K.travel.wait=clamp(K.travel.wait+rr(-1,1),9,19);
+  K.permits.onTime=clamp(K.permits.onTime+rr(-.15,.15),96,99.4);
+  K.intel.value=clamp(K.intel.value+(rnd()<.12?(rnd()<.5?1:-1):0),9,15);
+  Object.values(K).forEach(k=>{
+    let last=k.spark[k.spark.length-1];
+    let nv;
+    if(k===K.screening)nv=K.screening.coverage;
+    else if(k===K.sea)nv=K.sea.clear;
+    else if(k===K.travel)nv=K.travel.wait;
+    else if(k===K.permits)nv=K.permits.onTime;
+    else nv=clamp(last+rr(-1,1),k.band[0]-1.5,k.band[1]+1.5);
+    k.spark.push(nv);k.spark.shift();
+    k.trend[k.trend.length-1]=nv;
+  });
+  // crossings jitter + the recovery arc
+  crossings.forEach(c=>{
+    c.arr+=Math.round(rr(20,180));
+    if(c.id==='lmc'){
+      const a=alerts.find(x=>x.id==='a-lmc');
+      if(a.ack&&!a.resolved){c.cov=Math.min(98.4,c.cov+rr(1.6,2.4));c.q=Math.max(12,c.q-rr(3,5));
+        if(c.cov>=98){a.resolved=true;K.screening.coverage=98.6;
+          toast(t('toast.resolved'),'good');chime('good');
+          a.signals[0]={sev:'info',en:'Coverage restored to 98.4% — above the line',zh:'覆蓋率回升至98.4% — 重越安全線'};}}
+      else if(!a.resolved){c.cov=clamp(c.cov+rr(-.3,.2),90.4,93)}
+    } else {c.cov=clamp(c.cov+rr(-.12,.12),98.2,99.9);c.q=clamp(c.q+rr(-1.4,1.4),3,26)}
+    c.qh.push(c.q);c.qh.shift();
+  });
+  if(!alerts.find(x=>x.id==='a-lmc').resolved){
+    const tot=crossings.reduce((s,c)=>s+c.arr,0);
+    K.screening.coverage=crossings.reduce((s,c)=>s+c.arr*c.cov,0)/tot;
+  } else {K.screening.coverage=clamp(K.screening.coverage+rr(0,.15),98.4,99.2)}
+  // flow last point breathes
+  const li=flow.act.length-1;
+  flow.act[li]=clamp(flow.act[li]+rr(-300,340),flow.exp[li].lo*.9,flow.exp[li].hi*1.05);
+  vax.days[6]+=rnd()<.5?Math.round(rr(0,2)):0;
+  // a fresh advisory arrives once — the system feels alive
+  if(S.tick===6&&!S.spawned){S.spawned=true;
+    alerts.push({id:'a-measles',sev:'info',domain:'intel',ack:false,resolved:false,fresh:true,ts:timeStr(nowHKT()),
+      title:{en:'New advisory: measles activity rising in the nearby region',zh:'新通報：鄰近地區麻疹活躍度上升'},
+      detail:{en:'Travel Health Centres have updated vaccination guidance for travellers.',zh:'旅遊健康中心已更新外遊接種建議。'},
+      signals:[{sev:'info',en:'Catch-up doses offered at both centres',zh:'兩間中心提供補種服務'}],
+      action:{en:'For noting — no decision required.',zh:'僅供知悉 — 無需決策。'}});
+    K.intel.delta=3;toast(S.lang==='zh'?'新疫情通報：鄰近地區麻疹上升':'New advisory: measles rising nearby','info');chime('info');
+  }
+  renderLive();
+}
+function renderLive(){
+  renderStatus();renderTicker();renderNarrative();renderKPIs();renderFlow();
+  renderAlerts();renderPromises();renderTable();renderVax();renderPermits();renderMini();
+  if(S.drawer)renderDrawer();
+}
+function renderAll(){
+  document.documentElement.lang=S.lang==='zh'?'zh-Hant':'en';
+  document.body.setAttribute('data-lang',S.lang);
+  document.title=t('app.title');
+  document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.getAttribute('data-t')));
+  document.querySelectorAll('[data-th]').forEach(el=>el.innerHTML=t(el.getAttribute('data-th')));
+  document.querySelectorAll('[data-ta]').forEach(el=>el.setAttribute('aria-label',t(el.getAttribute('data-ta'))));
+  document.querySelectorAll('[data-tp]').forEach(el=>el.setAttribute('placeholder',t(el.getAttribute('data-tp'))));
+  $('langEn').classList.toggle('on',S.lang==='en');
+  $('langZh').classList.toggle('on',S.lang==='zh');
+  $('sortSel').value=S.sort;$('refreshSel').value=String(S.refresh);
+  renderSoundBtn();renderPauseBtn();renderFilters();renderReference();renderLive();
+  $('dateLine').textContent=dateStr(nowHKT());
+}
+function renderSoundBtn(){
+  $('soundBtn').innerHTML=`${ic(S.sound?'vol':'volx','sm')}<span>${t(S.sound?'ctl.soundOn':'ctl.soundOff')}</span>`;
+  $('soundBtn').classList.toggle('warn-on',!S.sound);
+  $('soundBtn').setAttribute('aria-pressed',String(!S.sound));
+}
+function renderPauseBtn(){
+  $('pauseBtn').innerHTML=`${ic(S.paused?'play':'pause','sm')}<span>${t(S.paused?'ctl.resume':'ctl.pause')}</span>`;
+  $('pauseBtn').classList.toggle('warn-on',S.paused);
+  $('liveBox').classList.toggle('paused',S.paused);
+}
+setInterval(()=>{
+  $('clock').textContent=timeStr(nowHKT(),true);
+  const s=Math.max(0,Math.round((Date.now()-S.lastUpdate)/1000));
+  $('freshness').textContent=S.paused?t('hdr.paused'):tf('hdr.updated',{s});
+  if(!S.paused){S.acc+=1000;if(S.acc>=S.refresh){S.acc=0;tickData()}}
+  $('refreshFill').style.width=(S.paused?0:S.acc/S.refresh*100)+'%';
+},1000);
+
+/* ================================================================
+   EXPORT — the executive brief, in the current language
+================================================================ */
+function exportBrief(){
+  const L=S.lang,zh=L==='zh';
+  const o=overall();
+  const lines=[];
+  lines.push(zh?'港口衞生科 — 管理層簡報':'PORT HEALTH DIVISION — EXECUTIVE BRIEF');
+  lines.push((zh?'衞生署 · 香港特別行政區':'Department of Health · HKSAR')+' · '+dateStr(nowHKT())+' '+timeStr(nowHKT())+' HKT');
+  lines.push(zh?'（模擬示範數據 — 並非官方統計）':'(Simulated demonstration data — not official statistics)');
+  lines.push('='.repeat(64));
+  lines.push((zh?'整體狀況：':'OVERALL STATUS: ')+t(o.key).toUpperCase());
+  lines.push(t(o.key+'.sub'));
+  lines.push('');
+  lines.push(zh?'【一分鐘掌握今日】':'[TODAY IN ONE MINUTE]');
+  document.querySelectorAll('#narrativeList li').forEach(li=>lines.push(' • '+li.textContent.trim()));
+  lines.push('');
+  lines.push(zh?'【六道防線】':'[THE SIX SHIELDS]');
+  Object.keys(K).forEach(id=>{const m=KPI_META[id];
+    lines.push(` • ${t(m.name)}: ${fmt(K[id].value)} ${t(m.unit)} — ${$('kpiGrid').querySelector(`[data-id="${id}"] .kpi-ctx`).textContent} [${t({ok:'stt.good',warn:'stt.warn',crit:'stt.bad',info:'stt.info'}[kpiStatus(id)])}]`)});
+  lines.push('');
+  lines.push(zh?'【需要關注（按範疇分組）】':'[NEEDS ATTENTION — GROUPED]');
+  alerts.forEach(a=>{const stat=a.resolved?t('alerts.resolved'):a.ack?t('alerts.acked'):t(sevMeta[a.sev].lab);
+    lines.push(` ${a.sev==='crit'?'▲':a.sev==='watch'?'◆':'●'} [${stat}] ${bi(a.title)}`);
+    lines.push(`   ${t('alerts.action')}: ${bi(a.action)}`)});
+  lines.push('');
+  lines.push(zh?'【服務承諾】':'[SERVICE PROMISES]');
+  promises.forEach(p=>{const v=p.get();const u=p.unit==='%'?'%':t(p.unit);
+    lines.push(` • ${t(p.key)}: ${p.dec?v.toFixed(p.dec):Math.round(v)}${u} (${t('prom.target')} ${p.dir==='low'?'≤':'≥'}${p.target}${u})`)});
+  lines.push('');
+  lines.push(zh?'【全球疫情監察】':'[GLOBAL OUTBREAK WATCH]');
+  watchItems.forEach(w=>lines.push(` • ${bi(w.name)} — ${bi(w.region)} [${t('watch.'+w.risk)}] ${bi(w.note)}`));
+  lines.push('');
+  lines.push(zh?'【敘事主線】':'[STORYLINE]');
+  document.querySelectorAll('#storyList li').forEach(li=>lines.push(' '+li.textContent.trim()));
+  lines.push('');
+  lines.push(zh?'設計原則：0.5秒法則 · 異常高呼正常低語 · 每個數字有基準 · 橫棒圖取代儀錶盤 · 圖形+文字+顏色 · 分組防警報疲勞 · 桌面/大屏雙模式。':'Design rules: 0.5-second rule · anomalies scream, normalcy whispers · every number has a baseline · bullet graphs, never gauges · shape+word+colour · grouped alerts · desktop & wall modes.');
+  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=zh?'港口衞生科-管理層簡報.txt':'Port-Health-Executive-Brief.txt';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  toast(t('toast.export'),'good');
+}
+
+/* ================================================================
+   EVENTS — one delegated listener, no duplicates on re-render
+================================================================ */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-action]');if(!el)return;
+  const act=el.getAttribute('data-action'),id=el.getAttribute('data-id');
+  if(act==='lang'){const l=el.getAttribute('data-lang');if(l!==S.lang){S.lang=l;store.set('phd-lang',l);renderAll()}}
+  else if(act==='pause'){S.paused=!S.paused;renderPauseBtn()}
+  else if(act==='sound'){S.sound=!S.sound;store.set('phd-sound',S.sound);ensureAudio();renderSoundBtn();if(S.sound)chime('ack')}
+  else if(act==='wall'){S.wall=true;document.body.classList.add('wall');document.querySelectorAll('.reveal').forEach(x=>x.classList.add('in'));renderFlow();renderVax();window.scrollTo({top:0})}
+  else if(act==='exit-wall'){S.wall=false;document.body.classList.remove('wall');renderFlow();renderVax()}
+  else if(act==='export')exportBrief();
+  else if(act==='review'){const sec=$('attention');if(sec)sec.scrollIntoView({behavior:'smooth'});const first=$('al-a-lmc');if(first){S.collapsed['a-lmc']=false;renderAlerts()}}
+  else if(act==='ack'){const a=alerts.find(x=>x.id===id);if(a){a.ack=true;a.fresh=false;renderLive();chime('ack');
+    toast(t('toast.ack'),'info',()=>{a.ack=false;renderLive();toast(t('toast.restored'),'info')})}}
+  else if(act==='unack'){const a=alerts.find(x=>x.id===id);if(a){a.ack=false;renderLive();toast(t('toast.restored'),'info')}}
+  else if(act==='toggle-group'){S.collapsed[id]=!(S.collapsed[id]===false||alerts.find(x=>x.id===id).sev==='crit');
+    const box=$('al-'+id);if(box){box.classList.toggle('open');box.querySelector('.alert-head').setAttribute('aria-expanded',box.classList.contains('open'))}}
+  else if(act==='kpi')openDrawer(id);
+  else if(act==='close-drawer')closeDrawer();
+  else if(act==='filter'){S.filter=el.getAttribute('data-val');store.set('phd-filter',S.filter);renderFilters();renderTable()}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(S.drawer)closeDrawer();else if(S.wall){S.wall=false;document.body.classList.remove('wall');renderFlow();renderVax()}}
+  const tag=(e.target.tagName||'').toLowerCase();
+  if((e.key==='w'||e.key==='W')&&!e.metaKey&&!e.ctrlKey&&tag!=='input'&&tag!=='select'&&tag!=='textarea'){
+    S.wall=!S.wall;document.body.classList.toggle('wall',S.wall);
+    if(S.wall)document.querySelectorAll('.reveal').forEach(x=>x.classList.add('in'));
+    renderFlow();renderVax();if(S.wall)window.scrollTo({top:0});
+  }
+  if(e.key==='Enter'&&e.target.matches&&e.target.matches('[data-action="kpi"]'))openDrawer(e.target.getAttribute('data-id'));
+  if(e.key==='Enter'&&e.target.matches&&e.target.matches('[data-action="toggle-group"]'))e.target.click();
+});
+$('refreshSel').addEventListener('change',e=>{S.refresh=parseInt(e.target.value,10);S.acc=0});
+$('sortSel').addEventListener('change',e=>{S.sort=e.target.value;store.set('phd-sort',S.sort);renderTable()});
+$('crossSearch').addEventListener('input',e=>{S.search=e.target.value.trim();renderTable()});
+
+/* ================================================================
+   ENTRANCE & NAV SPY
+================================================================ */
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const spy=new IntersectionObserver(es=>{
+  es.forEach(x=>{if(x.isIntersecting){
+    document.querySelectorAll('nav a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('data-spy')===x.target.id?'true':'false'))}})
+},{rootMargin:'-30% 0px -60% 0px'});
+['overview','attention','service','crossings','demand','reference'].forEach(id=>{const s=$(id);if(s)spy.observe(s)});
+
+/* ================================================================
+   BOOT
+================================================================ */
+renderAll();
+$('clock').textContent=timeStr(nowHKT(),true);
+</script>
+</body>
+</html>

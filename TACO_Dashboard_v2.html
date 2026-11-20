@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>TACO Executive Dashboard — Design Reference 管理層儀表板設計參考</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===== PAGE THEME (dark default; light via CSS-only checkbox) ===== */
+.page{
+--bg0:#04121a;--bg1:#071c26;--surface:#0b2230;--surface2:#0e2a3a;
+--line:rgba(122,196,214,.16);--line2:rgba(122,196,214,.32);
+--ink:#eaf4f4;--dim:#a8c3cc;--faint:#7d9aa6;
+--teal:#2ee6c8;--cyan:#4cc9f0;--blue:#5b9dff;--violet:#b18cff;--magenta:#f07ad9;
+--amber:#ffb224;--orange:#ff8a4c;--red:#ff4d5e;--green:#3ddc97;
+--tealS:rgba(46,230,200,.12);--amberS:rgba(255,178,36,.12);--redS:rgba(255,77,94,.13);
+--violetS:rgba(177,140,255,.12);--greenS:rgba(61,220,151,.12);--blueS:rgba(91,157,255,.12);
+--navbg:rgba(6,22,31,.86);--btnink:#032a26;--aur:.5;--gr:.05;
+}
+#theme:checked ~ .page{
+--bg0:#f4efe6;--bg1:#ece5d8;--surface:#fffdf7;--surface2:#f6f0e4;
+--line:rgba(23,58,74,.15);--line2:rgba(23,58,74,.34);
+--ink:#14262e;--dim:#46606c;--faint:#6d8590;
+--teal:#0a7d6e;--cyan:#0e7fa8;--blue:#2563c9;--violet:#7a4fd0;--magenta:#c02f9e;
+--amber:#a86404;--orange:#c2571f;--red:#cf2438;--green:#0c7a4e;
+--tealS:rgba(10,125,110,.1);--amberS:rgba(168,100,4,.11);--redS:rgba(207,36,56,.09);
+--violetS:rgba(122,79,208,.1);--greenS:rgba(12,122,78,.1);--blueS:rgba(37,99,201,.1);
+--navbg:rgba(255,253,247,.88);--btnink:#fff;--aur:.28;--gr:.04;
+}
+/* ===== CSS-ONLY LANGUAGE + THEME SWITCHING (works with JS disabled) ===== */
+.sr{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#lang:not(:checked) ~ .page .zh{display:none}
+#lang:checked ~ .page .en{display:none}
+#theme:not(:checked) ~ .page .when-light{display:none}
+#theme:checked ~ .page .when-dark{display:none}
+#lang:focus-visible ~ .page label[for=lang],#theme:focus-visible ~ .page label[for=theme]{outline:2px solid var(--teal);outline-offset:2px}
+/* ===== BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Space Grotesk","Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;font-size:15.5px;line-height:1.65}
+.page{background:var(--bg0);color:var(--ink);min-height:100vh;transition:background-color .35s,color .35s;overflow-x:hidden}
+html[lang=en] .zh,html[lang=en] .zh-b{font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+.zh{line-height:1.8}
+a{color:var(--teal)}
+button,label{font-family:inherit}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:6px}
+::selection{background:var(--teal);color:var(--bg0)}
+*{scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px;border:2px solid var(--bg1)}
+::-webkit-scrollbar-thumb:hover{background:var(--teal)}
+.ic{width:18px;height:18px;flex:0 0 auto;vertical-align:-3px}
+/* background */
+.bg{position:fixed;inset:-10%;z-index:0;pointer-events:none;opacity:var(--aur)}
+.blob{position:absolute;border-radius:50%}
+.b1{width:62vw;height:62vw;left:-14vw;top:-18vw;background:radial-gradient(closest-side,var(--teal),transparent 70%);opacity:.3;animation:d1 46s ease-in-out infinite alternate}
+.b2{width:54vw;height:54vw;right:-16vw;top:6vh;background:radial-gradient(closest-side,var(--violet),transparent 70%);opacity:.26;animation:d2 52s ease-in-out infinite alternate}
+.b3{width:46vw;height:46vw;left:24vw;bottom:-24vw;background:radial-gradient(closest-side,var(--amber),transparent 70%);opacity:.16;animation:d3 60s ease-in-out infinite alternate}
+@keyframes d1{to{transform:translate(9vw,7vh) scale(1.12)}}
+@keyframes d2{to{transform:translate(-8vw,10vh) scale(.9)}}
+@keyframes d3{to{transform:translate(-6vw,-9vh) scale(1.15)}}
+.grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:var(--gr);mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
+nav,main,footer{position:relative;z-index:1}
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;background:linear-gradient(90deg,var(--teal),var(--cyan),var(--violet),var(--amber))}
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--navbg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1320px;margin:0 auto;padding:0 18px;min-height:62px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-weight:700;font-size:15px;white-space:nowrap}
+.brand .ic{width:23px;height:23px;color:var(--teal)}
+.brand small{color:var(--faint);font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em}
+.nls{display:flex;gap:2px;flex:1;justify-content:center;overflow-x:auto;min-width:0;padding:4px 0}
+.nl{font-size:12px;font-weight:600;color:var(--dim);text-decoration:none;padding:6px 8px;border-radius:8px;white-space:nowrap}
+.nl b{font-family:"IBM Plex Mono",monospace;font-weight:400;font-size:9.5px;color:var(--faint);margin-right:3px}
+.nl:hover{color:var(--ink);background:var(--tealS)}
+.nl.active{color:var(--teal);box-shadow:inset 0 -2px 0 var(--teal)}
+.ctl{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line2);border-radius:9px;padding:7px 11px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;color:var(--ink)}
+.ctl:hover{border-color:var(--teal)}
+.ctl .ic{width:14px;height:14px}
+#clock{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);white-space:nowrap}
+.js-only{display:none}
+.js-on .js-only{display:inline-flex}
+/* layout */
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+.sec{padding:72px 0 26px;scroll-margin-top:84px}
+.sec-head{margin-bottom:26px;border-top:1px solid var(--line);padding-top:24px;position:relative}
+.sec-head::before{content:"";position:absolute;top:-1px;left:0;width:120px;height:2px;background:linear-gradient(90deg,var(--acc),transparent)}
+.kicker{display:flex;align-items:center;gap:10px;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--acc);text-transform:uppercase;margin-bottom:10px}
+.kicker .num{border:1px solid var(--acc);border-radius:6px;padding:2px 7px;font-size:10px}
+.sec-head h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;line-height:1.25;margin-bottom:10px}
+.sec-head .intro{color:var(--dim);max-width:76ch}
+.pre{opacity:0;transform:translateY(24px)}
+.pre.in{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+/* hero */
+#top{padding:118px 0 36px;scroll-margin-top:0}
+.hk{display:flex;align-items:center;gap:10px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.22em;color:var(--teal);margin-bottom:16px}
+.hk .ic{width:20px;height:20px}
+h1 .t1{display:block;font-size:clamp(3rem,8vw,5.4rem);font-weight:700;letter-spacing:-.02em;line-height:1.02;background:linear-gradient(100deg,var(--teal) 10%,var(--cyan) 45%,var(--violet) 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1 .t2{display:block;font-size:clamp(1.6rem,4vw,2.7rem);font-weight:700;margin-top:4px}
+.hsub{color:var(--faint);font-size:14px;margin:10px 0 14px;font-weight:500}
+.hlede{color:var(--dim);max-width:68ch;font-size:16.5px;margin-bottom:22px}
+.verdict{display:flex;align-items:center;gap:15px;background:var(--amberS);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:14px;padding:15px 19px;margin-bottom:16px}
+.verdict .ic{width:30px;height:30px;color:var(--amber)}
+.verdict h3{font-size:1.1rem;font-weight:700;line-height:1.35}
+.verdict p{color:var(--dim);font-size:13.5px}
+.verdict .vn{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:1.9rem;font-weight:600;color:var(--amber);line-height:1;text-align:right}
+.verdict .vn small{display:block;font-size:9px;letter-spacing:.18em;color:var(--faint)}
+.meta{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:20px}
+.mchip{display:flex;align-items:baseline;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 14px}
+.mchip small{font-size:10.5px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.mchip b{font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+.hactions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line2);background:var(--surface2);color:var(--ink);border-radius:11px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s}
+.btn:hover{border-color:var(--teal);transform:translateY(-2px)}
+.btn-p{background:linear-gradient(100deg,var(--teal),var(--cyan));border:0;color:var(--btnink)}
+.strip{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x proximity}
+.tile{flex:1 1 126px;min-width:126px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 12px 10px;text-decoration:none;color:var(--ink);display:block;transition:transform .2s,border-color .2s}
+.tile:hover{transform:translateY(-3px);border-color:var(--line2)}
+.tile .grp{font-family:"IBM Plex Mono",monospace;font-size:8.5px;letter-spacing:.18em;margin-bottom:5px}
+.grp.tob{color:var(--teal)}.grp.alc{color:var(--violet)}.grp.hea{color:var(--amber)}
+.tile .nm{font-size:11.5px;color:var(--dim);line-height:1.3;min-height:30px;font-weight:500}
+.tile .vl{font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;line-height:1.15;margin:3px 0 5px}
+.tile.crit{background:linear-gradient(160deg,var(--redS),var(--surface) 70%);border-color:var(--red);animation:glow 2.8s ease-in-out infinite}
+.tile.crit .vl{color:var(--red)}
+@keyframes glow{0%,100%{box-shadow:0 0 0 1px var(--red),0 0 16px rgba(255,77,94,.22)}50%{box-shadow:0 0 0 1px var(--red),0 0 32px rgba(255,77,94,.45)}}
+.hint{display:flex;justify-content:space-between;gap:12px;color:var(--faint);font-size:12px;font-family:"IBM Plex Mono",monospace;flex-wrap:wrap}
+/* shared */
+.spk{width:100%;height:30px;display:block}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:700;color:var(--sc);background:var(--surface2);background:color-mix(in srgb,var(--sc) 12%,transparent);border:1px solid var(--line);border-color:color-mix(in srgb,var(--sc) 38%,transparent);white-space:nowrap}
+.chip .ic{width:13px;height:13px}
+.st-ok{--sc:var(--green)}.st-steady{--sc:var(--faint)}.st-watch{--sc:var(--amber)}.st-near{--sc:var(--blue)}.st-critical{--sc:var(--red)}
+.dl{display:inline-flex;align-items:center;gap:5px;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--dim)}
+.dl.up{color:var(--amber)}.dl.down{color:var(--cyan)}.dl.bad{color:var(--red)}.dl.good{color:var(--green)}
+.bul{margin-top:24px}
+.bt{position:relative;height:10px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)}
+.bt i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--teal);display:block}
+.bt b{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--ink);border-radius:2px}
+.bt em{position:absolute;top:-22px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--dim);white-space:nowrap;transform:translateX(-50%)}
+.bt em.r{transform:translateX(-100%)}
+.bm{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint);margin-top:5px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+.panel h3{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;margin-bottom:13px}
+.panel h3 .ic{color:var(--acc,var(--teal))}
+.note{font-size:11.5px;color:var(--faint);line-height:1.55;margin-top:11px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);text-align:left;padding:11px 13px;border-bottom:1px solid var(--line2);white-space:nowrap}
+td{padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.flag{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--amber);background:var(--amberS);border:1px dashed var(--amber);border-radius:99px;padding:5px 13px}
+/* summary */
+.sumgrid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:20px}
+.dec{border:1px solid var(--line);border-left:4px solid var(--red);border-radius:14px;background:var(--surface);padding:17px 19px;margin-bottom:12px}
+.dec.w{border-left-color:var(--amber)}
+.dec h4{display:flex;align-items:center;gap:9px;font-size:14.5px;font-weight:700;margin-bottom:5px}
+.dec h4 .ic{color:var(--red)}.dec.w h4 .ic{color:var(--amber)}
+.dec p{font-size:13px;color:var(--dim)}
+.dec .act{display:inline-block;margin-top:9px;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;color:var(--red);background:var(--redS);border:1px solid var(--red);border-radius:99px;padding:3px 11px}
+.dec.w .act{color:var(--amber);background:var(--amberS);border-color:var(--amber)}
+.path{counter-reset:s}
+.path li{list-style:none;display:grid;grid-template-columns:34px 1fr;gap:11px;padding:9px 0;border-bottom:1px solid var(--line);align-items:start}
+.path li:last-child{border-bottom:0}
+.path li::before{counter-increment:s;content:counter(s);width:28px;height:28px;border-radius:50%;border:2px solid var(--teal);color:var(--teal);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600}
+.path a{font-weight:700;text-decoration:none}
+.path small{display:block;color:var(--faint);font-size:12px}
+.keynums{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.kn{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px;text-align:center}
+.kn b{display:block;font-family:"IBM Plex Mono",monospace;font-size:1.5rem;font-weight:600}
+.kn small{font-size:10.5px;color:var(--dim);line-height:1.35;display:block}
+.kn.r b{color:var(--red)}.kn.a b{color:var(--amber)}.kn.g b{color:var(--green)}.kn.t b{color:var(--teal)}
+/* overview */
+.purpose{color:var(--dim);max-width:82ch;margin-bottom:20px}
+.purpose b{color:var(--ink)}
+.cmp{min-width:680px}
+.cmp td:first-child{font-weight:700;white-space:nowrap}
+.cmp td{color:var(--dim);font-size:13px}
+.cmp td:last-child{color:var(--teal);font-weight:600}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0 16px}
+.pillar{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:19px;position:relative;overflow:hidden}
+.pillar::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pc),transparent)}
+.pillar .pic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;color:var(--pc);background:var(--surface2);background:color-mix(in srgb,var(--pc) 13%,transparent);margin-bottom:11px}
+.pillar h3{font-size:15px;font-weight:700;margin-bottom:6px}
+.pillar p{font-size:12.5px;color:var(--dim)}
+.pillar .cad{display:inline-block;margin-top:11px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--pc);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
+.cons{display:flex;flex-wrap:wrap;gap:9px}
+.cch{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--dim);border:1px dashed var(--line2);border-radius:99px;padding:7px 14px}
+.cch .ic{width:14px;height:14px;color:var(--green)}
+/* kpis */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+.fbtn{border:1px solid var(--line2);background:transparent;border-radius:99px;padding:6px 14px;font-size:12.5px;font-weight:700;color:var(--dim);cursor:pointer}
+.fbtn.on{background:var(--tealS);border-color:var(--teal);color:var(--teal)}
+.ktbl{min-width:840px}
+.k-name b{display:block;font-size:14px;font-weight:700}
+.k-name small{font-size:11px;color:var(--faint)}
+.opt{font-family:"IBM Plex Mono",monospace;font-size:9px;border:1px solid var(--line2);border-radius:5px;padding:1px 5px;color:var(--faint);margin-left:5px;vertical-align:2px}
+.k-val{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;white-space:nowrap}
+.k-val.crit{color:var(--red)}
+.k-base{font-size:12px;color:var(--dim);max-width:24ch}
+.k-spark{width:130px}
+.rules-note{margin-top:13px;font-size:12.5px;color:var(--faint);border-left:3px solid var(--amber);padding:6px 14px;background:var(--amberS);border-radius:0 10px 10px 0}
+details.spec{border:1px solid var(--line);border-radius:13px;background:var(--surface);margin-top:10px;overflow:hidden}
+details.spec summary{display:flex;align-items:center;gap:11px;padding:13px 17px;cursor:pointer;font-weight:700;font-size:14px;list-style:none}
+details.spec summary::-webkit-details-marker{display:none}
+details.spec summary::before{content:"▸";color:var(--teal);transition:transform .2s;font-size:13px}
+details.spec[open] summary::before{transform:rotate(90deg)}
+details.spec summary .n{font-family:"IBM Plex Mono",monospace;color:var(--faint);font-size:11px}
+details.spec summary .chip{margin-left:auto}
+.spec-b{padding:4px 19px 17px;border-top:1px solid var(--line)}
+.spec-b dl{display:grid;grid-template-columns:1fr 1fr;gap:4px 22px;margin-top:12px}
+.spec-b dt{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin-top:9px}
+.spec-b dd{font-size:13px;color:var(--dim)}
+.spec-spark{border:1px solid var(--line);border-radius:11px;background:var(--surface2);padding:11px;margin-top:13px}
+.spec-spark small{display:block;font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.14em;color:var(--faint);margin-bottom:5px}
+.spec-spark .spk{height:64px}
+/* story */
+.steps{position:relative;padding-left:6px}
+.steps::before{content:"";position:absolute;left:25px;top:14px;bottom:14px;width:2px;background:linear-gradient(180deg,var(--teal),var(--cyan),var(--violet),var(--amber),var(--red))}
+.step{display:grid;grid-template-columns:52px 1fr;gap:15px;padding:14px 0;position:relative}
+.step .sn{width:38px;height:38px;border-radius:50%;background:var(--bg1);border:2px solid var(--sc2);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;color:var(--sc2);z-index:1}
+.step h3{font-size:1.15rem;font-weight:700;margin-bottom:4px}
+.step p{color:var(--dim);max-width:74ch}
+.step .where{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
+.step .where .ic{width:12px;height:12px;color:var(--sc2)}
+.story-close{margin-top:18px;border-left:3px solid var(--teal);padding:10px 18px;color:var(--dim);font-size:14.5px;background:var(--tealS);border-radius:0 12px 12px 0;max-width:80ch}
+/* ===== FULL DASHBOARD EXHIBIT (always dark, fixed palette) ===== */
+.dashwrap{border:1px solid var(--line2);border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.35);margin-top:6px}
+.dashcap{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;padding:11px 18px;background:var(--surface);border-bottom:1px solid var(--line);font-size:12px;color:var(--dim)}
+.dash{--db:#050d14;--ds:#0b1c28;--ds2:#0f2434;--dln:rgba(120,190,210,.17);--di:#f2ede4;--dd:#9db4bd;--df:#7d99a5;--dt:#2ee6c8;--dc:#4cc9f0;--dbl:#5b9dff;--dv:#b18cff;--da:#ffb224;--dr:#ff4d5e;--dg:#3ddc97;--do:#ff8a4c;
+background:radial-gradient(120% 90% at 70% -10%,#0a2431 0%,var(--db) 55%);color:var(--di);padding:20px;font-size:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dash .scrl{overflow-x:auto}
+.dash .inner{min-width:1150px}
+.d-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--dln);margin-bottom:14px}
+.d-head .ic{width:34px;height:34px;color:var(--dt)}
+.d-head h3{font-size:19px;font-weight:700;letter-spacing:.02em;line-height:1.2}
+.d-head .sub{font-size:10.5px;color:var(--df)}
+.d-chips{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.dch{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.08em;border:1px solid var(--dln);border-radius:6px;padding:4px 9px;color:var(--dd);background:var(--ds)}
+.dch.clk{color:var(--di);font-size:12px;font-weight:600}
+.d-row1{display:grid;grid-template-columns:1.15fr repeat(8,1fr);gap:8px;margin-bottom:10px}
+.dcard{background:var(--ds);border:1px solid var(--dln);border-radius:11px;padding:10px 10px 9px}
+.dcard .g{font-family:"IBM Plex Mono",monospace;font-size:7.5px;letter-spacing:.18em;margin-bottom:4px}
+.dcard .g.t{color:var(--dt)}.dcard .g.a{color:var(--dv)}.dcard .g.h{color:var(--da)}
+.dcard .n{font-size:10px;color:var(--dd);line-height:1.3;min-height:26px;font-weight:600}
+.dcard .v{font-family:"IBM Plex Mono",monospace;font-size:23px;font-weight:600;line-height:1.1;margin:3px 0 4px}
+.dcard .row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.dcard .spk{height:26px}
+.dchip{display:inline-flex;align-items:center;gap:4px;font-family:"IBM Plex Mono",monospace;font-size:9px;font-weight:600;border-radius:5px;padding:2px 6px}
+.dchip .ic{width:10px;height:10px}
+.dc-ok{color:var(--dg);background:rgba(61,220,151,.13)}
+.dc-st{color:var(--df);background:rgba(125,153,165,.13)}
+.dc-wa{color:var(--da);background:rgba(255,178,36,.13)}
+.dc-ne{color:var(--dbl);background:rgba(91,157,255,.13)}
+.dc-cr{color:#fff;background:var(--dr)}
+.dcard.crit{background:linear-gradient(165deg,rgba(255,77,94,.2),var(--ds) 75%);border:1.5px solid var(--dr);animation:glow2 2.6s ease-in-out infinite}
+.dcard.crit .v{color:var(--dr)}
+@keyframes glow2{0%,100%{box-shadow:0 0 14px rgba(255,77,94,.3)}50%{box-shadow:0 0 30px rgba(255,77,94,.6)}}
+.dcard .bt{background:var(--ds2);border-color:var(--dln);height:8px;margin-top:2px}
+.dcard .bt b{background:var(--di)}
+.dcard .bt em{color:var(--dd);font-size:8.5px;top:-19px}
+.dcard .bm{color:var(--df);font-size:8.5px}
+.dcard .bul{margin-top:21px}
+.d-health .v{font-size:13px;color:var(--da);font-family:inherit;font-weight:700}
+.d-row2{display:grid;grid-template-columns:5fr 4.1fr 3.4fr;gap:8px;margin-bottom:10px}
+.d-row3{display:grid;grid-template-columns:3fr 3fr 2.7fr 3fr;gap:8px}
+.dpanel{background:var(--ds);border:1px solid var(--dln);border-radius:11px;padding:12px}
+.dpanel h4{font-size:11px;font-weight:700;letter-spacing:.05em;margin-bottom:9px;display:flex;align-items:center;gap:7px;color:var(--di)}
+.dpanel h4 .ic{width:14px;height:14px;color:var(--dt)}
+.dpanel h4 small{color:var(--df);font-weight:500;font-size:9px;margin-left:auto;font-family:"IBM Plex Mono",monospace}
+.dleg{display:flex;flex-wrap:wrap;gap:9px;font-size:9px;color:var(--dd);margin-bottom:6px}
+.dleg span{display:inline-flex;align-items:center;gap:4px}
+.dleg svg{width:10px;height:10px}
+.dnote{font-size:8.5px;color:var(--df);margin-top:7px;line-height:1.5}
+.dcarto{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.ddist{border:1px solid var(--dln);border-radius:6px;padding:4px 3px;text-align:center;background:var(--ds2);position:relative;min-height:40px}
+.ddist .c{font-family:"IBM Plex Mono",monospace;font-size:8px;font-weight:600;color:var(--dd);display:block}
+.ddist .nm{font-size:7px;color:var(--df);line-height:1.2;display:block}
+.ddist .ic{position:absolute;top:2px;right:2px;width:9px;height:9px}
+.ddist.w{border-color:var(--da)}.ddist.w .ic{color:var(--da)}
+.ddist.c{border-color:var(--dr);animation:glow2 2.6s ease-in-out infinite}.ddist.c .ic{color:var(--dr)}
+.dlegchips{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.dlc{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:600;border:1px solid var(--dln);border-radius:6px;padding:4px 8px;background:var(--ds2)}
+.dlc .ic{width:11px;height:11px}
+.dlc.w{color:var(--da)}.dlc.c{color:var(--dr)}
+.dlc small{margin-left:auto;color:var(--dd);font-weight:500;font-size:8.5px}
+.dalert{display:grid;grid-template-columns:20px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--dln)}
+.dalert .ic{width:17px;height:17px;margin-top:1px}
+.dalert.cr .ic{color:var(--dr)}.dalert.wa .ic{color:var(--da)}
+.dalert h5{font-size:10.5px;font-weight:700;line-height:1.3}
+.dalert p{font-size:9px;color:var(--dd);margin:2px 0 5px}
+.dact{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:8px;font-weight:600;border-radius:99px;padding:2px 8px}
+.dalert.cr .dact{color:var(--dr);border:1px solid var(--dr);background:rgba(255,77,94,.12)}
+.dalert.wa .dact{color:var(--da);border:1px solid var(--da);background:rgba(255,178,36,.12)}
+.dash details{margin-top:6px}
+.dash details summary{cursor:pointer;font-size:9.5px;font-weight:600;color:var(--df);list-style:none;padding:4px 0}
+.dash details summary::-webkit-details-marker{display:none}
+.dash details summary::before{content:"▸ ";color:var(--df)}
+.dash details[open] summary::before{content:"▾ "}
+.dash details li{list-style:none;font-size:9px;color:var(--dd);padding:3px 0 3px 14px;position:relative}
+.dash details li::before{content:"○";position:absolute;left:0;color:var(--df);font-size:8px}
+.frow{display:grid;grid-template-columns:74px 1fr 44px;gap:7px;align-items:center;padding:4px 0}
+.frow small{font-size:8.5px;color:var(--dd);line-height:1.25}
+.fbar{height:13px;border-radius:4px;background:linear-gradient(90deg,var(--dt),var(--dc));min-width:8%}
+.frow b{font-family:"IBM Plex Mono",monospace;font-size:11px;text-align:right}
+.fchip{display:inline-block;margin-top:7px;font-family:"IBM Plex Mono",monospace;font-size:9px;font-weight:600;color:var(--dg);border:1px solid var(--dg);background:rgba(61,220,151,.12);border-radius:99px;padding:3px 9px}
+.dbig{font-family:"IBM Plex Mono",monospace;font-size:30px;font-weight:600;line-height:1.05}
+.dbig small{display:block;font-size:8.5px;color:var(--df);font-family:inherit;font-weight:500;margin-top:2px}
+.dgood{display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;color:var(--dg);margin-top:8px}
+.dgood .ic{width:12px;height:12px}
+.jrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--dln)}
+.jrow:last-of-type{border-bottom:0}
+.jrow .ic{width:14px;height:14px;color:var(--dbl)}
+.jrow span{font-size:9.5px;color:var(--dd)}
+.jrow b{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:10.5px;white-space:nowrap}
+.dasp{display:inline-block;margin-top:8px;font-size:8px;color:var(--dv);border:1px dashed var(--dv);border-radius:99px;padding:3px 8px}
+.dfoot{display:flex;flex-wrap:wrap;gap:7px;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--dln);font-family:"IBM Plex Mono",monospace;font-size:8.5px;color:var(--df)}
+.dash .bt{background:var(--ds2);border-color:var(--dln)}
+.dash .bt b{background:var(--di)}
+.dash .bt em{color:var(--dd)}
+.dash .bm{color:var(--df)}
+/* wireframe */
+.wf-title{margin:26px 0 12px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px}
+.wf-title .ic{color:var(--magenta)}
+.layout-grid{display:grid;grid-template-columns:1fr 330px;gap:22px;align-items:start}
+.wire-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--bg1);padding:13px}
+.wire{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;min-width:740px}
+.zone{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 9px;text-decoration:none;color:var(--ink);display:block;transition:border-color .2s,transform .2s}
+.zone:hover{border-color:var(--zc);transform:translateY(-2px)}
+.zone .zl{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.zone .zl b{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--zc);border:1px solid var(--zc);border-radius:5px;padding:0 5px;line-height:1.5}
+.zone .zl span{font-size:9.5px;color:var(--dim);font-weight:600;line-height:1.25}
+.sk{height:5px;border-radius:3px;background:var(--line2);margin-top:5px}
+.w60{width:60%}.w80{width:80%}.w40{width:40%}
+.zone .big{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600}
+.legend{position:sticky;top:84px;display:flex;flex-direction:column;gap:5px}
+.lg{display:grid;grid-template-columns:28px 1fr;gap:9px;align-items:start;border-left:3px solid var(--line);border-radius:8px;padding:6px 10px;text-decoration:none;color:var(--ink);transition:.2s}
+.lg:hover{border-left-color:var(--zc);background:var(--surface)}
+.lg b{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--zc);border:1px solid var(--zc);border-radius:5px;text-align:center;line-height:1.7}
+.lg .t{font-size:12px;font-weight:700;line-height:1.3}
+.lg .j{font-size:10.5px;color:var(--faint);line-height:1.4}
+.env{margin-top:22px}
+.env table{min-width:620px}
+.env td:first-child{font-weight:700;white-space:nowrap}
+.env td{font-size:13px;color:var(--dim)}
+.env td:nth-child(2){color:var(--cyan)}
+.env td:nth-child(3){color:var(--teal)}
+/* rules */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:19px;transition:transform .25s,border-color .25s}
+.rule:hover{transform:translateY(-4px);border-color:var(--violet)}
+.rule .rt{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.rule .ri{width:37px;height:37px;border-radius:10px;display:grid;place-items:center;background:var(--violetS);color:var(--violet)}
+.rule h3{font-size:14.5px;font-weight:700;line-height:1.3}
+.rule h3 small{display:block;font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--faint);letter-spacing:.16em;font-weight:400}
+.rule p{font-size:12.5px;color:var(--dim)}
+.rule .ex{margin-top:11px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--violet);background:var(--violetS);border-radius:8px;padding:6px 11px}
+/* context */
+.ctx{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.carto{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.dist{border:1px solid var(--line);border-radius:7px;padding:5px 3px;text-align:center;background:var(--surface2);position:relative;min-height:44px}
+.dist .c{font-family:"IBM Plex Mono",monospace;font-size:9px;font-weight:600;color:var(--dim);display:block}
+.dist .nm{font-size:7.5px;color:var(--faint);line-height:1.2;display:block}
+.dist .ic{position:absolute;top:2px;right:2px;width:11px;height:11px}
+.dist.w{border-color:var(--amber)}.dist.w .ic{color:var(--amber)}
+.dist.c{border-color:var(--red);animation:glow 2.8s ease-in-out infinite}.dist.c .ic{color:var(--red)}
+.d-legend{display:flex;flex-direction:column;gap:6px;margin-top:11px}
+.dl-chip{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--surface2)}
+.dl-chip .ic{width:14px;height:14px}
+.dl-chip.w{color:var(--amber)}.dl-chip.c{color:var(--red)}
+.dl-chip small{color:var(--dim);font-weight:500;margin-left:auto;font-size:11px}
+.alert-row{display:grid;grid-template-columns:26px 1fr;gap:11px;padding:10px 0;border-bottom:1px solid var(--line)}
+.alert-row .ic{width:21px;height:21px;margin-top:2px}
+.alert-row.crit .ic{color:var(--red)}.alert-row.watch .ic{color:var(--amber)}
+.alert-row h4{font-size:13.5px;font-weight:700;line-height:1.35}
+.alert-row p{font-size:12px;color:var(--dim);margin:2px 0 7px}
+.act2{display:inline-flex;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;border-radius:99px;padding:3px 10px}
+.alert-row.crit .act2{color:var(--red);background:var(--redS);border:1px solid var(--red)}
+.alert-row.watch .act2{color:var(--amber);background:var(--amberS);border:1px solid var(--amber)}
+.adv summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--faint);padding:10px 0 2px;list-style:none}
+.adv summary::-webkit-details-marker{display:none}
+.adv summary::before{content:"▸ "}
+.adv[open] summary::before{content:"▾ "}
+.adv li{list-style:none;font-size:12px;color:var(--dim);padding:5px 0 5px 19px;position:relative}
+.adv li::before{content:"○";position:absolute;left:2px;color:var(--faint);font-size:10px}
+.funnel-row{display:grid;grid-template-columns:96px 1fr 56px;gap:10px;align-items:center;padding:5px 0}
+.funnel-row small{font-size:11px;color:var(--dim);line-height:1.25}
+.f-bar{height:15px;border-radius:5px;background:linear-gradient(90deg,var(--teal),var(--cyan));min-width:8%}
+.funnel-row b{font-family:"IBM Plex Mono",monospace;font-size:13.5px;text-align:right}
+.f-chip{display:inline-block;margin-top:9px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;color:var(--green);background:var(--greenS);border:1px solid var(--green);border-radius:99px;padding:4px 12px}
+.big-stat{font-family:"IBM Plex Mono",monospace;font-size:2.5rem;font-weight:600;line-height:1.1}
+.big-stat small{font-size:12px;color:var(--faint);font-family:inherit;font-weight:500;display:block;margin-top:2px}
+.good-line{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--green);margin-top:9px}
+.jrow2{display:flex;align-items:center;gap:11px;padding:8px 0;border-bottom:1px solid var(--line)}
+.jrow2:last-of-type{border-bottom:0}
+.jrow2 .ic{width:18px;height:18px;color:var(--blue)}
+.jrow2 span{font-size:12.5px;color:var(--dim)}
+.jrow2 b{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:13.5px;white-space:nowrap}
+.asp{display:inline-block;margin-top:10px;font-size:11px;color:var(--violet);border:1px dashed var(--violet);border-radius:99px;padding:4px 11px}
+/* governance */
+.gov-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
+.src-list{display:grid;gap:8px}
+.src{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--dim);border:1px solid var(--line);border-radius:10px;padding:9px 13px;background:var(--surface2)}
+.src .ic{width:16px;height:16px;color:var(--green)}
+.tier{border:1px solid var(--line);border-radius:14px;padding:15px;background:var(--surface2);margin-bottom:10px}
+.tier h4{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;margin-bottom:5px}
+.tier h4 .ic{width:16px;height:16px;color:var(--teal)}
+.tier.ops h4 .ic{color:var(--blue)}
+.tier p{font-size:12.5px;color:var(--dim)}
+.legal{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.lch{display:inline-flex;align-items:center;gap:7px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--dim);border:1px solid var(--line2);border-radius:99px;padding:6px 12px}
+.lch .ic{width:13px;height:13px;color:var(--amber)}
+.privacy{display:flex;gap:12px;align-items:flex-start;background:var(--greenS);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:12px;padding:14px 18px;font-size:13.5px;color:var(--dim)}
+.privacy .ic{color:var(--green);width:20px;height:20px;margin-top:2px}
+/* glossary */
+.g-controls{display:flex;align-items:center;gap:12px;margin-bottom:13px;flex-wrap:wrap}
+.g-search{position:relative;flex:1;max-width:420px;min-width:220px}
+.g-search .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--faint);pointer-events:none}
+#glossSearch{width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:11px;color:var(--ink);padding:10px 14px 10px 36px;font-family:inherit;font-size:13.5px}
+#glossSearch:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--tealS)}
+#gCount{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint)}
+.gtbl{min-width:640px}
+.gtbl td:first-child{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--dim)}
+.gtbl td:nth-child(2){font-weight:700}
+.gtbl td:nth-child(3){color:var(--teal);font-weight:500}
+/* footer */
+footer{padding:56px 0 40px}
+.takeaway{border-radius:20px;padding:2px;background:linear-gradient(120deg,var(--teal),var(--violet),var(--amber),var(--red))}
+.takeaway-in{background:var(--bg1);border-radius:18px;padding:30px}
+.takeaway h2{font-size:clamp(1.35rem,2.6vw,1.85rem);font-weight:700;margin-bottom:11px;display:flex;align-items:center;gap:11px}
+.takeaway h2 .ic{color:var(--red);width:24px;height:24px}
+.takeaway p{color:var(--dim);max-width:84ch;font-size:15.5px;margin-bottom:20px}
+.takeaway p b{color:var(--ink)}
+.f-actions{display:flex;flex-wrap:wrap;gap:10px}
+.f-meta{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:space-between;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint)}
+#toTop{position:fixed;right:20px;bottom:20px;z-index:110;width:42px;height:42px;border-radius:12px;border:1px solid var(--line2);background:var(--surface2);display:grid;place-items:center;color:var(--ink);text-decoration:none}
+#toTop:hover{border-color:var(--teal);color:var(--teal)}
+/* responsive */
+@media (max-width:1080px){.layout-grid{grid-template-columns:1fr}.legend{position:static;display:grid;grid-template-columns:1fr 1fr;gap:5px}.ctx{grid-template-columns:1fr 1fr}.sumgrid{grid-template-columns:1fr}}
+@media (max-width:820px){.pillars,.rules,.gov-grid{grid-template-columns:1fr}#clock{display:none}.keynums{grid-template-columns:1fr 1fr}.spec-b dl{grid-template-columns:1fr}}
+@media (max-width:640px){.wrap{padding:0 15px}.ctx,.legend{grid-template-columns:1fr}.nav-in{padding:0 12px;gap:8px}.ctl .lbl{display:none}.verdict .vn{display:none}.step{grid-template-columns:42px 1fr;gap:11px}.steps::before{left:20px}.step .sn{width:32px;height:32px;font-size:11px}#top{padding-top:132px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.pre{opacity:1;transform:none}}
+/* print */
+@media print{
+.page,#theme:checked ~ .page{--bg0:#fff;--bg1:#fff;--surface:#fff;--surface2:#f4f1ea;--line:rgba(23,58,74,.22);--line2:rgba(23,58,74,.42);--ink:#14262e;--dim:#3d5763;--faint:#5f7883;--teal:#0a7d6e;--cyan:#0e7fa8;--blue:#2563c9;--violet:#7a4fd0;--magenta:#c02f9e;--amber:#a86404;--orange:#c2571f;--red:#cf2438;--green:#0c7a4e;--tealS:rgba(10,125,110,.08);--amberS:rgba(168,100,4,.08);--redS:rgba(207,36,56,.07);--violetS:rgba(122,79,208,.08);--greenS:rgba(12,122,78,.08);--blueS:rgba(37,99,201,.08);--navbg:#fff;--btnink:#fff;--aur:0;--gr:0}
+nav,#progress,.bg,.grain,#toTop,.js-only,.hactions,.filters,.g-controls,.f-actions{display:none!important}
+body{font-size:12px}
+#top{padding-top:8px}
+.sec{padding:24px 0 8px}
+.pre{opacity:1!important;transform:none!important}
+.panel,.rule,.step,.pillar,.tier,.takeaway,.dec,details.spec{break-inside:avoid}
+.tbl-wrap,.wire-wrap,.dash .scrl{overflow:visible}
+.dash .inner{min-width:0}
+.strip{flex-wrap:wrap;overflow:visible}
+.layout-grid{grid-template-columns:1fr}
+.legend{position:static;grid-template-columns:1fr 1fr}
+a{color:inherit;text-decoration:none}
+.dashwrap{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<input type="checkbox" id="lang" class="sr" aria-label="Switch language English / 繁體中文">
+<input type="checkbox" id="theme" class="sr" aria-label="Switch theme dark / light">
+<div class="page" id="page">
+
+<!-- SVG symbol library -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><line x1="8.6" y1="14.6" x2="15.4" y2="9.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 12.4l2.4 2.5 4.6-5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-tri" viewBox="0 0 24 24"><path d="M12 4L21 19H3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><line x1="12" y1="10" x2="12" y2="13.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="16.2" x2="12" y2="16.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-oct" viewBox="0 0 24 24"><path d="M8.2 3h7.6L21 8.2v7.6L15.8 21H8.2L3 15.8V8.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><line x1="12" y1="8" x2="12" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="16.3" x2="12" y2="16.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-near" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.4" fill="currentColor"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3L5 13.5h5L9 21l8-10.5h-5z" fill="currentColor"/></symbol>
+<symbol id="i-watch" viewBox="0 0 24 24"><circle cx="12" cy="14" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 14l3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="3" x2="12" y2="6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-trend" viewBox="0 0 24 24"><path d="M4 17l5-5 3 3 7-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 7H19v3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-gaugeoff" viewBox="0 0 24 24"><path d="M4 15.5a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="15.5" x2="15.5" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-shapes" viewBox="0 0 24 24"><rect x="3.5" y="13.5" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16.8" cy="17" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5l4 7H8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="i-rows" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="4.5" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="11" width="16" height="4.5" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="4" y1="19.5" x2="13" y2="19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="4" y1="10" x2="20" y2="10" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="3" x2="8" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9.5L4 20z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="11" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-8.8A5 5 0 0 1 12 8a5 5 0 0 1 9 3.2C19 15.6 12 20 12 20z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="12" x2="17.5" y2="6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-enf" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 11.6l2.2 2.2 3.8-4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.4 1.5a12.5 12.5 0 0 0 4.9 4.9L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="M3 8l9-4 9 4v8l-9 4-9-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 8l9 4 9-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><line x1="12" y1="12" x2="12" y2="20" stroke="currentColor" stroke-width="1.8"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><line x1="12" y1="4" x2="12" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="5" y1="7" x2="19" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7 7l-3 6a3 3 0 0 0 6 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M17 7l-3 6a3 3 0 0 0 6 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><line x1="8" y1="20" x2="16" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><line x1="10" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="16" x2="15" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-printer" viewBox="0 0 24 24"><path d="M7 8V4h10v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><rect x="4" y="8" width="16" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="7" y="14" width="10" height="6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+<symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 10.5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="15.5" y1="15.5" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M6 14l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z" fill="currentColor"/></symbol>
+</defs></svg>
+
+<div class="bg" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="grain" aria-hidden="true"></div>
+<div id="progress" aria-hidden="true"></div>
+
+<nav aria-label="Sections">
+ <div class="nav-in">
+  <a class="brand" href="#top"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span>TACO</span><small><span class="en">REF · v2</span><span class="zh">參考 · v2</span></small></a>
+  <div class="nls">
+   <a class="nl" href="#summary"><b>01</b><span class="en">Summary</span><span class="zh">摘要</span></a>
+   <a class="nl" href="#overview"><b>02</b><span class="en">Overview</span><span class="zh">總覽</span></a>
+   <a class="nl" href="#kpis"><b>03</b><span class="en">KPIs</span><span class="zh">指標</span></a>
+   <a class="nl" href="#story"><b>04</b><span class="en">Storyline</span><span class="zh">故事線</span></a>
+   <a class="nl" href="#layout"><b>05</b><span class="en">Full Dashboard</span><span class="zh">完整儀表板</span></a>
+   <a class="nl" href="#design"><b>06</b><span class="en">Design Rules</span><span class="zh">設計原則</span></a>
+   <a class="nl" href="#context"><b>07</b><span class="en">Supporting Data</span><span class="zh">支援數據</span></a>
+   <a class="nl" href="#gov"><b>08</b><span class="en">Governance</span><span class="zh">管治</span></a>
+   <a class="nl" href="#glossary"><b>09</b><span class="en">Glossary</span><span class="zh">用語</span></a>
+  </div>
+  <span id="clock">—:— HKT</span>
+  <label for="lang" class="ctl" title="English ⇄ 繁體中文"><span class="en">繁 中文</span><span class="zh">English</span></label>
+  <label for="theme" class="ctl" title="Dark wall ⇄ Light brief">
+   <span class="when-dark"><span class="en">☀ <span class="lbl">Light brief</span></span><span class="zh">☀ <span class="lbl">淺色簡報</span></span></span>
+   <span class="when-light"><span class="en">◑ <span class="lbl">Dark wall</span></span><span class="zh">◑ <span class="lbl">深色牆屏</span></span></span>
+  </label>
+  <button type="button" class="ctl js-only" id="printBtn"><svg class="ic" aria-hidden="true"><use href="#i-printer"/></svg><span class="lbl"><span class="en">Print / PDF</span><span class="zh">列印／PDF</span></span></button>
+ </div>
+</nav>
+
+<main>
+<div class="wrap">
+
+<!-- ============ HERO ============ -->
+<header id="top">
+ <div class="hk"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><span class="en">EXECUTIVE DASHBOARD · DESIGN REFERENCE · PRESENTATION EDITION</span><span class="zh">管理層儀表板 · 設計參考 · 簡報版</span></div>
+ <h1><span class="t1">TACO</span><span class="t2"><span class="en">Executive Command</span><span class="zh">管理層總覽</span></span></h1>
+ <p class="hsub"><span class="en">Tobacco &amp; Alcohol Control Office · Department of Health, HKSAR</span><span class="zh">衞生署控煙酒辦公室 · 香港特別行政區</span></p>
+ <p class="hlede"><span class="en">One monthly picture of tobacco and alcohol control — eight plain-number KPIs on top, the public-health story underneath, and exactly two decisions waiting for leadership. This edition is re-sequenced for presenting to senior management, and Part 05 now shows the complete dashboard display.</span><span class="zh">每月一頁，盡覽煙酒管制全貌 — 頂部八項顯淺數字指標，下方公共衞生故事線，以及兩項待管理層決策的事項。本版本已按高層簡報次序重新編排，第05部現展示完整儀表板。</span></p>
+ <div class="verdict" role="status">
+  <svg class="ic" aria-hidden="true"><use href="#i-tri"/></svg>
+  <div><h3><span class="en">Overall: Steady — 2 items need your attention</span><span class="zh">整體：平穩 — 兩項事項需要關注</span></h3>
+  <p><span class="en">Tobacco control is on track. Alcohol shop rule-breaks are rising and complaint replies are slowing.</span><span class="zh">煙草管制達標。酒類店舖違規上升，投訴回覆速度放緩。</span></p></div>
+  <span class="vn">02<small><span class="en">ITEMS</span><span class="zh">事項</span></small></span>
+ </div>
+ <div class="meta">
+  <span class="mchip"><small><span class="en">Data</span><span class="zh">數據</span></small><b><span class="en">Oct 2026</span><span class="zh">2026年10月</span></b></span>
+  <span class="mchip"><small><span class="en">Refresh</span><span class="zh">更新</span></small><b><span class="en">Monthly</span><span class="zh">每月</span></b></span>
+  <span class="mchip"><small><span class="en">Next update</span><span class="zh">下次更新</span></small><b><span class="en">17 Nov 2026</span><span class="zh">2026年11月17日</span></b></span>
+  <span class="mchip"><small><span class="en">Audience</span><span class="zh">對象</span></small><b><span class="en">DH senior management</span><span class="zh">衞生署高層管理人員</span></b></span>
+ </div>
+ <div class="hactions">
+  <a class="btn btn-p" href="#layout"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg><span class="en">Open the Full Dashboard (Part 05)</span><span class="zh">開啟完整儀表板（第05部）</span></a>
+  <a class="btn" href="#summary"><span class="en">Management Summary ↓</span><span class="zh">管理層摘要 ↓</span></a>
+ </div>
+ <div class="strip">
+  <a class="tile" href="#story"><div class="grp hea">▲ <span class="en">ATTENTION</span><span class="zh">需關注</span></div><div class="nm"><span class="en">Service health</span><span class="zh">服務健康</span></div><div class="vl" style="font-size:13px;color:var(--amber)"><span class="en">2 of 8 KPIs off target</span><span class="zh">8項中2項未達標</span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,18.0 13.4,18.0 23.7,33.0 34.1,18.0 44.5,18.0 54.8,3.0 65.2,18.0 75.5,18.0 85.9,3.0 96.3,3.0 106.6,3.0 117.0,3.0" fill="none" stroke="var(--amber)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--amber)"/></svg></a>
+  <a class="tile" href="#kpis"><div class="grp tob"><span class="en">TOBACCO</span><span class="zh">煙草</span></div><div class="nm"><span class="en">Smoking tickets</span><span class="zh">吸煙罰款告票</span></div><div class="vl">812</div><span class="chip st-ok"><svg class="ic"><use href="#i-check"/></svg><b><span class="en">On track</span><span class="zh">達標</span></b></span><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,33.0 13.4,30.3 23.7,27.8 34.1,25.6 44.5,23.8 54.8,21.1 65.2,18.9 75.5,16.7 85.9,14.0 96.3,11.9 106.6,10.3 117.0,3.0 117,33" fill="var(--teal)" opacity=".14"/><polyline points="3.0,33.0 13.4,30.3 23.7,27.8 34.1,25.6 44.5,23.8 54.8,21.1 65.2,18.9 75.5,16.7 85.9,14.0 96.3,11.9 106.6,10.3 117.0,3.0" fill="none" stroke="var(--teal)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--teal)"/></svg></a>
+  <a class="tile" href="#kpis"><div class="grp tob"><span class="en">TOBACCO</span><span class="zh">煙草</span></div><div class="nm"><span class="en">Court summonses (smoking)</span><span class="zh">吸煙罪行傳票</span></div><div class="vl">96</div><span class="chip st-steady"><svg class="ic"><use href="#i-minus"/></svg><b><span class="en">Steady</span><span class="zh">平穩</span></b></span><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><line x1="3" y1="19.7" x2="117" y2="19.7" stroke="var(--faint)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/><polyline points="3.0,3.0 13.4,23.0 23.7,13.0 34.1,33.0 44.5,9.7 54.8,26.3 65.2,19.7 75.5,6.3 85.9,29.7 96.3,16.3 106.6,19.7 117.0,29.7" fill="none" stroke="var(--teal)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="29.7" r="2.6" fill="var(--teal)"/></svg></a>
+  <a class="tile" href="#kpis"><div class="grp tob"><span class="en">TOBACCO</span><span class="zh">煙草</span></div><div class="nm"><span class="en">Public complaints (tobacco)</span><span class="zh">公眾投訴（煙草）</span></div><div class="vl">1,412</div><span class="chip st-watch"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Watch</span><span class="zh">觀察</span></b></span><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,31.5 13.4,28.6 23.7,33.0 34.1,25.7 44.5,22.7 54.8,24.7 65.2,19.8 75.5,17.4 85.9,20.8 96.3,14.9 106.6,18.6 117.0,3.0 117,33" fill="var(--amber)" opacity=".14"/><polyline points="3.0,31.5 13.4,28.6 23.7,33.0 34.1,25.7 44.5,22.7 54.8,24.7 65.2,19.8 75.5,17.4 85.9,20.8 96.3,14.9 106.6,18.6 117.0,3.0" fill="none" stroke="var(--amber)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--amber)"/></svg></a>
+  <a class="tile" href="#kpis"><div class="grp tob"><span class="en">TOBACCO</span><span class="zh">煙草</span></div><div class="nm"><span class="en">Inspections done</span><span class="zh">完成巡查</span></div><div class="vl">2,940</div><span class="chip st-near"><svg class="ic"><use href="#i-near"/></svg><b><span class="en">Near</span><span class="zh">接近</span></b></span><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,33.0 13.4,25.9 23.7,20.1 34.1,28.7 44.5,17.3 54.8,10.1 65.2,14.4 75.5,5.9 85.9,13.0 96.3,3.0 106.6,8.7 117.0,20.1" fill="none" stroke="var(--blue)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="20.1" r="2.6" fill="var(--blue)"/></svg></a>
+  <a class="tile crit" href="#kpis"><div class="grp alc"><span class="en">ALCOHOL</span><span class="zh">酒類</span></div><div class="nm"><span class="en">Rule-breaks found</span><span class="zh">發現違規</span></div><div class="vl">14</div><span class="chip st-critical"><svg class="ic"><use href="#i-oct"/></svg><b><span class="en">Act now</span><span class="zh">立即行動</span></b></span><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,33.0 13.4,33.0 23.7,25.5 34.1,25.5 44.5,33.0 54.8,25.5 65.2,25.5 75.5,18.0 85.9,25.5 96.3,25.5 106.6,25.5 117.0,3.0 117,33" fill="var(--red)" opacity=".16"/><polyline points="3.0,33.0 13.4,33.0 23.7,25.5 34.1,25.5 44.5,33.0 54.8,25.5 65.2,25.5 75.5,18.0 85.9,25.5 96.3,25.5 106.6,25.5 117.0,3.0" fill="none" stroke="var(--red)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--red)"/></svg></a>
+  <a class="tile" href="#kpis"><div class="grp alc"><span class="en">ALCOHOL</span><span class="zh">酒類</span></div><div class="nm"><span class="en">Court summonses (alcohol)</span><span class="zh">酒類罪行傳票</span></div><div class="vl">11</div><span class="chip st-steady"><svg class="ic"><use href="#i-minus"/></svg><b><span class="en">Steady</span><span class="zh">平穩</span></b></span><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><line x1="3" y1="18" x2="117" y2="18" stroke="var(--faint)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/><polyline points="3.0,33.0 13.4,3.0 23.7,18.0 34.1,33.0 44.5,18.0 54.8,3.0 65.2,33.0 75.5,18.0 85.9,3.0 96.3,18.0 106.6,18.0 117.0,18.0" fill="none" stroke="var(--violet)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="18" r="2.6" fill="var(--violet)"/></svg></a>
+  <a class="tile" href="#kpis"><div class="grp alc"><span class="en">ALCOHOL</span><span class="zh">酒類</span></div><div class="nm"><span class="en">Public complaints (alcohol)</span><span class="zh">公眾投訴（酒類）</span></div><div class="vl">87</div><span class="chip st-watch"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Watch</span><span class="zh">觀察</span></b></span><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,33.0 13.4,27.0 23.7,21.0 34.1,29.0 44.5,17.0 54.8,23.0 65.2,13.0 75.5,19.0 85.9,9.0 96.3,17.0 106.6,17.0 117.0,3.0" fill="none" stroke="var(--amber)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--amber)"/></svg></a>
+  <a class="tile" href="#kpis"><div class="grp alc"><span class="en">ALCOHOL</span><span class="zh">酒類</span></div><div class="nm"><span class="en">Shop checks</span><span class="zh">店舖查核</span></div><div class="vl">260</div><span class="chip st-watch"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Watch</span><span class="zh">觀察</span></b></span><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,33.0 13.4,22.1 23.7,16.6 34.1,24.8 44.5,12.5 54.8,19.4 65.2,8.5 75.5,13.9 85.9,3.0 96.3,11.2 106.6,8.5 117.0,5.7" fill="none" stroke="var(--amber)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="5.7" r="2.6" fill="var(--amber)"/></svg></a>
+ </div>
+ <div class="hint"><span><span class="en">Preview strip — the complete dashboard display is in Part 05 · figures are illustrative</span><span class="zh">預覽列 — 完整儀表板展示見第05部 · 數字為示例</span></span><span style="color:var(--teal)"><span class="en">Scroll for the full reference ↓</span><span class="zh">向下捲動查看完整參考 ↓</span></span></div>
+</header>
+
+<!-- ============ 01 MANAGEMENT SUMMARY ============ -->
+<section class="sec" id="summary" style="--acc:var(--red)">
+ <div class="sec-head"><div class="kicker"><span class="num">01</span><span class="en">Management Summary</span><span class="zh">管理層摘要</span></div>
+ <h2><span class="en">The half-second takeaway &amp; your two decisions</span><span class="zh">半秒結論與兩項決策</span></h2>
+ <p class="intro"><span class="en">Start the briefing here. One verdict, two decisions, and a five-minute path through the rest of this document.</span><span class="zh">簡報由這裏開始。一個結論、兩項決策，以及五分鐘讀完本文件的路線。</span></p></div>
+ <span class="flag"><svg class="ic" aria-hidden="true"><use href="#i-tri"/></svg><span class="en">All figures below are illustrative mock-up data — not real statistics</span><span class="zh">以下全部為示例數字 — 並非真實統計</span></span>
+ <div class="sumgrid">
+  <div>
+   <div class="dec"><h4><svg class="ic" aria-hidden="true"><use href="#i-oct"/></svg><span class="en">Alcohol rule-breaks up 27% — 14 cases</span><span class="zh">酒類違規上升27% — 14宗</span></h4>
+   <p><span class="en">3 repeat-offender shops cluster in Yau Tsim Mong / Sham Shui Po / Kwai Tsing (repeat offender = ≥3 verified violations in 6 months).</span><span class="zh">3間屢犯店舖集中於油尖旺／深水埗／葵青（屢犯＝6個月內≥3宗核實違規）。</span></p>
+   <span class="act"><span class="en">DECISION: Approve targeted checks</span><span class="zh">決策：批准針對性查核</span></span></div>
+   <div class="dec w"><h4><svg class="ic" aria-hidden="true"><use href="#i-tri"/></svg><span class="en">Complaint replies slowing — 91.4% vs 95% goal</span><span class="zh">投訴回覆放緩 — 91.4%，低於95%目標</span></h4>
+   <p><span class="en">Only 91.4% of complaints answered within 2 days; Sham Shui Po carries a 14-case backlog.</span><span class="zh">兩天內回覆僅91.4%；深水埗積壓14宗。</span></p>
+   <span class="act"><span class="en">DECISION: Add staff in Sham Shui Po</span><span class="zh">決策：增派深水埗人手</span></span></div>
+   <div class="keynums">
+    <div class="kn r"><b>+27%</b><small><span class="en">alcohol rule-breaks</span><span class="zh">酒類違規升幅</span></small></div>
+    <div class="kn a"><b>91.4%</b><small><span class="en">48h replies vs 95%</span><span class="zh">48小時回覆 對 95%</span></small></div>
+    <div class="kn g"><b>9.1%</b><small><span class="en">smoking rate → 7.8% goal</span><span class="zh">吸煙率 → 7.8%目標</span></small></div>
+    <div class="kn t"><b>34.6%</b><small><span class="en">quit at 1 year</span><span class="zh">一年戒煙成功率</span></small></div>
+   </div>
+  </div>
+  <div class="panel" style="--acc:var(--teal)">
+   <h3><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg><span class="en">5-minute briefing path (priority sequence)</span><span class="zh">五分鐘簡報路線（優先次序）</span></h3>
+   <ol class="path">
+    <li><div><a href="#summary"><span class="en">Verdict &amp; two decisions</span><span class="zh">結論與兩項決策</span></a><small><span class="en">You are here — 30 seconds</span><span class="zh">您現在的位置 — 30秒</span></small></div></li>
+    <li><div><a href="#layout"><span class="en">Show the FULL dashboard (Part 05)</span><span class="zh">展示完整儀表板（第05部）</span></a><small><span class="en">Every component, one screen — 90 seconds</span><span class="zh">所有組件，一頁盡覽 — 90秒</span></small></div></li>
+    <li><div><a href="#kpis"><span class="en">Walk the eight numbers (Part 03)</span><span class="zh">解讀八項數字（第03部）</span></a><small><span class="en">Baselines, thresholds, trends — 60 seconds</span><span class="zh">基準、門檻、走勢 — 60秒</span></small></div></li>
+    <li><div><a href="#story"><span class="en">Tell the five-question story (Part 04)</span><span class="zh">講述五問故事線（第04部）</span></a><small><span class="en">Where to focus &amp; health impact — 60 seconds</span><span class="zh">聚焦所在與健康成效 — 60秒</span></small></div></li>
+    <li><div><a href="#gov"><span class="en">Close: governance &amp; next refresh (Part 08)</span><span class="zh">總結：管治與下次更新（第08部）</span></a><small><span class="en">Zero new data · monthly · 17 Nov — 30 seconds</span><span class="zh">無需新增數據 · 每月 · 11月17日 — 30秒</span></small></div></li>
+   </ol>
+  </div>
+ </div>
+</section>
+
+<!-- ============ 02 OVERVIEW ============ -->
+<section class="sec" id="overview" style="--acc:var(--teal)">
+ <div class="sec-head"><div class="kicker"><span class="num">02</span><span class="en">Overview</span><span class="zh">總覽</span></div>
+ <h2><span class="en">What this dashboard is</span><span class="zh">這儀表板是甚麼</span></h2>
+ <p class="intro"><span class="en">Two source documents, reconciled into one executive screen. TACO.docx supplies the full three-pillar architecture; Dashboard 20261017_rev2 supplies the approved lean scope.</span><span class="zh">兩份來源文件，整合為一個管理層畫面。TACO.docx 提供三大支柱完整架構；Dashboard 20261017_rev2 提供已核准的精簡範圍。</span></p></div>
+ <p class="purpose"><span class="en"><b>Purpose</b> — let senior management judge service health in half a second, read the month's enforcement output in plain numbers, and leave with decisions, not raw data. rev2's eight monthly numbers headline the screen; the full architecture supplies the supporting context band.</span><span class="zh"><b>目的</b> — 讓高層半秒判斷服務健康，以顯淺數字讀懂本月執法產出，帶着決策而非原始數據離開。rev2 的八項每月數字作為頭條；完整架構提供支援脈絡。</span></p>
+ <div class="tbl-wrap"><table class="cmp">
+  <thead><tr><th><span class="en">Dimension</span><span class="zh">面向</span></th><th>TACO.docx</th><th><span class="en">rev2 (approved)</span><span class="zh">rev2（已核准）</span></th><th><span class="en">Applied here</span><span class="zh">本設計採用</span></th></tr></thead>
+  <tbody>
+   <tr><td><span class="en">Audience</span><span class="zh">對象</span></td><td><span class="en">Leaders · ops · policy</span><span class="zh">領導 · 行動 · 政策</span></td><td><span class="en">DH Seniors</span><span class="zh">衞生署高層</span></td><td><span class="en">Executive-first</span><span class="zh">管理層優先</span></td></tr>
+   <tr><td><span class="en">Scope</span><span class="zh">範圍</span></td><td><span class="en">3 pillars, many metrics</span><span class="zh">三大支柱、多項指標</span></td><td><span class="en">8 monthly KPIs</span><span class="zh">八項每月指標</span></td><td><span class="en">8 headline + context band</span><span class="zh">八項頭條＋支援帶</span></td></tr>
+   <tr><td><span class="en">Cadence</span><span class="zh">週期</span></td><td><span class="en">Real-time → annual</span><span class="zh">實時至每年</span></td><td><span class="en">Monthly</span><span class="zh">每月</span></td><td><span class="en">Monthly freshness stamp</span><span class="zh">每月時效標示</span></td></tr>
+   <tr><td><span class="en">Data</span><span class="zh">數據</span></td><td><span class="en">5+ systems</span><span class="zh">五個以上系統</span></td><td><span class="en">No new collection</span><span class="zh">無需新增收集</span></td><td><span class="en">Existing feeds only</span><span class="zh">只用現有來源</span></td></tr>
+   <tr><td><span class="en">Security</span><span class="zh">安全</span></td><td>RBAC · PDPO</td><td>—</td><td><span class="en">Executive tier, aggregates only</span><span class="zh">管理層權限，僅匯總</span></td></tr>
+  </tbody></table></div>
+ <div class="pillars">
+  <div class="pillar" style="--pc:var(--teal)"><div class="pic"><svg class="ic"><use href="#i-enf"/></svg></div><h3><span class="en">Enforcement &amp; Operations</span><span class="zh">執法與行動</span></h3><p><span class="en">Inspections, smoking tickets, summonses, seizures and prosecutions under Cap. 371 and Cap. 109 — including hotspot inspection density.</span><span class="zh">第371章及第109章下的巡查、吸煙告票、傳票、檢獲及檢控 — 包括黑點巡查密度。</span></p><span class="cad"><span class="en">Daily / real-time → monthly roll-up</span><span class="zh">每日／實時 → 每月匯總</span></span></div>
+  <div class="pillar" style="--pc:var(--violet)"><div class="pic"><svg class="ic"><use href="#i-radar"/></svg></div><h3><span class="en">Compliance &amp; Intelligence</span><span class="zh">合規與情報</span></h3><p><span class="en">Complaints and the 48-hour reply promise, the 18-district risk map, repeat-offender flags, retail checks, ASP and illicit-trade action.</span><span class="zh">投訴與48小時回覆承諾、18區風險地圖、屢犯標記、零售查核、另類吸煙產品及私煙行動。</span></p><span class="cad"><span class="en">Weekly / monthly</span><span class="zh">每週／每月</span></span></div>
+  <div class="pillar" style="--pc:var(--amber)"><div class="pic"><svg class="ic"><use href="#i-heart"/></svg></div><h3><span class="en">Health Impact &amp; Cessation</span><span class="zh">健康成效與戒煙服務</span></h3><p><span class="en">Quitline 1833 183 and clinics, 4-week and 52-week quit rates, smoking prevalence toward the 7.8% goal, youth and second-hand-smoke trends.</span><span class="zh">戒煙熱線1833 183及診所、4週與52週戒煙成功率、邁向7.8%目標的吸煙率、青少年及二手煙趨勢。</span></p><span class="cad"><span class="en">Quarterly / annual</span><span class="zh">每季／每年</span></span></div>
+ </div>
+ <div class="cons">
+  <span class="cch"><svg class="ic"><use href="#i-check"/></svg><span class="en">Zero new data collection</span><span class="zh">無需新增數據收集</span></span>
+  <span class="cch"><svg class="ic"><use href="#i-check"/></svg><span class="en">Fits the monthly reporting cycle</span><span class="zh">配合每月報告週期</span></span>
+  <span class="cch"><svg class="ic"><use href="#i-check"/></svg><span class="en">Executive tier first</span><span class="zh">管理層視圖優先</span></span>
+  <span class="cch"><svg class="ic"><use href="#i-check"/></svg><span class="en">RBAC + PDPO (Cap. 486)</span><span class="zh">權限分級＋《私隱條例》（第486章）</span></span>
+ </div>
+</section>
+
+<!-- ============ 03 KPIs ============ -->
+<section class="sec" id="kpis" style="--acc:var(--cyan)">
+ <div class="sec-head"><div class="kicker"><span class="num">03</span><span class="en">Core KPIs</span><span class="zh">核心指標</span></div>
+ <h2><span class="en">The eight core numbers</span><span class="zh">八項核心數字</span></h2>
+ <p class="intro"><span class="en">The approved monthly indicators. Every one carries a baseline, a threshold and a 12-month trend — a naked number is never shown. Expand ▸ any specification below the table for full detail.</span><span class="zh">已核准的每月指標。每項均附基準、門檻與12個月走勢 — 絕不顯示孤立數字。展開表下任何 ▸ 規格查看完整詳情。</span></p></div>
+ <div class="filters js-only">
+  <button type="button" class="fbtn on" data-f="all"><span class="en">All</span><span class="zh">全部</span></button>
+  <button type="button" class="fbtn" data-f="tob"><span class="en">Tobacco</span><span class="zh">煙草</span></button>
+  <button type="button" class="fbtn" data-f="alc"><span class="en">Alcohol</span><span class="zh">酒類</span></button>
+  <button type="button" class="fbtn" data-f="att"><span class="en">Needs attention</span><span class="zh">需關注</span></button>
+ </div>
+ <div class="tbl-wrap"><table class="ktbl">
+  <thead><tr><th><span class="en">Indicator</span><span class="zh">指標</span></th><th><span class="en">Oct 2026</span><span class="zh">2026年10月</span></th><th><span class="en">Change</span><span class="zh">變化</span></th><th><span class="en">Baseline · target</span><span class="zh">基準／目標</span></th><th><span class="en">12-month trend</span><span class="zh">12個月走勢</span></th><th><span class="en">Status</span><span class="zh">狀態</span></th></tr></thead>
+  <tbody>
+   <tr data-grp="tob"><td class="k-name"><b><span class="en">Smoking tickets</span><span class="zh">吸煙罰款告票</span></b><small><span class="en">Fixed penalty notices — smoking</span><span class="zh">吸煙罪行定額罰款通知書</span></small></td><td class="k-val">812</td><td><span class="dl good">▲ +6.4%</span></td><td class="k-base"><span class="en">Target 780 / month</span><span class="zh">每月目標780張</span></td><td class="k-spark"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,33.0 13.4,30.3 23.7,27.8 34.1,25.6 44.5,23.8 54.8,21.1 65.2,18.9 75.5,16.7 85.9,14.0 96.3,11.9 106.6,10.3 117.0,3.0 117,33" fill="var(--teal)" opacity=".14"/><polyline points="3.0,33.0 13.4,30.3 23.7,27.8 34.1,25.6 44.5,23.8 54.8,21.1 65.2,18.9 75.5,16.7 85.9,14.0 96.3,11.9 106.6,10.3 117.0,3.0" fill="none" stroke="var(--teal)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--teal)"/></svg></td><td><span class="chip st-ok"><svg class="ic"><use href="#i-check"/></svg><b><span class="en">On track</span><span class="zh">達標</span></b></span></td></tr>
+   <tr data-grp="tob"><td class="k-name"><b><span class="en">Court summonses (smoking)</span><span class="zh">吸煙罪行傳票</span></b><small><span class="en">Summonses — smoking offences</span><span class="zh">吸煙罪行傳票</span></small></td><td class="k-val">96</td><td><span class="dl down">▼ −3.1%</span></td><td class="k-base"><span class="en">12-month mean ≈ 99</span><span class="zh">12個月平均≈99張</span></td><td class="k-spark"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><line x1="3" y1="19.7" x2="117" y2="19.7" stroke="var(--faint)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/><polyline points="3.0,3.0 13.4,23.0 23.7,13.0 34.1,33.0 44.5,9.7 54.8,26.3 65.2,19.7 75.5,6.3 85.9,29.7 96.3,16.3 106.6,19.7 117.0,29.7" fill="none" stroke="var(--teal)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="29.7" r="2.6" fill="var(--teal)"/></svg></td><td><span class="chip st-steady"><svg class="ic"><use href="#i-minus"/></svg><b><span class="en">Steady</span><span class="zh">平穩</span></b></span></td></tr>
+   <tr data-grp="tob" data-att="1"><td class="k-name"><b><span class="en">Public complaints (tobacco)</span><span class="zh">公眾投訴（煙草）</span><span class="opt"><span class="en">optional</span><span class="zh">可選</span></span></b><small><span class="en">Complaints — tobacco</span><span class="zh">投訴 — 煙草</span></small></td><td class="k-val">1,412</td><td><span class="dl up">▲ +12.8%</span></td><td class="k-base"><span class="en">Watch above +10% MoM</span><span class="zh">按月&gt;+10%即觀察</span></td><td class="k-spark"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,31.5 13.4,28.6 23.7,33.0 34.1,25.7 44.5,22.7 54.8,24.7 65.2,19.8 75.5,17.4 85.9,20.8 96.3,14.9 106.6,18.6 117.0,3.0 117,33" fill="var(--amber)" opacity=".14"/><polyline points="3.0,31.5 13.4,28.6 23.7,33.0 34.1,25.7 44.5,22.7 54.8,24.7 65.2,19.8 75.5,17.4 85.9,20.8 96.3,14.9 106.6,18.6 117.0,3.0" fill="none" stroke="var(--amber)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--amber)"/></svg></td><td><span class="chip st-watch"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Watch</span><span class="zh">觀察</span></b></span></td></tr>
+   <tr data-grp="tob" data-att="1"><td class="k-name"><b><span class="en">Inspections done</span><span class="zh">完成巡查</span><span class="opt"><span class="en">optional</span><span class="zh">可選</span></span></b><small><span class="en">Inspections completed</span><span class="zh">完成巡查</span></small></td><td class="k-val">2,940</td><td><span class="dl"><span class="en">95% of target</span><span class="zh">達目標95%</span></span></td><td class="k-base"><span class="en">Target 3,100 / month</span><span class="zh">每月目標3,100次</span></td><td class="k-spark"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,33.0 13.4,25.9 23.7,20.1 34.1,28.7 44.5,17.3 54.8,10.1 65.2,14.4 75.5,5.9 85.9,13.0 96.3,3.0 106.6,8.7 117.0,20.1" fill="none" stroke="var(--blue)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="20.1" r="2.6" fill="var(--blue)"/></svg></td><td><span class="chip st-near"><svg class="ic"><use href="#i-near"/></svg><b><span class="en">Near</span><span class="zh">接近</span></b></span></td></tr>
+   <tr data-grp="alc" data-att="1"><td class="k-name"><b><span class="en">Rule-breaks found</span><span class="zh">發現違規</span></b><small><span class="en">Non-compliance cases — alcohol</span><span class="zh">違規個案 — 酒類</span></small></td><td class="k-val crit">14</td><td><span class="dl bad">▲ +27%</span></td><td class="k-base"><span class="en">Prior month 11 · critical &gt;+20%</span><span class="zh">上月11宗 · &gt;+20%即嚴重</span></td><td class="k-spark"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,33.0 13.4,33.0 23.7,25.5 34.1,25.5 44.5,33.0 54.8,25.5 65.2,25.5 75.5,18.0 85.9,25.5 96.3,25.5 106.6,25.5 117.0,3.0 117,33" fill="var(--red)" opacity=".16"/><polyline points="3.0,33.0 13.4,33.0 23.7,25.5 34.1,25.5 44.5,33.0 54.8,25.5 65.2,25.5 75.5,18.0 85.9,25.5 96.3,25.5 106.6,25.5 117.0,3.0" fill="none" stroke="var(--red)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--red)"/></svg></td><td><span class="chip st-critical"><svg class="ic"><use href="#i-oct"/></svg><b><span class="en">Act now</span><span class="zh">立即行動</span></b></span></td></tr>
+   <tr data-grp="alc"><td class="k-name"><b><span class="en">Court summonses (alcohol)</span><span class="zh">酒類罪行傳票</span></b><small><span class="en">Summonses — alcohol offences</span><span class="zh">酒類罪行傳票</span></small></td><td class="k-val">11</td><td><span class="dl">— <span class="en">flat</span><span class="zh">持平</span></span></td><td class="k-base"><span class="en">12-month mean ≈ 11</span><span class="zh">12個月平均≈11張</span></td><td class="k-spark"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><line x1="3" y1="18" x2="117" y2="18" stroke="var(--faint)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/><polyline points="3.0,33.0 13.4,3.0 23.7,18.0 34.1,33.0 44.5,18.0 54.8,3.0 65.2,33.0 75.5,18.0 85.9,3.0 96.3,18.0 106.6,18.0 117.0,18.0" fill="none" stroke="var(--violet)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="18" r="2.6" fill="var(--violet)"/></svg></td><td><span class="chip st-steady"><svg class="ic"><use href="#i-minus"/></svg><b><span class="en">Steady</span><span class="zh">平穩</span></b></span></td></tr>
+   <tr data-grp="alc" data-att="1"><td class="k-name"><b><span class="en">Public complaints (alcohol)</span><span class="zh">公眾投訴（酒類）</span><span class="opt"><span class="en">optional</span><span class="zh">可選</span></span></b><small><span class="en">Complaints — alcohol</span><span class="zh">投訴 — 酒類</span></small></td><td class="k-val">87</td><td><span class="dl up">▲ +9%</span></td><td class="k-base"><span class="en">Watch above +8% MoM</span><span class="zh">按月&gt;+8%即觀察</span></td><td class="k-spark"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,33.0 13.4,27.0 23.7,21.0 34.1,29.0 44.5,17.0 54.8,23.0 65.2,13.0 75.5,19.0 85.9,9.0 96.3,17.0 106.6,17.0 117.0,3.0" fill="none" stroke="var(--amber)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--amber)"/></svg></td><td><span class="chip st-watch"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Watch</span><span class="zh">觀察</span></b></span></td></tr>
+   <tr data-grp="alc" data-att="1"><td class="k-name"><b><span class="en">Shop checks</span><span class="zh">店舖查核</span><span class="opt"><span class="en">optional</span><span class="zh">可選</span></span></b><small><span class="en">Compliance checks — retail</span><span class="zh">合規查核 — 零售</span></small></td><td class="k-val">260</td><td><span class="dl up"><span class="en">91.3% pass</span><span class="zh">合格91.3%</span></span></td><td class="k-base"><span class="en">Pass-rate goal ≥ 95%</span><span class="zh">合格率目標≥95%</span></td><td class="k-spark"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,33.0 13.4,22.1 23.7,16.6 34.1,24.8 44.5,12.5 54.8,19.4 65.2,8.5 75.5,13.9 85.9,3.0 96.3,11.2 106.6,8.5 117.0,5.7" fill="none" stroke="var(--amber)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="5.7" r="2.6" fill="var(--amber)"/></svg></td><td><span class="chip st-watch"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Watch</span><span class="zh">觀察</span></b></span></td></tr>
+  </tbody></table></div>
+ <p class="rules-note"><span class="en">Alert rules — tobacco complaints: &gt;+10% MoM = watch · alcohol rule-breaks: &gt;+20% MoM = act now · shop-check pass rate &amp; 48h replies: below 95% = watch · inspections: below target = near.</span><span class="zh">告警規則 — 煙草投訴：按月&gt;+10% = 觀察 · 酒類違規：按月&gt;+20% = 立即行動 · 查核合格率及48小時回覆：低於95% = 觀察 · 巡查：低於目標 = 接近。</span></p>
+
+ <details class="spec"><summary><span class="n">K1</span><span class="en">Smoking tickets — full specification</span><span class="zh">吸煙罰款告票 — 完整規格</span><span class="chip st-ok"><svg class="ic"><use href="#i-check"/></svg><b><span class="en">On track</span><span class="zh">達標</span></b></span></summary>
+  <div class="spec-b"><div class="spec-spark"><small><span class="en">12-MONTH TREND · NOV → OCT</span><span class="zh">12個月走勢 · 11月 → 10月</span></small><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,33.0 13.4,30.3 23.7,27.8 34.1,25.6 44.5,23.8 54.8,21.1 65.2,18.9 75.5,16.7 85.9,14.0 96.3,11.9 106.6,10.3 117.0,3.0 117,33" fill="var(--teal)" opacity=".14"/><polyline points="3.0,33.0 13.4,30.3 23.7,27.8 34.1,25.6 44.5,23.8 54.8,21.1 65.2,18.9 75.5,16.7 85.9,14.0 96.3,11.9 106.6,10.3 117.0,3.0" fill="none" stroke="var(--teal)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--teal)"/></svg></div>
+  <div class="bul"><div class="bt"><i style="width:81.2%;background:var(--teal)"></i><b style="left:78%"></b><em style="left:78%"><span class="en">target 780</span><span class="zh">目標780</span></em></div><div class="bm"><span>0</span><span>1,000</span></div></div>
+  <dl><dt><span class="en">Definition</span><span class="zh">定義</span></dt><dd><span class="en">Fixed penalty notices issued for smoking offences in statutory no-smoking areas (Cap. 371).</span><span class="zh">在法定禁煙區吸煙罪行所發出的定額罰款通知書（第371章）。</span></dd>
+  <dt><span class="en">Source</span><span class="zh">數據來源</span></dt><dd><span class="en">Field officer mobile inspection app → monthly DH Information document.</span><span class="zh">前線人員流動巡查應用程式 → 衞生署每月資訊文件。</span></dd>
+  <dt><span class="en">Alert rule</span><span class="zh">告警規則</span></dt><dd><span class="en">Below 90% of target for 2 consecutive months = watch.</span><span class="zh">連續兩個月低於目標90% = 觀察。</span></dd>
+  <dt><span class="en">Visual encoding</span><span class="zh">視覺編碼</span></dt><dd><span class="en">Sparkline + bullet against target; ✓ chip when on target.</span><span class="zh">迷你走勢圖＋子彈圖對比目標；達標顯示 ✓ 標籤。</span></dd>
+  <dt><span class="en">Why it matters</span><span class="zh">為何重要</span></dt><dd><span class="en">The clearest single measure of frontline enforcement output.</span><span class="zh">前線執法產出最直接的單一量度。</span></dd></dl></div></details>
+
+ <details class="spec"><summary><span class="n">K2</span><span class="en">Court summonses (smoking) — full specification</span><span class="zh">吸煙罪行傳票 — 完整規格</span><span class="chip st-steady"><svg class="ic"><use href="#i-minus"/></svg><b><span class="en">Steady</span><span class="zh">平穩</span></b></span></summary>
+  <div class="spec-b"><dl><dt><span class="en">Definition</span><span class="zh">定義</span></dt><dd><span class="en">Summonses issued for smoking offences escalated beyond fixed penalties.</span><span class="zh">就吸煙罪行發出、須上庭處理的傳票。</span></dd>
+  <dt><span class="en">Source</span><span class="zh">數據來源</span></dt><dd><span class="en">TACO internal case management system.</span><span class="zh">TACO內部個案管理系統。</span></dd>
+  <dt><span class="en">Alert rule</span><span class="zh">告警規則</span></dt><dd><span class="en">±15% swing against the 12-month mean = review.</span><span class="zh">偏離12個月平均±15% = 檢視。</span></dd>
+  <dt><span class="en">Visual encoding</span><span class="zh">視覺編碼</span></dt><dd><span class="en">Quiet sparkline with mean tick; — chip when steady.</span><span class="zh">低調走勢圖附平均線；平穩顯示 — 標籤。</span></dd>
+  <dt><span class="en">Why it matters</span><span class="zh">為何重要</span></dt><dd><span class="en">Escalation volume shows offence seriousness and legal follow-through.</span><span class="zh">升級檢控數量反映罪行嚴重性及法律跟進力度。</span></dd></dl></div></details>
+
+ <details class="spec"><summary><span class="n">K3</span><span class="en">Public complaints (tobacco) — full specification</span><span class="zh">公眾投訴（煙草） — 完整規格</span><span class="chip st-watch"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Watch</span><span class="zh">觀察</span></b></span></summary>
+  <div class="spec-b"><dl><dt><span class="en">Definition</span><span class="zh">定義</span></dt><dd><span class="en">Complaints received via 1823, hotline, web form and e-submission. Top premises: catering, transport interchanges, bars.</span><span class="zh">經1823、熱線、網頁及電子表格收到的投訴。主要處所：食肆、公共運輸交匯處、酒吧。</span></dd>
+  <dt><span class="en">Source</span><span class="zh">數據來源</span></dt><dd><span class="en">1823 ticketing system.</span><span class="zh">1823個案系統。</span></dd>
+  <dt><span class="en">Alert rule</span><span class="zh">告警規則</span></dt><dd><span class="en">More than +10% month-on-month = watch.</span><span class="zh">按月上升超過10% = 觀察。</span></dd>
+  <dt><span class="en">Visual encoding</span><span class="zh">視覺編碼</span></dt><dd><span class="en">Spike-highlighted sparkline + ▲ chip.</span><span class="zh">突升標示走勢圖＋▲ 標籤。</span></dd>
+  <dt><span class="en">Why it matters</span><span class="zh">為何重要</span></dt><dd><span class="en">The public's early-warning signal of emerging hotspots; feeds the district risk map.</span><span class="zh">公眾對新興黑點的預警訊號；餵入分區風險地圖。</span></dd></dl></div></details>
+
+ <details class="spec"><summary><span class="n">K4</span><span class="en">Inspections done — full specification</span><span class="zh">完成巡查 — 完整規格</span><span class="chip st-near"><svg class="ic"><use href="#i-near"/></svg><b><span class="en">Near</span><span class="zh">接近</span></b></span></summary>
+  <div class="spec-b"><div class="bul"><div class="bt"><i style="width:89.1%;background:var(--blue)"></i><b style="left:93.9%"></b><em class="r" style="left:93.9%"><span class="en">target 3,100</span><span class="zh">目標3,100</span></em></div><div class="bm"><span>0</span><span>3,300</span></div></div>
+  <dl><dt><span class="en">Definition</span><span class="zh">定義</span></dt><dd><span class="en">Venue inspections completed across districts and premises types, including hotspot density at transport interchanges and night venues.</span><span class="zh">跨區及處所類型完成的巡查，包括運輸交匯處及夜間場所等黑點密度。</span></dd>
+  <dt><span class="en">Source</span><span class="zh">數據來源</span></dt><dd><span class="en">Field officer mobile inspection app.</span><span class="zh">前線人員流動巡查應用程式。</span></dd>
+  <dt><span class="en">Alert rule</span><span class="zh">告警規則</span></dt><dd><span class="en">Below 95% of target = near; below 85% = watch.</span><span class="zh">低於目標95% = 接近；低於85% = 觀察。</span></dd>
+  <dt><span class="en">Visual encoding</span><span class="zh">視覺編碼</span></dt><dd><span class="en">Bullet at 95% with target tick; ○ chip.</span><span class="zh">子彈圖顯示95%附目標刻度；○ 標籤。</span></dd>
+  <dt><span class="en">Why it matters</span><span class="zh">為何重要</span></dt><dd><span class="en">Coverage sustains deterrence; shortfalls erode it quietly.</span><span class="zh">巡查覆蓋維持阻嚇力；不足會悄然削弱成效。</span></dd></dl></div></details>
+
+ <details class="spec" open><summary><span class="n">K5</span><span class="en">Rule-breaks found — full specification (this month's anomaly)</span><span class="zh">發現違規 — 完整規格（本月異常）</span><span class="chip st-critical"><svg class="ic"><use href="#i-oct"/></svg><b><span class="en">Act now</span><span class="zh">立即行動</span></b></span></summary>
+  <div class="spec-b"><div class="spec-spark"><small><span class="en">12-MONTH TREND · NOV → OCT</span><span class="zh">12個月走勢 · 11月 → 10月</span></small><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,33.0 13.4,33.0 23.7,25.5 34.1,25.5 44.5,33.0 54.8,25.5 65.2,25.5 75.5,18.0 85.9,25.5 96.3,25.5 106.6,25.5 117.0,3.0 117,33" fill="var(--red)" opacity=".16"/><polyline points="3.0,33.0 13.4,33.0 23.7,25.5 34.1,25.5 44.5,33.0 54.8,25.5 65.2,25.5 75.5,18.0 85.9,25.5 96.3,25.5 106.6,25.5 117.0,3.0" fill="none" stroke="var(--red)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="var(--red)"/></svg></div>
+  <dl><dt><span class="en">Definition</span><span class="zh">定義</span></dt><dd><span class="en">Verified non-compliance cases at alcohol retail and licensed premises, including underage sales.</span><span class="zh">酒類零售及持牌處所經核實的違規個案，包括向未成年人售酒。</span></dd>
+  <dt><span class="en">Source</span><span class="zh">數據來源</span></dt><dd><span class="en">Case management system + compliance check programme.</span><span class="zh">個案管理系統＋合規查核計劃。</span></dd>
+  <dt><span class="en">Baseline</span><span class="zh">基準</span></dt><dd><span class="en">Prior month 11 · critical above +20%.</span><span class="zh">上月11宗 · 超過+20%即嚴重。</span></dd>
+  <dt><span class="en">Alert rule</span><span class="zh">告警規則</span></dt><dd><span class="en">More than +20% month-on-month = act now (red).</span><span class="zh">按月上升超過20% = 立即行動（紅色）。</span></dd>
+  <dt><span class="en">Visual encoding</span><span class="zh">視覺編碼</span></dt><dd><span class="en">The one glowing red card + ⬣ octagon + rising sparkline.</span><span class="zh">唯一發紅光的卡＋⬣ 八角形＋上升走勢。</span></dd>
+  <dt><span class="en">Why it matters</span><span class="zh">為何重要</span></dt><dd><span class="en">This month's single anomaly: 3 repeat-offender venues cluster in Yau Tsim Mong / Sham Shui Po / Kwai Tsing.</span><span class="zh">本月唯一異常：3間屢犯店舖集中於油尖旺／深水埗／葵青。</span></dd></dl></div></details>
+
+ <details class="spec"><summary><span class="n">K6</span><span class="en">Court summonses (alcohol) — full specification</span><span class="zh">酒類罪行傳票 — 完整規格</span><span class="chip st-steady"><svg class="ic"><use href="#i-minus"/></svg><b><span class="en">Steady</span><span class="zh">平穩</span></b></span></summary>
+  <div class="spec-b"><dl><dt><span class="en">Definition</span><span class="zh">定義</span></dt><dd><span class="en">Summonses issued for alcohol-related offences, e.g. sales to minors.</span><span class="zh">就酒類相關罪行（如向未成年人售酒）發出的傳票。</span></dd>
+  <dt><span class="en">Source</span><span class="zh">數據來源</span></dt><dd><span class="en">TACO internal case management system.</span><span class="zh">TACO內部個案管理系統。</span></dd>
+  <dt><span class="en">Alert rule</span><span class="zh">告警規則</span></dt><dd><span class="en">Sustained rise for 3 months = review.</span><span class="zh">連續3個月上升 = 檢視。</span></dd>
+  <dt><span class="en">Visual encoding</span><span class="zh">視覺編碼</span></dt><dd><span class="en">Quiet sparkline; — steady chip.</span><span class="zh">低調走勢圖；— 平穩標籤。</span></dd>
+  <dt><span class="en">Why it matters</span><span class="zh">為何重要</span></dt><dd><span class="en">Legal follow-through on the rule-breaks above.</span><span class="zh">上述違規個案的法律跟進。</span></dd></dl></div></details>
+
+ <details class="spec"><summary><span class="n">K7</span><span class="en">Public complaints (alcohol) — full specification</span><span class="zh">公眾投訴（酒類） — 完整規格</span><span class="chip st-watch"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Watch</span><span class="zh">觀察</span></b></span></summary>
+  <div class="spec-b"><dl><dt><span class="en">Definition</span><span class="zh">定義</span></dt><dd><span class="en">Public complaints on alcohol retail and licensed premises.</span><span class="zh">涉及酒類零售及持牌處所的公眾投訴。</span></dd>
+  <dt><span class="en">Source</span><span class="zh">數據來源</span></dt><dd><span class="en">1823 ticketing system.</span><span class="zh">1823個案系統。</span></dd>
+  <dt><span class="en">Alert rule</span><span class="zh">告警規則</span></dt><dd><span class="en">More than +8% month-on-month = watch (small base, tighter trigger).</span><span class="zh">按月上升超過8% = 觀察（基數小，觸發更緊）。</span></dd>
+  <dt><span class="en">Visual encoding</span><span class="zh">視覺編碼</span></dt><dd><span class="en">Sparkline + ▲ watch chip at +9%.</span><span class="zh">走勢圖；+9% 顯示 ▲ 觀察標籤。</span></dd>
+  <dt><span class="en">Why it matters</span><span class="zh">為何重要</span></dt><dd><span class="en">Early-warning feed for the alcohol risk picture.</span><span class="zh">酒類風險圖像的預警訊號。</span></dd></dl></div></details>
+
+ <details class="spec"><summary><span class="n">K8</span><span class="en">Shop checks — full specification</span><span class="zh">店舖查核 — 完整規格</span><span class="chip st-watch"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Watch</span><span class="zh">觀察</span></b></span></summary>
+  <div class="spec-b"><div class="bul"><div class="bt"><i style="width:56.5%;background:var(--violet)"></i><b style="left:75%"></b><em style="left:75%"><span class="en">goal 95%</span><span class="zh">目標95%</span></em></div><div class="bm"><span>80%</span><span>100%</span></div></div>
+  <dl><dt><span class="en">Definition</span><span class="zh">定義</span></dt><dd><span class="en">Underage-sale compliance checks (mystery shopper) at alcohol and tobacco retailers, incl. health-warning label checks. Pass rate tracked, not just volume.</span><span class="zh">於煙酒零售商進行的未成年銷售合規查核（神秘顧客試買），包括健康警示標籤查核。追蹤合格率，而非單看次數。</span></dd>
+  <dt><span class="en">Source</span><span class="zh">數據來源</span></dt><dd><span class="en">Compliance check programme records.</span><span class="zh">合規查核計劃紀錄。</span></dd>
+  <dt><span class="en">Alert rule</span><span class="zh">告警規則</span></dt><dd><span class="en">Pass rate below 95% = watch.</span><span class="zh">合格率低於95% = 觀察。</span></dd>
+  <dt><span class="en">Visual encoding</span><span class="zh">視覺編碼</span></dt><dd><span class="en">Bullet against the 95% tick + ▲ chip.</span><span class="zh">子彈圖對比95%刻度＋▲ 標籤。</span></dd>
+  <dt><span class="en">Why it matters</span><span class="zh">為何重要</span></dt><dd><span class="en">Pass rate is the true compliance outcome — volume alone can mislead.</span><span class="zh">合格率才是真實合規成果 — 單看次數會誤導。</span></dd></dl></div></details>
+</section>
+
+<!-- ============ 04 STORYLINE ============ -->
+<section class="sec" id="story" style="--acc:var(--blue)">
+ <div class="sec-head"><div class="kicker"><span class="num">04</span><span class="en">Storyline</span><span class="zh">故事線</span></div>
+ <h2><span class="en">The executive storyline</span><span class="zh">管理層故事線</span></h2>
+ <p class="intro"><span class="en">Five questions, answered in reading order. No jargon required — the layout itself is the narrative.</span><span class="zh">五條問題，按閱讀次序作答。無需術語 — 版面本身就是敘事。</span></p></div>
+ <div class="steps">
+  <div class="step" style="--sc2:var(--teal)"><span class="sn">1</span><div><h3><span class="en">Are we on track?</span><span class="zh">我們達標嗎？</span></h3><p><span class="en">Steady. Tobacco is on target; two items are flagged for attention.</span><span class="zh">平穩。煙草達標；兩項被標示需關注。</span></p><span class="where"><svg class="ic"><use href="#i-pin"/></svg><span class="en">Verdict banner · top-left</span><span class="zh">結論橫幅 · 左上角</span></span></div></div>
+  <div class="step" style="--sc2:var(--cyan)"><span class="sn">2</span><div><h3><span class="en">What happened this month?</span><span class="zh">本月發生了甚麼？</span></h3><p><span class="en">812 smoking tickets · 2,940 inspections · 1,412 complaints — and one red card: 14 alcohol rule-breaks, up 27%.</span><span class="zh">812張吸煙告票 · 2,940次巡查 · 1,412宗投訴 — 以及一張紅卡：14宗酒類違規，上升27%。</span></p><span class="where"><svg class="ic"><use href="#i-pin"/></svg><span class="en">Eight KPI cards · tobacco left, alcohol right</span><span class="zh">八張指標卡 · 煙草在左，酒類在右</span></span></div></div>
+  <div class="step" style="--sc2:var(--violet)"><span class="sn">3</span><div><h3><span class="en">Where should we focus?</span><span class="zh">應聚焦哪裏？</span></h3><p><span class="en">Yau Tsim Mong, Sham Shui Po and Kwai Tsing light up: complaint density × patrol coverage, with 3 repeat-offender shops.</span><span class="zh">油尖旺、深水埗及葵青亮起：投訴密度×巡查覆蓋，並有3間屢犯店舖。</span></p><span class="where"><svg class="ic"><use href="#i-pin"/></svg><span class="en">18-district risk map</span><span class="zh">18區風險地圖</span></span></div></div>
+  <div class="step" style="--sc2:var(--amber)"><span class="sn">4</span><div><h3><span class="en">Is public health improving?</span><span class="zh">公共衞生正在改善嗎？</span></h3><p><span class="en">Yes — the smoking rate is 9.1% and falling toward the 7.8% goal; 436 people stayed quit for a full year (34.6% of enrolments).</span><span class="zh">有 — 吸煙率9.1%，正朝7.8%目標下降；436人戒煙滿一年（佔報名者34.6%）。</span></p><span class="where"><svg class="ic"><use href="#i-pin"/></svg><span class="en">Prevalence bullet + quitting funnel</span><span class="zh">吸煙率子彈圖＋戒煙漏斗</span></span></div></div>
+  <div class="step" style="--sc2:var(--red)"><span class="sn">5</span><div><h3><span class="en">What needs my decision?</span><span class="zh">甚麼需要我決策？</span></h3><p><span class="en">Two asks: approve targeted checks on the 3 repeat venues, and add complaint-handling staff in Sham Shui Po (14-case backlog).</span><span class="zh">兩項請求：批准針對3間屢犯店舖的查核；增派深水埗投訴處理人手（積壓14宗）。</span></p><span class="where"><svg class="ic"><use href="#i-pin"/></svg><span class="en">Decision panel · grouped alerts</span><span class="zh">決策面板 · 分組告警</span></span></div></div>
+ </div>
+ <p class="story-close"><span class="en">The reading order is the design: verdict → red card → map → decisions. Half a second to the verdict; ninety seconds to the whole story.</span><span class="zh">閱讀次序即設計：結論 → 紅卡 → 地圖 → 決策。半秒看到結論，九十秒讀完故事。</span></p>
+</section>
+
+<!-- ============ 05 LAYOUT + FULL DASHBOARD ============ -->
+<section class="sec" id="layout" style="--acc:var(--magenta)">
+ <div class="sec-head"><div class="kicker"><span class="num">05</span><span class="en">Layout &amp; Viewing Environments</span><span class="zh">版面與觀看環境</span></div>
+ <h2><span class="en">The FULL TACO Dashboard display</span><span class="zh">完整 TACO 儀表板展示</span></h2>
+ <p class="intro"><span class="en">Every component, fully populated, exactly as the wall screen shows it: header &amp; freshness, health verdict, all 8 KPI cards, 12-month trend, all 18 districts, grouped alerts, cessation funnel, prevalence vs goal, joint operations, and prosecution &amp; SLA. The zone anatomy and environment specifications follow below.</span><span class="zh">每個組件均以完整內容呈現，與牆屏顯示一致：標題與時效列、健康結論、八張指標卡、12個月趨勢、全部18區、分組告警、戒煙漏斗、吸煙率與目標、聯合行動、檢控與服務承諾。分區解剖與環境規格見下文。</span></p></div>
+
+ <div class="dashwrap">
+  <div class="dashcap"><span><b><span class="en">Wall-screen render · dark mode</span><span class="zh">牆屏效果 · 深色模式</span></b> — <span class="en">scroll sideways on small screens</span><span class="zh">小屏幕可左右捲動</span></span><span class="flag" style="padding:3px 10px;font-size:10.5px"><span class="en">Illustrative Oct 2026 figures</span><span class="zh">2026年10月示例數字</span></span></div>
+  <div class="dash"><div class="scrl"><div class="inner">
+
+   <div class="d-head">
+    <svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg>
+    <div><h3><span class="en">TACO · EXECUTIVE COMMAND</span><span class="zh">TACO · 管理層總覽</span></h3><div class="sub"><span class="en">Tobacco &amp; Alcohol Control Office · Department of Health, HKSAR</span><span class="zh">衞生署控煙酒辦公室 · 香港特別行政區</span></div></div>
+    <div class="d-chips">
+     <span class="dch"><span class="en">DATA: OCT 2026</span><span class="zh">數據：2026年10月</span></span>
+     <span class="dch"><span class="en">REFRESH: MONTHLY</span><span class="zh">更新：每月</span></span>
+     <span class="dch"><span class="en">NEXT: 17 NOV 2026</span><span class="zh">下次：2026年11月17日</span></span>
+     <span class="dch clk">09:41 HKT</span>
+    </div>
+   </div>
+
+   <div class="d-row1">
+    <div class="dcard d-health"><div class="g h">▲ <span class="en">ATTENTION</span><span class="zh">需關注</span></div><div class="n"><span class="en">SERVICE HEALTH</span><span class="zh">服務健康</span></div><div class="v"><span class="en">2 of 8 KPIs off target</span><span class="zh">8項中2項未達標</span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,18.0 13.4,18.0 23.7,33.0 34.1,18.0 44.5,18.0 54.8,3.0 65.2,18.0 75.5,18.0 85.9,3.0 96.3,3.0 106.6,3.0 117.0,3.0" fill="none" stroke="#ffb224" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="#ffb224"/></svg></div>
+    <div class="dcard"><div class="g t"><span class="en">TOBACCO</span><span class="zh">煙草</span></div><div class="n"><span class="en">Smoking tickets</span><span class="zh">吸煙罰款告票</span></div><div class="v">812</div><div class="row"><span class="dchip dc-ok">▲ +6.4%</span><span class="dchip dc-ok"><svg class="ic"><use href="#i-check"/></svg><span class="en">On track</span><span class="zh">達標</span></span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,33.0 13.4,30.3 23.7,27.8 34.1,25.6 44.5,23.8 54.8,21.1 65.2,18.9 75.5,16.7 85.9,14.0 96.3,11.9 106.6,10.3 117.0,3.0 117,33" fill="#2ee6c8" opacity=".15"/><polyline points="3.0,33.0 13.4,30.3 23.7,27.8 34.1,25.6 44.5,23.8 54.8,21.1 65.2,18.9 75.5,16.7 85.9,14.0 96.3,11.9 106.6,10.3 117.0,3.0" fill="none" stroke="#2ee6c8" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="#2ee6c8"/></svg><div class="bul"><div class="bt"><i style="width:81.2%;background:#2ee6c8"></i><b style="left:78%"></b><em style="left:78%">780</em></div><div class="bm"><span>0</span><span>1,000</span></div></div></div>
+    <div class="dcard"><div class="g t"><span class="en">TOBACCO</span><span class="zh">煙草</span></div><div class="n"><span class="en">Summonses · smoking</span><span class="zh">傳票 · 吸煙</span></div><div class="v">96</div><div class="row"><span class="dchip dc-st">▼ −3.1%</span><span class="dchip dc-st"><svg class="ic"><use href="#i-minus"/></svg><span class="en">Steady</span><span class="zh">平穩</span></span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><line x1="3" y1="19.7" x2="117" y2="19.7" stroke="#7d99a5" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/><polyline points="3.0,3.0 13.4,23.0 23.7,13.0 34.1,33.0 44.5,9.7 54.8,26.3 65.2,19.7 75.5,6.3 85.9,29.7 96.3,16.3 106.6,19.7 117.0,29.7" fill="none" stroke="#2ee6c8" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="29.7" r="2.6" fill="#2ee6c8"/></svg><div class="dnote"><span class="en">12-mo mean ≈ 99</span><span class="zh">12個月平均≈99</span></div></div>
+    <div class="dcard"><div class="g t"><span class="en">TOBACCO</span><span class="zh">煙草</span></div><div class="n"><span class="en">Complaints · tobacco</span><span class="zh">投訴 · 煙草</span></div><div class="v">1,412</div><div class="row"><span class="dchip dc-wa">▲ +12.8%</span><span class="dchip dc-wa"><svg class="ic"><use href="#i-tri"/></svg><span class="en">Watch</span><span class="zh">觀察</span></span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,31.5 13.4,28.6 23.7,33.0 34.1,25.7 44.5,22.7 54.8,24.7 65.2,19.8 75.5,17.4 85.9,20.8 96.3,14.9 106.6,18.6 117.0,3.0 117,33" fill="#ffb224" opacity=".15"/><polyline points="3.0,31.5 13.4,28.6 23.7,33.0 34.1,25.7 44.5,22.7 54.8,24.7 65.2,19.8 75.5,17.4 85.9,20.8 96.3,14.9 106.6,18.6 117.0,3.0" fill="none" stroke="#ffb224" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="#ffb224"/></svg><div class="dnote"><span class="en">alert &gt; +10% MoM</span><span class="zh">按月&gt;+10%告警</span></div></div>
+    <div class="dcard"><div class="g t"><span class="en">TOBACCO</span><span class="zh">煙草</span></div><div class="n"><span class="en">Inspections done</span><span class="zh">完成巡查</span></div><div class="v">2,940</div><div class="row"><span class="dchip dc-ne"><svg class="ic"><use href="#i-near"/></svg><span class="en">Near · 95%</span><span class="zh">接近 · 95%</span></span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,33.0 13.4,25.9 23.7,20.1 34.1,28.7 44.5,17.3 54.8,10.1 65.2,14.4 75.5,5.9 85.9,13.0 96.3,3.0 106.6,8.7 117.0,20.1" fill="none" stroke="#5b9dff" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="20.1" r="2.6" fill="#5b9dff"/></svg><div class="bul"><div class="bt"><i style="width:89.1%;background:#5b9dff"></i><b style="left:93.9%"></b><em class="r" style="left:93.9%">3,100</em></div><div class="bm"><span>0</span><span>3,300</span></div></div></div>
+    <div class="dcard crit"><div class="g a"><span class="en">ALCOHOL</span><span class="zh">酒類</span></div><div class="n"><span class="en">NON-COMPLIANCE CASES</span><span class="zh">違規個案</span></div><div class="v">14</div><div class="row"><span class="dchip dc-cr">▲ +27%</span><span class="dchip dc-cr"><svg class="ic"><use href="#i-oct"/></svg><span class="en">Act now</span><span class="zh">立即行動</span></span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polygon points="3,33 3.0,33.0 13.4,33.0 23.7,25.5 34.1,25.5 44.5,33.0 54.8,25.5 65.2,25.5 75.5,18.0 85.9,25.5 96.3,25.5 106.6,25.5 117.0,3.0 117,33" fill="#ff4d5e" opacity=".2"/><polyline points="3.0,33.0 13.4,33.0 23.7,25.5 34.1,25.5 44.5,33.0 54.8,25.5 65.2,25.5 75.5,18.0 85.9,25.5 96.3,25.5 106.6,25.5 117.0,3.0" fill="none" stroke="#ff4d5e" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="#ff4d5e"/></svg><div class="dnote"><span class="en">baseline 11 · critical &gt; +20%</span><span class="zh">基準11 · &gt;+20%即嚴重</span></div></div>
+    <div class="dcard"><div class="g a"><span class="en">ALCOHOL</span><span class="zh">酒類</span></div><div class="n"><span class="en">Summonses · alcohol</span><span class="zh">傳票 · 酒類</span></div><div class="v">11</div><div class="row"><span class="dchip dc-st">— <span class="en">flat</span><span class="zh">持平</span></span><span class="dchip dc-st"><svg class="ic"><use href="#i-minus"/></svg><span class="en">Steady</span><span class="zh">平穩</span></span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><line x1="3" y1="18" x2="117" y2="18" stroke="#7d99a5" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/><polyline points="3.0,33.0 13.4,3.0 23.7,18.0 34.1,33.0 44.5,18.0 54.8,3.0 65.2,33.0 75.5,18.0 85.9,3.0 96.3,18.0 106.6,18.0 117.0,18.0" fill="none" stroke="#b18cff" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="18" r="2.6" fill="#b18cff"/></svg><div class="dnote"><span class="en">12-mo mean ≈ 11</span><span class="zh">12個月平均≈11</span></div></div>
+    <div class="dcard"><div class="g a"><span class="en">ALCOHOL</span><span class="zh">酒類</span></div><div class="n"><span class="en">Complaints · alcohol</span><span class="zh">投訴 · 酒類</span></div><div class="v">87</div><div class="row"><span class="dchip dc-wa">▲ +9%</span><span class="dchip dc-wa"><svg class="ic"><use href="#i-tri"/></svg><span class="en">Watch</span><span class="zh">觀察</span></span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,33.0 13.4,27.0 23.7,21.0 34.1,29.0 44.5,17.0 54.8,23.0 65.2,13.0 75.5,19.0 85.9,9.0 96.3,17.0 106.6,17.0 117.0,3.0" fill="none" stroke="#ffb224" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="3" r="2.6" fill="#ffb224"/></svg><div class="dnote"><span class="en">watch &gt; +8% MoM</span><span class="zh">按月&gt;+8%觀察</span></div></div>
+    <div class="dcard"><div class="g a"><span class="en">ALCOHOL</span><span class="zh">酒類</span></div><div class="n"><span class="en">Shop checks</span><span class="zh">店舖查核</span></div><div class="v">260</div><div class="row"><span class="dchip dc-wa"><svg class="ic"><use href="#i-tri"/></svg><span class="en">91.3% pass</span><span class="zh">合格91.3%</span></span></div><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,33.0 13.4,22.1 23.7,16.6 34.1,24.8 44.5,12.5 54.8,19.4 65.2,8.5 75.5,13.9 85.9,3.0 96.3,11.2 106.6,8.5 117.0,5.7" fill="none" stroke="#b18cff" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="5.7" r="2.6" fill="#b18cff"/></svg><div class="bul"><div class="bt"><i style="width:56.5%;background:#b18cff"></i><b style="left:75%"></b><em style="left:75%">95%</em></div><div class="bm"><span>80%</span><span>100%</span></div></div></div>
+   </div>
+
+   <div class="d-row2">
+    <div class="dpanel">
+     <h4><svg class="ic"><use href="#i-trend"/></svg><span class="en">TERRITORY-WIDE TREND · 12 MONTHS</span><span class="zh">全港趨勢 · 12個月</span><small><span class="en">Indexed · Nov = 100</span><span class="zh">指數 · 11月=100</span></small></h4>
+     <div class="dleg">
+      <span><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.5" fill="#2ee6c8"/></svg><span class="en">FPNs → 812</span><span class="zh">告票 → 812</span></span>
+      <span><svg viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" fill="#5b9dff"/></svg><span class="en">Summonses → 96</span><span class="zh">傳票 → 96</span></span>
+      <span><svg viewBox="0 0 10 10"><path d="M5 1l4 8H1z" fill="#b18cff"/></svg><span class="en">Alcohol rule-breaks → 14</span><span class="zh">酒類違規 → 14</span></span>
+      <span><svg viewBox="0 0 10 10"><rect x="2" y="2" width="6" height="6" transform="rotate(45 5 5)" fill="#ffb224"/></svg><span class="en">Complaints → 1,412</span><span class="zh">投訴 → 1,412</span></span>
+     </div>
+     <svg viewBox="0 0 600 230" style="width:100%;height:auto;display:block" preserveAspectRatio="none" aria-hidden="true">
+      <line x1="14" y1="14" x2="586" y2="14" stroke="rgba(120,190,210,.14)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+      <line x1="14" y1="96.9" x2="586" y2="96.9" stroke="rgba(120,190,210,.14)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+      <line x1="14" y1="180" x2="586" y2="180" stroke="rgba(120,190,210,.3)" stroke-width="1" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+      <text x="16" y="12" font-size="9" fill="#7d99a5" font-family="monospace">140</text>
+      <text x="16" y="94" font-size="9" fill="#7d99a5" font-family="monospace">120</text>
+      <text x="16" y="177" font-size="9" fill="#7d99a5" font-family="monospace">100</text>
+      <polyline points="14.0,180.1 66.0,167.8 118.0,156.2 170.0,146.0 222.0,137.9 274.0,125.6 326.0,115.4 378.0,105.2 430.0,93.0 482.0,83.4 534.0,75.9 586.0,42.6" fill="none" stroke="#2ee6c8" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+      <polyline points="14.0,180.1 66.0,204.0 118.0,192.0 170.0,216.0 222.0,188.1 274.0,208.0 326.0,200.0 378.0,184.1 430.0,212.0 482.0,196.0 534.0,200.0 586.0,212.0" fill="none" stroke="#5b9dff" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+      <polyline points="14.0,180.1 66.0,169.0 118.0,185.6 170.0,157.8 222.0,146.7 274.0,154.1 326.0,135.6 378.0,126.3 430.0,139.3 482.0,117.1 534.0,131.1 586.0,71.8" fill="none" stroke="#ffb224" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+      <polyline points="14.0,180.1 66.0,180.1 118.0,138.6 170.0,138.6 222.0,180.1 274.0,138.6 326.0,138.6 378.0,97.0 430.0,138.6 482.0,138.6 534.0,138.6 586.0,14.0" fill="none" stroke="#b18cff" stroke-width="2.5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+      <circle cx="586" cy="42.6" r="3.4" fill="#2ee6c8"/>
+      <rect x="582.5" y="208.5" width="7" height="7" fill="#5b9dff"/>
+      <rect x="583" y="68.8" width="6" height="6" transform="rotate(45 586 71.8)" fill="#ffb224"/>
+      <path d="M586 8l5.5 10h-11z" fill="#b18cff"/>
+      <text x="578" y="46" font-size="10" fill="#2ee6c8" text-anchor="end" font-family="monospace">812</text>
+      <text x="578" y="222" font-size="10" fill="#5b9dff" text-anchor="end" font-family="monospace">96</text>
+      <text x="576" y="76" font-size="10" fill="#ffb224" text-anchor="end" font-family="monospace">1,412</text>
+      <text x="574" y="18" font-size="10" fill="#b18cff" text-anchor="end" font-family="monospace">14</text>
+      <text x="540" y="32" font-size="10" fill="#b18cff" text-anchor="end" font-family="monospace" font-weight="bold">+27% vs Sep</text>
+      <text x="14" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">11</text><text x="66" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">12</text><text x="118" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">1</text><text x="170" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">2</text><text x="222" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">3</text><text x="274" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">4</text><text x="326" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">5</text><text x="378" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">6</text><text x="430" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">7</text><text x="482" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">8</text><text x="534" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">9</text><text x="580" y="228" font-size="8.5" fill="#7d99a5" font-family="monospace">10</text>
+     </svg>
+     <div class="dnote"><span class="en">Each line indexed to Nov = 100 for shape comparison; actual values labelled at line ends and on the KPI cards.</span><span class="zh">各線以11月=100指數化比較形態；實際數值標於線端及指標卡。</span></div>
+    </div>
+    <div class="dpanel">
+     <h4><svg class="ic"><use href="#i-pin"/></svg><span class="en">18-DISTRICT RISK MAP</span><span class="zh">18區風險地圖</span><small><span class="en">density × coverage</span><span class="zh">密度×覆蓋</span></small></h4>
+     <div class="dcarto">
+      <div class="ddist" title="Central &amp; Western 中西區 · 34"><span class="c">C&amp;W</span><span class="nm"><span class="en">Central &amp; W.</span><span class="zh">中西區</span></span></div>
+      <div class="ddist" title="Eastern 東區 · 41"><span class="c">E</span><span class="nm"><span class="en">Eastern</span><span class="zh">東區</span></span></div>
+      <div class="ddist" title="Southern 南區 · 28"><span class="c">S</span><span class="nm"><span class="en">Southern</span><span class="zh">南區</span></span></div>
+      <div class="ddist" title="Wan Chai 灣仔 · 55" style="background:color-mix(in srgb,#2ee6c8 22%,#0f2434)"><span class="c">WC</span><span class="nm"><span class="en">Wan Chai</span><span class="zh">灣仔</span></span></div>
+      <div class="ddist w" title="Sham Shui Po 深水埗 · 88" style="background:color-mix(in srgb,#ffb224 45%,#0f2434)"><svg class="ic"><use href="#i-tri"/></svg><span class="c">SSP</span><span class="nm"><span class="en">Sham Shui Po</span><span class="zh">深水埗</span></span></div>
+      <div class="ddist" title="Kowloon City 九龍城 · 62" style="background:color-mix(in srgb,#2ee6c8 28%,#0f2434)"><span class="c">KC</span><span class="nm"><span class="en">Kowloon City</span><span class="zh">九龍城</span></span></div>
+      <div class="ddist" title="Kwun Tong 觀塘 · 58" style="background:color-mix(in srgb,#2ee6c8 24%,#0f2434)"><span class="c">KUN</span><span class="nm"><span class="en">Kwun Tong</span><span class="zh">觀塘</span></span></div>
+      <div class="ddist" title="Wong Tai Sin 黃大仙 · 47"><span class="c">WTS</span><span class="nm"><span class="en">Wong Tai Sin</span><span class="zh">黃大仙</span></span></div>
+      <div class="ddist w" title="Yau Tsim Mong 油尖旺 · 92" style="background:color-mix(in srgb,#ffb224 50%,#0f2434)"><svg class="ic"><use href="#i-tri"/></svg><span class="c">YTM</span><span class="nm"><span class="en">Yau Tsim Mong</span><span class="zh">油尖旺</span></span></div>
+      <div class="ddist" title="Islands 離島 · 18"><span class="c">IS</span><span class="nm"><span class="en">Islands</span><span class="zh">離島</span></span></div>
+      <div class="ddist c" title="Kwai Tsing 葵青 · 96" style="background:color-mix(in srgb,#ff4d5e 50%,#0f2434)"><svg class="ic"><use href="#i-oct"/></svg><span class="c">KWA</span><span class="nm"><span class="en">Kwai Tsing</span><span class="zh">葵青</span></span></div>
+      <div class="ddist" title="North 北區 · 28"><span class="c">N</span><span class="nm"><span class="en">North</span><span class="zh">北區</span></span></div>
+      <div class="ddist" title="Sai Kung 西貢 · 24"><span class="c">SK</span><span class="nm"><span class="en">Sai Kung</span><span class="zh">西貢</span></span></div>
+      <div class="ddist" title="Sha Tin 沙田 · 44"><span class="c">ST</span><span class="nm"><span class="en">Sha Tin</span><span class="zh">沙田</span></span></div>
+      <div class="ddist" title="Tai Po 大埔 · 30"><span class="c">TP</span><span class="nm"><span class="en">Tai Po</span><span class="zh">大埔</span></span></div>
+      <div class="ddist" title="Tsuen Wan 荃灣 · 52" style="background:color-mix(in srgb,#2ee6c8 20%,#0f2434)"><span class="c">TW</span><span class="nm"><span class="en">Tsuen Wan</span><span class="zh">荃灣</span></span></div>
+      <div class="ddist" title="Tuen Mun 屯門 · 49"><span class="c">TM</span><span class="nm"><span class="en">Tuen Mun</span><span class="zh">屯門</span></span></div>
+      <div class="ddist" title="Yuen Long 元朗 · 48"><span class="c">YL</span><span class="nm"><span class="en">Yuen Long</span><span class="zh">元朗</span></span></div>
+     </div>
+     <div class="dlegchips">
+      <span class="dlc w"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Yau Tsim Mong</span><span class="zh">油尖旺</span></b><small><span class="en">▲ 1 repeat shop</span><span class="zh">▲ 1間屢犯店舖</span></small></span>
+      <span class="dlc w"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Sham Shui Po</span><span class="zh">深水埗</span></b><small><span class="en">▲ repeat shop · backlog 14</span><span class="zh">▲ 屢犯店舖 · 積壓14宗</span></small></span>
+      <span class="dlc c"><svg class="ic"><use href="#i-oct"/></svg><b><span class="en">Kwai Tsing</span><span class="zh">葵青</span></b><small><span class="en">⬣ repeat shop · highest density</span><span class="zh">⬣ 屢犯店舖 · 密度最高</span></small></span>
+     </div>
+     <div class="dnote"><span class="en">Shade = complaint density × patrol coverage. Repeat offender = ≥3 verified violations in 6 months.</span><span class="zh">色深＝投訴密度×巡查覆蓋。屢犯＝6個月內≥3宗核實違規。</span></div>
+    </div>
+    <div class="dpanel">
+     <h4><svg class="ic"><use href="#i-oct"/></svg><span class="en">GROUPED ALERTS · 2 + 4</span><span class="zh">分組告警 · 2 + 4</span></h4>
+     <div class="dalert cr"><svg class="ic"><use href="#i-oct"/></svg><div><h5><span class="en">Alcohol rule-breaks up 27%</span><span class="zh">酒類違規上升27%</span></h5><p><span class="en">3 repeat shops in YTM / SSP / Kwai Tsing.</span><span class="zh">油尖旺／深水埗／葵青3間屢犯店舖。</span></p><span class="dact"><span class="en">Approve targeted checks</span><span class="zh">批准針對性查核</span></span></div></div>
+     <div class="dalert wa"><svg class="ic"><use href="#i-tri"/></svg><div><h5><span class="en">Complaint replies slowing</span><span class="zh">投訴回覆放緩</span></h5><p><span class="en">91.4% within 2 days vs 95% goal · SSP backlog 14.</span><span class="zh">兩天內回覆91.4% 對 95%目標 · 深水埗積壓14宗。</span></p><span class="dact"><span class="en">Add staff in Sham Shui Po</span><span class="zh">增派深水埗人手</span></span></div></div>
+     <details><summary><span class="en">4 minor advisories (grouped)</span><span class="zh">4項輕微提示（已分組）</span></summary><ul>
+      <li><span class="en">Inspections at 95% of target — recover in November</span><span class="zh">巡查達目標95% — 11月補回</span></li>
+      <li><span class="en">Tobacco complaints +12.8% — monitor weekly</span><span class="zh">煙草投訴+12.8% — 每週監察</span></li>
+      <li><span class="en">Alcohol complaints +9% — nearing watch trigger</span><span class="zh">酒類投訴+9% — 接近觀察門檻</span></li>
+      <li><span class="en">Average case 46 days — inside the 60-day norm</span><span class="zh">平均個案46天 — 低於60天上限</span></li>
+     </ul></details>
+    </div>
+   </div>
+
+   <div class="d-row3">
+    <div class="dpanel">
+     <h4><svg class="ic"><use href="#i-heart"/></svg><span class="en">HELPING SMOKERS QUIT</span><span class="zh">協助市民戒煙</span></h4>
+     <div class="frow"><small><span class="en">calls</span><span class="zh">來電</span></small><div class="fbar" style="width:100%"></div><b>4,180</b></div>
+     <div class="frow"><small><span class="en">enrolled</span><span class="zh">報名</span></small><div class="fbar" style="width:30.1%;opacity:.83"></div><b>1,260</b></div>
+     <div class="frow"><small><span class="en">quit · 4 wk</span><span class="zh">戒煙 · 4週</span></small><div class="fbar" style="width:15.3%;opacity:.66"></div><b>640</b></div>
+     <div class="frow"><small><span class="en">quit · 52 wk</span><span class="zh">戒煙 · 52週</span></small><div class="fbar" style="width:10.4%;opacity:.5"></div><b>436</b></div>
+     <span class="fchip"><span class="en">34.6% quit at 1 year</span><span class="zh">一年戒煙成功率34.6%</span></span>
+     <div class="dnote"><span class="en">Quitline 1833 183 + DH clinics + digital referrals</span><span class="zh">戒煙熱線1833 183＋衞生署診所＋數碼轉介</span></div>
+    </div>
+    <div class="dpanel">
+     <h4><svg class="ic"><use href="#i-trend"/></svg><span class="en">SMOKING RATE VS GOAL</span><span class="zh">吸煙率與目標</span></h4>
+     <div class="dbig">9.1%<small><span class="en">daily cigarette smokers</span><span class="zh">每日吸煙人士比率</span></small></div>
+     <div class="bul"><div class="bt"><i style="width:75.8%;background:#3ddc97"></i><b style="left:65%"></b><em style="left:65%"><span class="en">goal 7.8%</span><span class="zh">目標7.8%</span></em></div><div class="bm"><span>0%</span><span>12%</span></div></div>
+     <div style="margin-top:9px"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,3.0 13.4,5.7 23.7,8.5 34.1,11.2 44.5,13.9 54.8,16.6 65.2,19.4 75.5,22.1 85.9,24.8 96.3,27.5 106.6,30.3 117.0,33.0" fill="none" stroke="#3ddc97" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="33" r="2.6" fill="#3ddc97"/></svg></div>
+     <div class="dgood"><svg class="ic"><use href="#i-check"/></svg><span class="en">Falling — policy goal 7.8%</span><span class="zh">下降中 — 政策目標7.8%</span></div>
+    </div>
+    <div class="dpanel">
+     <h4><svg class="ic"><use href="#i-enf"/></svg><span class="en">JOINT OPERATIONS</span><span class="zh">聯合行動</span></h4>
+     <div class="jrow"><svg class="ic"><use href="#i-enf"/></svg><span><span class="en">HKPF</span><span class="zh">香港警務處</span></span><b><span class="en">12 raids</span><span class="zh">12次突擊巡查</span></b></div>
+     <div class="jrow"><svg class="ic"><use href="#i-box"/></svg><span><span class="en">C&amp;ED</span><span class="zh">香港海關</span></span><b><span class="en">9 ops</span><span class="zh">9次行動</span></b></div>
+     <div class="jrow"><svg class="ic"><use href="#i-db"/></svg><span><span class="en">Illicit cigarettes seized</span><span class="zh">檢獲私煙</span></span><b><span class="en">38,400 sticks</span><span class="zh">38,400支</span></b></div>
+     <span class="dasp"><span class="en">ASP ban enforced online + offline</span><span class="zh">另類吸煙產品禁令 — 線上線下執法</span></span>
+    </div>
+    <div class="dpanel">
+     <h4><svg class="ic"><use href="#i-scale"/></svg><span class="en">PROSECUTION &amp; REPLY PROMISE</span><span class="zh">檢控與回覆承諾</span></h4>
+     <div class="dbig">87.2%<small><span class="en">Conviction rate</span><span class="zh">定罪率</span></small></div>
+     <div class="jrow"><svg class="ic"><use href="#i-watch"/></svg><span><span class="en">Avg case 46 days</span><span class="zh">平均個案46天</span></span></div>
+     <div class="jrow"><svg class="ic"><use href="#i-db"/></svg><span><span class="en">Fines realised (Oct)</span><span class="zh">已收罰款（10月）</span></span><b>HK$1.86M</b></div>
+     <div class="bul"><div class="bt"><i style="width:57%;background:#ffb224"></i><b style="left:75%"></b><em style="left:75%">95%</em></div><div class="bm"><span>80%</span><span>100%</span></div></div>
+     <div class="dnote" style="color:#ffb224;font-weight:600">▲ <span class="en">48h replies · 91.4% vs 95%</span><span class="zh">48小時回覆 · 91.4% 對 95%</span></div>
+    </div>
+   </div>
+
+   <div class="dfoot"><span><span class="en">Executive view · RBAC · PDPO Cap. 486 · Cap. 371 &amp; Cap. 109</span><span class="zh">管理層視圖 · RBAC · 《私隱條例》第486章 · 第371章及第109章</span></span><span><span class="en">Illustrative figures · not real statistics</span><span class="zh">示例數字 · 並非真實統計</span></span></div>
+
+  </div></div></div>
+ </div>
+
+ <h3 class="wf-title"><svg class="ic" aria-hidden="true"><use href="#i-shapes"/></svg><span class="en">Zone anatomy — eleven zones, one reading path (click a zone to jump)</span><span class="zh">分區解剖 — 十一個分區，一條閱讀路徑（點選分區跳往相關章節）</span></h3>
+ <div class="layout-grid">
+  <div class="wire-wrap"><div class="wire">
+   <a class="zone" href="#layout" style="grid-column:1/-1;min-height:42px;--zc:var(--faint)"><div class="zl"><b>A</b><span><span class="en">Header &amp; freshness</span><span class="zh">標題與時效列</span></span></div><div class="sk w40" style="margin-top:2px"></div></a>
+   <a class="zone" href="#story" style="grid-column:span 2;min-height:112px;--zc:var(--amber)"><div class="zl"><b>B</b><span><span class="en">Health verdict</span><span class="zh">健康結論</span></span></div><div class="big" style="color:var(--amber)">▲ <span class="en">ATTENTION</span><span class="zh">需關注</span></div><div class="sk w80"></div><div class="sk w60"></div></a>
+   <a class="zone" href="#kpis" style="grid-column:span 4;min-height:112px;--zc:var(--teal)"><div class="zl"><b>C</b><span><span class="en">Tobacco KPIs ×4</span><span class="zh">煙草指標 ×4</span></span></div><div class="big">812 · 96 · 1,412 · 2,940</div><div class="sk w80"></div><div class="sk w60"></div></a>
+   <a class="zone" href="#kpis" style="grid-column:span 4;min-height:112px;--zc:var(--violet)"><div class="zl"><b>D</b><span><span class="en">Alcohol KPIs ×4</span><span class="zh">酒類指標 ×4</span></span></div><div class="big"><span style="color:var(--red)">⬣ 14</span> · 11 · 87 · 260</div><div class="sk w80"></div><div class="sk w60"></div></a>
+   <a class="zone" href="#context" style="grid-column:span 4;min-height:140px;--zc:var(--cyan)"><div class="zl"><b>E</b><span><span class="en">Territory trend</span><span class="zh">全港趨勢</span></span></div><svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%;height:60px" aria-hidden="true"><polyline points="2,30 20,27 40,24 60,20 80,15 98,7" fill="none" stroke="var(--violet)" stroke-width="1.6" vector-effect="non-scaling-stroke"/><polyline points="2,33 20,31 40,29 60,26 80,23 98,18" fill="none" stroke="var(--blue)" stroke-width="1.6" vector-effect="non-scaling-stroke"/><polyline points="2,36 20,35 40,33 60,32 80,30 98,27" fill="none" stroke="var(--amber)" stroke-width="1.6" vector-effect="non-scaling-stroke"/><circle cx="98" cy="7" r="2.4" fill="var(--violet)"/></svg></a>
+   <a class="zone" href="#context" style="grid-column:span 3;min-height:140px;--zc:var(--amber)"><div class="zl"><b>F</b><span><span class="en">District risk map</span><span class="zh">分區風險地圖</span></span></div><div class="big" style="font-size:11px;color:var(--amber)">▲ YTM · ▲ SSP · <span style="color:var(--red)">⬣ KWA</span></div><div class="sk w80"></div><div class="sk w60"></div></a>
+   <a class="zone" href="#design" style="grid-column:span 3;min-height:140px;--zc:var(--red)"><div class="zl"><b>G</b><span><span class="en">Grouped alerts</span><span class="zh">分組告警</span></span></div><div class="big" style="font-size:11px;color:var(--red)">⬣ +27%</div><div class="big" style="font-size:11px;color:var(--amber);margin-top:4px">▲ 91.4%</div><div class="sk w60"></div></a>
+   <a class="zone" href="#context" style="grid-column:span 3;min-height:104px;--zc:var(--teal)"><div class="zl"><b>H</b><span><span class="en">Cessation funnel</span><span class="zh">戒煙漏斗</span></span></div><div class="sk w80"></div><div class="sk w60"></div><div class="sk w40"></div></a>
+   <a class="zone" href="#context" style="grid-column:span 3;min-height:104px;--zc:var(--green)"><div class="zl"><b>I</b><span><span class="en">Prevalence vs goal</span><span class="zh">吸煙率與目標</span></span></div><div class="big">9.1%</div><div class="sk w80"></div></a>
+   <a class="zone" href="#context" style="grid-column:span 2;min-height:104px;--zc:var(--blue)"><div class="zl"><b>J</b><span><span class="en">Joint operations</span><span class="zh">聯合行動</span></span></div><div class="sk w80"></div><div class="sk w60"></div><div class="sk w40"></div></a>
+   <a class="zone" href="#context" style="grid-column:span 2;min-height:104px;--zc:var(--violet)"><div class="zl"><b>K</b><span><span class="en">Prosecution &amp; SLA</span><span class="zh">檢控與服務承諾</span></span></div><div class="big" style="font-size:13px">87.2%</div><div class="sk w60"></div></a>
+  </div></div>
+  <div class="legend">
+   <a class="lg" href="#layout" style="--zc:var(--faint)"><b>A</b><span><span class="t"><span class="en">Header &amp; freshness</span><span class="zh">標題與時效列</span></span><br><span class="j"><span class="en">Identity · data month · refresh · next update · HKT clock</span><span class="zh">識別 · 數據月份 · 更新週期 · 下次更新 · 香港時間</span></span></span></a>
+   <a class="lg" href="#story" style="--zc:var(--amber)"><b>B</b><span><span class="t"><span class="en">Health verdict</span><span class="zh">健康結論</span></span><br><span class="j"><span class="en">One-line verdict, always top-left</span><span class="zh">一句結論，永遠左上</span></span></span></a>
+   <a class="lg" href="#kpis" style="--zc:var(--teal)"><b>C</b><span><span class="t"><span class="en">Tobacco KPIs ×4</span><span class="zh">煙草指標 ×4</span></span><br><span class="j"><span class="en">Tickets · summonses · complaints · inspections</span><span class="zh">告票 · 傳票 · 投訴 · 巡查</span></span></span></a>
+   <a class="lg" href="#kpis" style="--zc:var(--violet)"><b>D</b><span><span class="t"><span class="en">Alcohol KPIs ×4</span><span class="zh">酒類指標 ×4</span></span><br><span class="j"><span class="en">Rule-breaks (red) · summonses · complaints · checks</span><span class="zh">違規（紅）· 傳票 · 投訴 · 查核</span></span></span></a>
+   <a class="lg" href="#context" style="--zc:var(--cyan)"><b>E</b><span><span class="t"><span class="en">Territory trend</span><span class="zh">全港趨勢</span></span><br><span class="j"><span class="en">12-month lines, October spike annotated</span><span class="zh">12個月折線，標註10月突升</span></span></span></a>
+   <a class="lg" href="#context" style="--zc:var(--amber)"><b>F</b><span><span class="t"><span class="en">District risk map</span><span class="zh">分區風險地圖</span></span><br><span class="j"><span class="en">Complaint density × patrol coverage · repeat shops</span><span class="zh">投訴密度×巡查覆蓋 · 屢犯店舖</span></span></span></a>
+   <a class="lg" href="#design" style="--zc:var(--red)"><b>G</b><span><span class="t"><span class="en">Grouped alerts</span><span class="zh">分組告警</span></span><br><span class="j"><span class="en">2 decisions + grouped advisories</span><span class="zh">2項決策＋分組提示</span></span></span></a>
+   <a class="lg" href="#context" style="--zc:var(--teal)"><b>H</b><span><span class="t"><span class="en">Cessation funnel</span><span class="zh">戒煙漏斗</span></span><br><span class="j"><span class="en">Calls → enrolled → 4-week → 52-week quit</span><span class="zh">來電 → 報名 → 4週 → 52週戒煙</span></span></span></a>
+   <a class="lg" href="#context" style="--zc:var(--green)"><b>I</b><span><span class="t"><span class="en">Prevalence vs goal</span><span class="zh">吸煙率與目標</span></span><br><span class="j"><span class="en">9.1% against the 7.8% goal</span><span class="zh">9.1%對比7.8%目標</span></span></span></a>
+   <a class="lg" href="#context" style="--zc:var(--blue)"><b>J</b><span><span class="t"><span class="en">Joint operations</span><span class="zh">聯合行動</span></span><br><span class="j"><span class="en">HKPF · C&amp;ED · seizures</span><span class="zh">警務處 · 海關 · 檢獲</span></span></span></a>
+   <a class="lg" href="#context" style="--zc:var(--violet)"><b>K</b><span><span class="t"><span class="en">Prosecution &amp; SLA</span><span class="zh">檢控與服務承諾</span></span><br><span class="j"><span class="en">Convictions · case days · 48h replies</span><span class="zh">定罪 · 處理天數 · 48小時回覆</span></span></span></a>
+  </div>
+ </div>
+ <div class="env tbl-wrap"><table>
+  <thead><tr><th><span class="en">Aspect</span><span class="zh">項目</span></th><th><span class="en">Wall screen</span><span class="zh">牆屏</span></th><th><span class="en">Desktop / print</span><span class="zh">桌面／列印</span></th></tr></thead>
+  <tbody>
+   <tr><td><span class="en">Theme</span><span class="zh">主題</span></td><td><span class="en">Dark — mandatory</span><span class="zh">深色 — 必須</span></td><td><span class="en">Light brief or dark</span><span class="zh">淺色簡報或深色</span></td></tr>
+   <tr><td><span class="en">Type scale</span><span class="zh">字級</span></td><td><span class="en">KPI ≥ 96 px · labels ≥ 28 px</span><span class="zh">指標 ≥ 96 px · 標籤 ≥ 28 px</span></td><td><span class="en">KPI 44–56 px · labels 14–16 px</span><span class="zh">指標 44–56 px · 標籤 14–16 px</span></td></tr>
+   <tr><td><span class="en">Viewing distance</span><span class="zh">觀看距離</span></td><td><span class="en">3–8 m</span><span class="zh">3–8 米</span></td><td><span class="en">0.5 m</span><span class="zh">0.5 米</span></td></tr>
+   <tr><td><span class="en">Interaction</span><span class="zh">互動</span></td><td><span class="en">None — read-only</span><span class="zh">零互動 · 唯讀</span></td><td><span class="en">Click-through detail</span><span class="zh">點擊查看詳情</span></td></tr>
+   <tr><td><span class="en">Canvas</span><span class="zh">畫面</span></td><td><span class="en">Fixed 16:9, no scroll</span><span class="zh">固定16:9，不捲動</span></td><td><span class="en">Responsive, scrolls</span><span class="zh">響應式，可捲動</span></td></tr>
+   <tr><td><span class="en">Refresh</span><span class="zh">更新</span></td><td><span class="en">Monthly stamp</span><span class="zh">每月時效標示</span></td><td><span class="en">Monthly stamp</span><span class="zh">每月時效標示</span></td></tr>
+  </tbody></table></div>
+</section>
+
+<!-- ============ 06 DESIGN RULES ============ -->
+<section class="sec" id="design" style="--acc:var(--violet)">
+ <div class="sec-head"><div class="kicker"><span class="num">06</span><span class="en">Design Rules</span><span class="zh">設計原則</span></div>
+ <h2><span class="en">Eight design rules</span><span class="zh">八條設計原則</span></h2>
+ <p class="intro"><span class="en">The doctrine behind every pixel — built so anomalies are detected in milliseconds, not minutes.</span><span class="zh">每個像素背後的原則 — 讓異常以毫秒級而非分鐘級被察覺。</span></p></div>
+ <div class="rules">
+  <div class="rule"><div class="rt"><span class="ri"><svg class="ic"><use href="#i-bolt"/></svg></span><h3><small>R1</small><span class="en">Anomalies scream, normalcy whispers</span><span class="zh">異常搶眼，正常低調</span></h3></div><p><span class="en">Exactly one card may glow red — this month, alcohol rule-breaks. Everything healthy stays muted so the anomaly owns the eye.</span><span class="zh">只容一張卡發紅光 — 本月是酒類違規。健康的指標保持低調，讓異常獨佔視線。</span></p><div class="ex"><span class="en">Applied: 1 red card among 8 · 2 alerts among 6 signals</span><span class="zh">應用：8卡中1紅 · 6個訊號中2個告警</span></div></div>
+  <div class="rule"><div class="rt"><span class="ri"><svg class="ic"><use href="#i-watch"/></svg></span><h3><small>R2</small><span class="en">The 0.5-second rule</span><span class="zh">半秒法則</span></h3></div><p><span class="en">Critical health sits top-left with a one-line verdict, readable at a glance — from three metres away on a wall screen.</span><span class="zh">關鍵健康狀態置於左上，附一句結論 — 牆屏三米外一眼可讀。</span></p><div class="ex"><span class="en">Applied: “Steady — 2 items need attention” is read first</span><span class="zh">應用：「平穩 — 兩項需關注」最先被讀到</span></div></div>
+  <div class="rule"><div class="rt"><span class="ri"><svg class="ic"><use href="#i-trend"/></svg></span><h3><small>R3</small><span class="en">Context or it doesn't ship</span><span class="zh">無上下文，不上線</span></h3></div><p><span class="en">Every metric carries a baseline or target plus a 12-month sparkline. A number without context is banned.</span><span class="zh">每項指標必附基準或目標，加上12個月迷你走勢圖。禁止孤立數字。</span></p><div class="ex"><span class="en">Applied: 8 / 8 KPI cards carry spark + target tick</span><span class="zh">應用：8 / 8 張卡均有走勢＋目標刻度</span></div></div>
+  <div class="rule"><div class="rt"><span class="ri"><svg class="ic"><use href="#i-gaugeoff"/></svg></span><h3><small>R4</small><span class="en">Gauges vetoed</span><span class="zh">否決速度計圖表</span></h3></div><p><span class="en">Speedometer gauges burn space and hide history. Bullet graphs show progress against target; sparklines show direction.</span><span class="zh">速度計圖表浪費空間且隱藏歷史。子彈圖顯示對目標進度；走勢圖顯示方向。</span></p><div class="ex"><span class="en">Applied: inspections 95% bullet · prevalence vs 7.8% tick</span><span class="zh">應用：巡查95%子彈圖 · 吸煙率對7.8%刻度</span></div></div>
+  <div class="rule"><div class="rt"><span class="ri"><svg class="ic"><use href="#i-shapes"/></svg></span><h3><small>R5</small><span class="en">Never colour alone</span><span class="zh">絕不單靠顏色</span></h3></div><p><span class="en">Every status pairs colour with a shape and a word, so colour-blind readers and monochrome prints lose nothing.</span><span class="zh">每個狀態以形狀＋文字配對顏色，色弱讀者與黑白列印同樣無損。</span></p><div class="ex"><span class="en">Applied: ✓ on track · ▲ watch · ⬣ act now · ○ near · — steady</span><span class="zh">應用：✓ 達標 · ▲ 觀察 · ⬣ 立即行動 · ○ 接近 · — 平穩</span></div></div>
+  <div class="rule"><div class="rt"><span class="ri"><svg class="ic"><use href="#i-rows"/></svg></span><h3><small>R6</small><span class="en">Group alerts, kill fatigue</span><span class="zh">告警分組，防疲勞</span></h3></div><p><span class="en">Show only what demands action; collapse minor advisories into one quiet, expandable row.</span><span class="zh">只顯示需要行動的告警；輕微提示收進一行可展開的安靜列。</span></p><div class="ex"><span class="en">Applied: 2 decision alerts + 4 advisories grouped</span><span class="zh">應用：2個決策告警＋4個提示分組</span></div></div>
+  <div class="rule"><div class="rt"><span class="ri"><svg class="ic"><use href="#i-cal"/></svg></span><h3><small>R7</small><span class="en">Honest freshness</span><span class="zh">時效標示要誠實</span></h3></div><p><span class="en">A monthly dashboard must never fake a live pulse. Stamp the data month and the next update instead.</span><span class="zh">每月儀表板絕不假裝實時跳動。改為標示數據月份及下次更新日期。</span></p><div class="ex"><span class="en">Applied: “Data Oct 2026 · Monthly · Next 17 Nov 2026”</span><span class="zh">應用：「數據2026年10月 · 每月 · 下次11月17日」</span></div></div>
+  <div class="rule"><div class="rt"><span class="ri"><svg class="ic"><use href="#i-chat"/></svg></span><h3><small>R8</small><span class="en">Plain words first</span><span class="zh">顯淺用語優先</span></h3></div><p><span class="en">Executives read outcomes, not jargon: FPN becomes “smoking tickets”; SLA becomes “replies within 2 days”.</span><span class="zh">高層讀的是成果，不是術語：FPN 變成「吸煙告票」；SLA 變成「兩天內回覆」。</span></p><div class="ex"><span class="en">Applied: full glossary in section 09</span><span class="zh">應用：完整對照表見第09節</span></div></div>
+ </div>
+</section>
+
+<!-- ============ 07 SUPPORTING DATA ============ -->
+<section class="sec" id="context" style="--acc:var(--amber)">
+ <div class="sec-head"><div class="kicker"><span class="num">07</span><span class="en">Supporting Data</span><span class="zh">支援數據</span></div>
+ <h2><span class="en">Supporting health &amp; risk data — annotated detail</span><span class="zh">支援健康與風險數據 — 註解詳情</span></h2>
+ <p class="intro"><span class="en">The context band from the full architecture, with annotations for discussion. All figures: October 2026 (illustrative).</span><span class="zh">來自完整架構的支援帶，附討論用註解。全部數字：2026年10月（示例）。</span></p></div>
+ <div class="ctx">
+  <div class="panel" style="--acc:var(--amber)"><h3><svg class="ic"><use href="#i-pin"/></svg><span class="en">Where to focus — 18 districts</span><span class="zh">聚焦所在 — 18區</span></h3>
+   <div class="carto">
+    <div class="dist" title="Central &amp; Western 中西區 · 34"><span class="c">C&amp;W</span><span class="nm"><span class="en">Central &amp; W.</span><span class="zh">中西區</span></span></div>
+    <div class="dist" title="Eastern 東區 · 41"><span class="c">E</span><span class="nm"><span class="en">Eastern</span><span class="zh">東區</span></span></div>
+    <div class="dist" title="Southern 南區 · 28"><span class="c">S</span><span class="nm"><span class="en">Southern</span><span class="zh">南區</span></span></div>
+    <div class="dist" title="Wan Chai 灣仔 · 55"><span class="c">WC</span><span class="nm"><span class="en">Wan Chai</span><span class="zh">灣仔</span></span></div>
+    <div class="dist w" title="Sham Shui Po 深水埗 · 88" style="background:color-mix(in srgb,var(--amber) 30%,var(--surface2))"><svg class="ic"><use href="#i-tri"/></svg><span class="c">SSP</span><span class="nm"><span class="en">Sham Shui Po</span><span class="zh">深水埗</span></span></div>
+    <div class="dist" title="Kowloon City 九龍城 · 62"><span class="c">KC</span><span class="nm"><span class="en">Kowloon City</span><span class="zh">九龍城</span></span></div>
+    <div class="dist" title="Kwun Tong 觀塘 · 58"><span class="c">KUN</span><span class="nm"><span class="en">Kwun Tong</span><span class="zh">觀塘</span></span></div>
+    <div class="dist" title="Wong Tai Sin 黃大仙 · 47"><span class="c">WTS</span><span class="nm"><span class="en">Wong Tai Sin</span><span class="zh">黃大仙</span></span></div>
+    <div class="dist w" title="Yau Tsim Mong 油尖旺 · 92" style="background:color-mix(in srgb,var(--amber) 34%,var(--surface2))"><svg class="ic"><use href="#i-tri"/></svg><span class="c">YTM</span><span class="nm"><span class="en">Yau Tsim Mong</span><span class="zh">油尖旺</span></span></div>
+    <div class="dist" title="Islands 離島 · 18"><span class="c">IS</span><span class="nm"><span class="en">Islands</span><span class="zh">離島</span></span></div>
+    <div class="dist c" title="Kwai Tsing 葵青 · 96" style="background:color-mix(in srgb,var(--red) 30%,var(--surface2))"><svg class="ic"><use href="#i-oct"/></svg><span class="c">KWA</span><span class="nm"><span class="en">Kwai Tsing</span><span class="zh">葵青</span></span></div>
+    <div class="dist" title="North 北區 · 28"><span class="c">N</span><span class="nm"><span class="en">North</span><span class="zh">北區</span></span></div>
+    <div class="dist" title="Sai Kung 西貢 · 24"><span class="c">SK</span><span class="nm"><span class="en">Sai Kung</span><span class="zh">西貢</span></span></div>
+    <div class="dist" title="Sha Tin 沙田 · 44"><span class="c">ST</span><span class="nm"><span class="en">Sha Tin</span><span class="zh">沙田</span></span></div>
+    <div class="dist" title="Tai Po 大埔 · 30"><span class="c">TP</span><span class="nm"><span class="en">Tai Po</span><span class="zh">大埔</span></span></div>
+    <div class="dist" title="Tsuen Wan 荃灣 · 52"><span class="c">TW</span><span class="nm"><span class="en">Tsuen Wan</span><span class="zh">荃灣</span></span></div>
+    <div class="dist" title="Tuen Mun 屯門 · 49"><span class="c">TM</span><span class="nm"><span class="en">Tuen Mun</span><span class="zh">屯門</span></span></div>
+    <div class="dist" title="Yuen Long 元朗 · 48"><span class="c">YL</span><span class="nm"><span class="en">Yuen Long</span><span class="zh">元朗</span></span></div>
+   </div>
+   <div class="d-legend">
+    <span class="dl-chip w"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Yau Tsim Mong</span><span class="zh">油尖旺</span></b><small><span class="en">▲ 1 repeat shop</span><span class="zh">▲ 1間屢犯店舖</span></small></span>
+    <span class="dl-chip w"><svg class="ic"><use href="#i-tri"/></svg><b><span class="en">Sham Shui Po</span><span class="zh">深水埗</span></b><small><span class="en">▲ repeat shop · backlog 14</span><span class="zh">▲ 屢犯店舖 · 積壓14宗</span></small></span>
+    <span class="dl-chip c"><svg class="ic"><use href="#i-oct"/></svg><b><span class="en">Kwai Tsing</span><span class="zh">葵青</span></b><small><span class="en">⬣ repeat shop · highest density</span><span class="zh">⬣ 屢犯店舖 · 密度最高</span></small></span>
+   </div>
+   <p class="note"><span class="en">Shade = complaint density × patrol coverage. Repeat offender = ≥3 verified violations in 6 months. GIS overlay with patrol routes optimises shift deployment.</span><span class="zh">色深＝投訴密度×巡查覆蓋。屢犯＝6個月內≥3宗核實違規。GIS疊加巡邏路線，優化更份調配。</span></p></div>
+  <div class="panel" style="--acc:var(--red)"><h3><svg class="ic"><use href="#i-oct"/></svg><span class="en">What needs your decision</span><span class="zh">需要您決策的事項</span></h3>
+   <div class="alert-row crit"><svg class="ic"><use href="#i-oct"/></svg><div><h4><span class="en">Alcohol rule-breaks up 27%</span><span class="zh">酒類違規上升27%</span></h4><p><span class="en">3 repeat shops in Yau Tsim Mong / Sham Shui Po / Kwai Tsing.</span><span class="zh">油尖旺／深水埗／葵青有3間屢犯店舖。</span></p><span class="act2"><span class="en">Approve targeted checks</span><span class="zh">批准針對性查核</span></span></div></div>
+   <div class="alert-row watch"><svg class="ic"><use href="#i-tri"/></svg><div><h4><span class="en">Complaint replies slowing</span><span class="zh">投訴回覆放緩</span></h4><p><span class="en">91.4% answered within 2 days vs 95% goal; SSP backlog 14.</span><span class="zh">兩天內回覆91.4%，低於95%目標；深水埗積壓14宗。</span></p><span class="act2"><span class="en">Add staff in Sham Shui Po</span><span class="zh">增派深水埗人手</span></span></div></div>
+   <details class="adv"><summary><span class="en">4 minor advisories</span><span class="zh">4項輕微提示</span></summary><ul>
+    <li><span class="en">Inspections at 95% of target — recover in November</span><span class="zh">巡查達目標95% — 11月補回</span></li>
+    <li><span class="en">Tobacco complaints +12.8% — monitor weekly</span><span class="zh">煙草投訴+12.8% — 每週監察</span></li>
+    <li><span class="en">Alcohol complaints +9% — nearing watch trigger</span><span class="zh">酒類投訴+9% — 接近觀察門檻</span></li>
+    <li><span class="en">Average case 46 days — inside the 60-day norm</span><span class="zh">平均個案46天 — 低於60天上限</span></li>
+   </ul></details></div>
+  <div class="panel" style="--acc:var(--teal)"><h3><svg class="ic"><use href="#i-heart"/></svg><span class="en">Helping smokers quit</span><span class="zh">協助市民戒煙</span></h3>
+   <div class="funnel-row"><small><span class="en">calls</span><span class="zh">來電</span></small><div class="f-bar" style="width:100%"></div><b>4,180</b></div>
+   <div class="funnel-row"><small><span class="en">enrolled</span><span class="zh">報名</span></small><div class="f-bar" style="width:30.1%;opacity:.83"></div><b>1,260</b></div>
+   <div class="funnel-row"><small><span class="en">quit · 4 wk</span><span class="zh">戒煙 · 4週</span></small><div class="f-bar" style="width:15.3%;opacity:.66"></div><b>640</b></div>
+   <div class="funnel-row"><small><span class="en">quit · 52 wk</span><span class="zh">戒煙 · 52週</span></small><div class="f-bar" style="width:10.4%;opacity:.5"></div><b>436</b></div>
+   <span class="f-chip"><span class="en">34.6% quit at 1 year</span><span class="zh">一年戒煙成功率34.6%</span></span>
+   <p class="note"><span class="en">Quitline 1833 183 + DH clinics + digital referrals</span><span class="zh">戒煙熱線1833 183＋衞生署診所＋數碼轉介</span></p></div>
+  <div class="panel" style="--acc:var(--green)"><h3><svg class="ic"><use href="#i-trend"/></svg><span class="en">Smoking rate vs goal</span><span class="zh">吸煙率與目標</span></h3>
+   <div class="big-stat">9.1%<small><span class="en">daily cigarette smokers</span><span class="zh">每日吸煙人士比率</span></small></div>
+   <div class="bul"><div class="bt"><i style="width:75.8%;background:var(--green)"></i><b style="left:65%"></b><em style="left:65%"><span class="en">goal 7.8%</span><span class="zh">目標7.8%</span></em></div><div class="bm"><span>0%</span><span>12%</span></div></div>
+   <div style="margin-top:11px"><svg class="spk" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true"><polyline points="3.0,3.0 13.4,5.7 23.7,8.5 34.1,11.2 44.5,13.9 54.8,16.6 65.2,19.4 75.5,22.1 85.9,24.8 96.3,27.5 106.6,30.3 117.0,33.0" fill="none" stroke="var(--green)" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="117" cy="33" r="2.6" fill="var(--green)"/></svg></div>
+   <div class="good-line"><svg class="ic"><use href="#i-check"/></svg><span class="en">Falling — policy goal 7.8%</span><span class="zh">下降中 — 政策目標7.8%</span></div></div>
+  <div class="panel" style="--acc:var(--blue)"><h3><svg class="ic"><use href="#i-enf"/></svg><span class="en">Joint operations</span><span class="zh">聯合行動</span></h3>
+   <div class="jrow2"><svg class="ic"><use href="#i-enf"/></svg><span><span class="en">HKPF</span><span class="zh">香港警務處</span></span><b><span class="en">12 raids</span><span class="zh">12次突擊巡查</span></b></div>
+   <div class="jrow2"><svg class="ic"><use href="#i-box"/></svg><span><span class="en">C&amp;ED</span><span class="zh">香港海關</span></span><b><span class="en">9 ops</span><span class="zh">9次行動</span></b></div>
+   <div class="jrow2"><svg class="ic"><use href="#i-db"/></svg><span><span class="en">Illicit cigarettes seized</span><span class="zh">檢獲私煙</span></span><b><span class="en">38,400 sticks</span><span class="zh">38,400支</span></b></div>
+   <span class="asp"><span class="en">ASP prohibition enforced online + offline</span><span class="zh">另類吸煙產品禁令 — 線上線下執法</span></span></div>
+  <div class="panel" style="--acc:var(--violet)"><h3><svg class="ic"><use href="#i-scale"/></svg><span class="en">Prosecution &amp; reply promise</span><span class="zh">檢控與回覆承諾</span></h3>
+   <div class="big-stat">87.2%<small><span class="en">Conviction rate</span><span class="zh">定罪率</span></small></div>
+   <div class="jrow2" style="margin-top:7px"><svg class="ic"><use href="#i-watch"/></svg><span><span class="en">Avg case 46 days</span><span class="zh">平均個案46天</span></span></div>
+   <div class="jrow2"><svg class="ic"><use href="#i-db"/></svg><span><span class="en">Fines realised (Oct): HK$1.86M</span><span class="zh">已收罰款（10月）：186萬港元</span></span></div>
+   <div class="bul"><div class="bt"><i style="width:57%;background:var(--amber)"></i><b style="left:75%"></b><em style="left:75%">95%</em></div><div class="bm"><span>80%</span><span>100%</span></div></div>
+   <p class="note" style="color:var(--amber);font-weight:600">▲ <span class="en">48h replies · 91.4% vs 95%</span><span class="zh">48小時回覆 · 91.4% 對 95%</span></p></div>
+ </div>
+</section>
+
+<!-- ============ 08 GOVERNANCE ============ -->
+<section class="sec" id="gov" style="--acc:var(--green)">
+ <div class="sec-head"><div class="kicker"><span class="num">08</span><span class="en">Data &amp; Governance</span><span class="zh">數據與管治</span></div>
+ <h2><span class="en">Data sources &amp; governance</span><span class="zh">數據來源與管治</span></h2>
+ <p class="intro"><span class="en">Feeds, permissions and the legal frame — everything runs on existing systems, with zero new data collection.</span><span class="zh">數據來源、權限與法律框架 — 全部沿用現有系統，無需新增數據收集。</span></p></div>
+ <div class="gov-grid">
+  <div class="panel" style="--acc:var(--green)"><h3><svg class="ic"><use href="#i-db"/></svg><span class="en">Existing feeds — zero new collection</span><span class="zh">現有來源 — 無需新增收集</span></h3>
+   <div class="src-list">
+    <div class="src"><svg class="ic"><use href="#i-phone"/></svg><span class="en">1823 ticketing system</span><span class="zh">1823個案系統</span></div>
+    <div class="src"><svg class="ic"><use href="#i-enf"/></svg><span class="en">Field officer mobile inspection apps</span><span class="zh">前線人員流動巡查應用程式</span></div>
+    <div class="src"><svg class="ic"><use href="#i-db"/></svg><span class="en">Treasury revenue system</span><span class="zh">庫務署收入系統</span></div>
+    <div class="src"><svg class="ic"><use href="#i-heart"/></svg><span class="en">DH clinics database</span><span class="zh">衞生署診所資料庫</span></div>
+    <div class="src"><svg class="ic"><use href="#i-box"/></svg><span class="en">C&amp;ED referral portal</span><span class="zh">海關轉介平台</span></div>
+    <div class="src"><svg class="ic"><use href="#i-doc"/></svg><span class="en">Monthly DH Information document + TACO case management</span><span class="zh">衞生署每月資訊文件＋TACO個案管理系統</span></div>
+   </div></div>
+  <div class="panel" style="--acc:var(--teal)"><h3><svg class="ic"><use href="#i-lock"/></svg><span class="en">Access tiers (RBAC)</span><span class="zh">存取權限分級（RBAC）</span></h3>
+   <div class="tier"><h4><svg class="ic"><use href="#i-shield"/></svg><span class="en">Executive view — this dashboard</span><span class="zh">管理層視圖 — 本儀表板</span></h4><p><span class="en">Policy targets, macro prevalence, overall enforcement KPIs. Aggregates only — no personal data.</span><span class="zh">政策目標、宏觀吸煙率、整體執法指標。只顯示匯總 — 不含個人資料。</span></p></div>
+   <div class="tier ops"><h4><svg class="ic"><use href="#i-radar"/></svg><span class="en">Operational view — drill-down tier</span><span class="zh">行動作業視圖 — 下鑽層</span></h4><p><span class="en">Granular district maps, team inspection targets, pending complaint queues. Restricted by role.</span><span class="zh">細緻分區地圖、小隊巡查目標、待處理投訴隊列。按角色限制存取。</span></p></div>
+   <div class="legal">
+    <span class="lch"><svg class="ic"><use href="#i-scale"/></svg><span class="en">Cap. 371 · Smoking (Public Health) Ordinance</span><span class="zh">第371章 · 《吸煙（公眾衞生）條例》</span></span>
+    <span class="lch"><svg class="ic"><use href="#i-scale"/></svg><span class="en">Cap. 109 · Dutiable Commodities Ordinance</span><span class="zh">第109章 · 《應課稅品條例》</span></span>
+    <span class="lch"><svg class="ic"><use href="#i-scale"/></svg><span class="en">Cap. 486 · Personal Data (Privacy) Ordinance</span><span class="zh">第486章 · 《個人資料（私隱）條例》</span></span>
+    <span class="lch"><svg class="ic"><use href="#i-scale"/></svg><span class="en">ASP import / manufacture / sale / advertising ban</span><span class="zh">另類吸煙產品進口／製造／銷售／廣告禁令</span></span>
+   </div></div>
+ </div>
+ <div class="privacy"><svg class="ic"><use href="#i-shield"/></svg><span><span class="en">RBAC enforces the two tiers; the executive screen carries aggregate statistics only, keeping it inside PDPO (Cap. 486).</span><span class="zh">RBAC 落實兩層權限；管理層畫面僅載匯總統計，符合《個人資料（私隱）條例》（第486章）。</span></span></div>
+</section>
+
+<!-- ============ 09 GLOSSARY ============ -->
+<section class="sec" id="glossary" style="--acc:var(--orange)">
+ <div class="sec-head"><div class="kicker"><span class="num">09</span><span class="en">Glossary</span><span class="zh">用語對照</span></div>
+ <h2><span class="en">Plain-language glossary</span><span class="zh">顯淺用語對照表</span></h2>
+ <p class="intro"><span class="en">Executives read outcomes, not jargon. Every technical term on the dashboard has a plain-English and Traditional-Chinese equivalent.</span><span class="zh">高層讀的是成果，不是術語。儀表板上每個專業用語，均有顯淺英文及繁體中文對應。</span></p></div>
+ <div class="g-controls js-only">
+  <div class="g-search"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><input id="glossSearch" type="search" autocomplete="off" placeholder="Search terms… 搜尋用語…"></div>
+  <span id="gCount">15 / 15</span>
+ </div>
+ <div class="tbl-wrap"><table class="gtbl">
+  <thead><tr><th><span class="en">Technical term</span><span class="zh">專業用語</span></th><th><span class="en">Plain English</span><span class="zh">顯淺英文</span></th><th><span class="en">Traditional Chinese</span><span class="zh">繁體中文</span></th></tr></thead>
+  <tbody>
+   <tr data-search="fixed penalty notice fpn smoking tickets 定額罰款通知書 吸煙罰款告票"><td>Fixed penalty notice (FPN)</td><td>Smoking tickets</td><td>定額罰款通知書 → 吸煙罰款告票</td></tr>
+   <tr data-search="summons court 傳票 上庭傳票"><td>Summons</td><td>Court summons</td><td>傳票 → 上庭傳票</td></tr>
+   <tr data-search="non-compliance case rule-break 違規個案 發現違規"><td>Non-compliance case</td><td>Rule-break found</td><td>違規個案 → 發現違規</td></tr>
+   <tr data-search="compliance check shop check 合規查核 店舖查核"><td>Compliance check</td><td>Shop check</td><td>合規查核 → 店舖查核</td></tr>
+   <tr data-search="sla 48h reply within 2 days 服務承諾 兩天內回覆"><td>SLA (48 h)</td><td>Reply within 2 days</td><td>服務承諾 → 兩天內回覆</td></tr>
+   <tr data-search="prevalence smoking rate 吸煙率 每日吸煙人士比率"><td>Prevalence</td><td>Smoking rate</td><td>吸煙率（每日吸煙人士比率）</td></tr>
+   <tr data-search="cessation services helping smokers quit 戒煙服務 協助戒煙"><td>Cessation services</td><td>Helping smokers quit</td><td>戒煙服務 → 協助戒煙</td></tr>
+   <tr data-search="52-week quit rate quit for 1 year 52週戒煙成功率 戒煙滿一年"><td>52-week quit rate</td><td>Quit for 1 year</td><td>52週戒煙成功率 → 戒煙滿一年</td></tr>
+   <tr data-search="alternative smoking products asp e-cigarettes 另類吸煙產品 電子煙"><td>Alternative smoking products (ASP)</td><td>E-cigarettes &amp; similar</td><td>另類吸煙產品 → 電子煙等</td></tr>
+   <tr data-search="mystery shopper test purchase 神秘顧客 試買"><td>Mystery shopper</td><td>Test purchase</td><td>神秘顧客 → 試買</td></tr>
+   <tr data-search="repeat-offender venue repeat shop 屢犯處所 屢犯店舖"><td>Repeat-offender venue</td><td>Repeat shop</td><td>屢犯處所 → 屢犯店舖</td></tr>
+   <tr data-search="seizure confiscated goods 檢獲 充公物品"><td>Seizure</td><td>Confiscated goods</td><td>檢獲 → 充公物品</td></tr>
+   <tr data-search="rbac permission tiers 按角色存取控制 權限分級"><td>RBAC</td><td>Permission tiers</td><td>按角色存取控制 → 權限分級</td></tr>
+   <tr data-search="bullet graph progress bar vs target 子彈圖 對比目標進度條"><td>Bullet graph</td><td>Progress bar vs target</td><td>子彈圖 → 對比目標進度條</td></tr>
+   <tr data-search="sparkline small trend line 迷你走勢圖 小趨勢線"><td>Sparkline</td><td>Small trend line</td><td>迷你走勢圖 → 小趨勢線</td></tr>
+  </tbody></table></div>
+</section>
+
+</div>
+</main>
+
+<footer>
+ <div class="wrap">
+  <div class="takeaway"><div class="takeaway-in">
+   <h2><svg class="ic" aria-hidden="true"><use href="#i-oct"/></svg><span class="en">The half-second takeaway</span><span class="zh">半秒結論</span></h2>
+   <p><span class="en"><b>Alcohol shop rule-breaks jumped 27%</b> — 3 repeat venues in Yau Tsim Mong, Sham Shui Po and Kwai Tsing — while complaint replies slipped to <b>91.4%</b>. Approve targeted checks and add Sham Shui Po staff. <b>Everything else is on track.</b> (Illustrative figures.)</span><span class="zh"><b>酒類店舖違規急升27%</b> — 油尖旺、深水埗及葵青有3間屢犯店舖 — 同時投訴回覆率跌至<b>91.4%</b>。請批准針對性查核並增派深水埗人手。<b>其餘一切達標。</b>（示例數字。）</span></p>
+   <div class="f-actions">
+    <button type="button" class="btn btn-p js-only" id="printBtn2"><svg class="ic"><use href="#i-printer"/></svg><span class="en">Print / PDF</span><span class="zh">列印／PDF</span></button>
+    <button type="button" class="btn js-only" id="dlBtn"><svg class="ic"><use href="#i-dl"/></svg><span class="en">Save HTML</span><span class="zh">儲存HTML</span></button>
+    <a class="btn" href="#layout"><span class="en">Back to Full Dashboard</span><span class="zh">返回完整儀表板</span></a>
+   </div>
+  </div></div>
+  <div class="f-meta">
+   <span><span class="en">Compiled from TACO.docx + Dashboard 20261017_rev2.docx · Data period Oct 2026 · Presentation edition v2</span><span class="zh">整合自 TACO.docx 及 Dashboard 20261017_rev2.docx · 數據期2026年10月 · 簡報版 v2</span></span>
+   <span><span class="en">Self-contained · works offline · works without JavaScript · prints in the selected language</span><span class="zh">單一檔案 · 可離線 · 無JavaScript亦可顯示 · 以所選語言列印</span></span>
+   <span>Professor Pulse · Operational UX</span>
+  </div>
+ </div>
+</footer>
+
+<a id="toTop" href="#top" aria-label="Back to top 回到頂部"><svg class="ic" aria-hidden="true"><use href="#i-up"/></svg></a>
+</div><!-- /.page -->
+
+<script>
+/* Optional enhancements only — the document is fully readable and switchable without this script. */
+(function(){
+"use strict";
+try{
+var page=document.getElementById("page"); if(!page)return;
+page.classList.add("js-on");
+var $=function(s){return document.querySelector(s)};
+var $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+/* restore preferences */
+try{
+ var l=localStorage.getItem("taco-ref-lang"); if(l==="zh")document.getElementById("lang").checked=true;
+ var t=localStorage.getItem("taco-ref-theme"); if(t==="light")document.getElementById("theme").checked=true;
+}catch(e){}
+document.getElementById("lang").addEventListener("change",function(){
+ document.documentElement.lang=this.checked?"zh-Hant":"en";
+ try{localStorage.setItem("taco-ref-lang",this.checked?"zh":"en")}catch(e){}
+});
+document.getElementById("theme").addEventListener("change",function(){
+ try{localStorage.setItem("taco-ref-theme",this.checked?"light":"dark")}catch(e){}
+});
+document.documentElement.lang=document.getElementById("lang").checked?"zh-Hant":"en";
+/* clock */
+var clock=$("#clock");
+function tick(){var s;try{s=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Hong_Kong",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date())}catch(e){var d=new Date();s=[d.getHours(),d.getMinutes(),d.getSeconds()].map(function(n){return String(n).padStart(2,"0")}).join(":")}if(clock)clock.textContent=s+" HKT"}
+tick(); setInterval(tick,1000);
+/* progress + scrollspy */
+var secs=["summary","overview","kpis","story","layout","design","context","gov","glossary"];
+var ticking=false;
+function onScroll(){if(ticking)return;ticking=true;requestAnimationFrame(function(){
+ var y=window.scrollY||window.pageYOffset,h=document.documentElement.scrollHeight-window.innerHeight;
+ var p=$("#progress"); if(p)p.style.width=(h>0?(y/h*100):0)+"%";
+ var act=secs[0];
+ secs.forEach(function(id){var el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<140)act=id});
+ $$(".nl").forEach(function(a){a.classList.toggle("active",a.getAttribute("href")==="#"+act)});
+ ticking=false;})}
+window.addEventListener("scroll",onScroll,{passive:true}); onScroll();
+/* reveals (added only when JS runs, so no-JS never hides content) */
+var motionOK=!window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(motionOK&&"IntersectionObserver" in window){
+ var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target)}})},{threshold:.08});
+ $$(".sec, footer").forEach(function(el){el.classList.add("pre");io.observe(el)});
+}
+/* KPI filters */
+$$(".fbtn").forEach(function(b){b.addEventListener("click",function(){
+ $$(".fbtn").forEach(function(x){x.classList.toggle("on",x===b)});
+ var f=b.getAttribute("data-f");
+ $$(".ktbl tbody tr").forEach(function(tr){
+  var show=f==="all"||(f==="att"?tr.hasAttribute("data-att"):tr.getAttribute("data-grp")===f);
+  tr.style.display=show?"":"none";
+ });
+})});
+/* glossary search */
+var gs=$("#glossSearch");
+if(gs)gs.addEventListener("input",function(){
+ var q=this.value.trim().toLowerCase(),n=0;
+ $$(".gtbl tbody tr").forEach(function(tr){
+  var hit=!q||(tr.getAttribute("data-search")||"").indexOf(q)>-1;
+  tr.style.display=hit?"":"none"; if(hit)n++;
+ });
+ var c=$("#gCount"); if(c)c.textContent=n+" / 15";
+});
+/* print + save */
+function doPrint(){window.print()}
+var pb=$("#printBtn"),pb2=$("#printBtn2");
+if(pb)pb.addEventListener("click",doPrint);
+if(pb2)pb2.addEventListener("click",doPrint);
+var opened=[];
+window.addEventListener("beforeprint",function(){opened=$$("details:not([open])");opened.forEach(function(d){d.open=true})});
+window.addEventListener("afterprint",function(){opened.forEach(function(d){d.open=false});opened=[]});
+var dl=$("#dlBtn");
+if(dl)dl.addEventListener("click",function(){
+ try{
+  var blob=new Blob(["<!DOCTYPE html>\n"+document.documentElement.outerHTML],{type:"text/html;charset=utf-8"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="TACO_Dashboard_v2.html";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000);
+ }catch(e){}
+});
+}catch(e){}
+})();
+</script>
+</body>
+</html>
