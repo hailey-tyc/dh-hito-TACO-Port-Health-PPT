@@ -1,0 +1,1281 @@
+﻿<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>港口衞生科 · 管理層指揮中心 | Port Health Division · Executive Command</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+            background: #0B1320;
+            color: #E8EEF7;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #0F1A2C 0%, #142238 100%);
+            border: 1px solid #1F3350;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .shield {
+            width: 48px;
+            height: 48px;
+        }
+        
+        .brand-text h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #E8EEF7;
+        }
+        
+        .brand-text .sub {
+            font-size: 12px;
+            color: #7A8AA3;
+            margin-top: 4px;
+        }
+        
+        .simulated-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(255,181,71,0.15);
+            border: 1px solid rgba(255,181,71,0.4);
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #FFB547;
+            letter-spacing: 0.8px;
+            margin-left: 12px;
+        }
+        
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .capsule {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: #142238;
+            border: 1px solid #17263E;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #B8C4D6;
+        }
+        
+        .capsule .lbl {
+            color: #4E5E78;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .capsule .val {
+            color: #E8EEF7;
+            font-weight: 600;
+        }
+        
+        .lang-switch {
+            display: inline-flex;
+            background: #142238;
+            border: 1px solid #1F3350;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .lang-switch button {
+            background: transparent;
+            border: none;
+            color: #7A8AA3;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .lang-switch button.active {
+            background: #5BA8FF;
+            color: #fff;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .control-btn {
+            background: #142238;
+            border: 1px solid #1F3350;
+            color: #B8C4D6;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .control-btn:hover {
+            background: #1A2B45;
+            color: #E8EEF7;
+        }
+        
+        .control-btn.export {
+            background: #4FD1E0;
+            color: #0B1320;
+            border-color: #4FD1E0;
+        }
+        
+        .control-btn.export:hover {
+            background: #5BDCE8;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            background: #0F1A2C;
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid #1F3350;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: #7A8AA3;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab.active {
+            background: #1F3350;
+            color: #E8EEF7;
+        }
+        
+        .action-banner {
+            background: rgba(255,77,109,0.08);
+            border: 1px solid rgba(255,77,109,0.4);
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        
+        .action-banner .alert-icon {
+            color: #FF4D6D;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .action-banner .alert-text {
+            flex: 1;
+            font-size: 13px;
+            color: #E8EEF7;
+            line-height: 1.5;
+        }
+        
+        .action-banner .alert-text strong {
+            color: #FF4D6D;
+            font-weight: 700;
+        }
+        
+        .action-banner .action-btn {
+            background: #FF4D6D;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .action-banner .action-btn:hover {
+            background: #FF6B85;
+            box-shadow: 0 0 16px rgba(255,77,109,0.4);
+        }
+        
+        .band {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .band-1 {
+            grid-template-columns: 1.2fr 1.5fr 1fr;
+        }
+        
+        .band-2 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .band-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .band-4 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .card {
+            background: #0F1A2C;
+            border: 1px solid #1F3350;
+            border-radius: 10px;
+            padding: 16px;
+            position: relative;
+        }
+        
+        .card.alert {
+            border-color: rgba(255,77,109,0.5);
+            box-shadow: 0 0 0 1px rgba(255,77,109,0.3), 0 0 20px rgba(255,77,109,0.2);
+        }
+        
+        .card-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #7A8AA3;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        
+        .action-card .action-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .action-card .action-icon {
+            color: #FF4D6D;
+            font-size: 18px;
+        }
+        
+        .action-card .action-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #FF4D6D;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        
+        .action-card .action-metric {
+            font-size: 32px;
+            font-weight: 800;
+            color: #E8EEF7;
+            margin: 8px 0;
+        }
+        
+        .action-card .action-metric .vs {
+            font-size: 14px;
+            color: #7A8AA3;
+            font-weight: 500;
+        }
+        
+        .action-card .action-metric .threshold {
+            color: #FF4D6D;
+        }
+        
+        .action-card .action-btn {
+            width: 100%;
+            background: #FF4D6D;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        
+        .summary-card .summary-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .summary-card .summary-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #1F3350;
+            font-size: 12px;
+            color: #B8C4D6;
+            line-height: 1.5;
+        }
+        
+        .summary-card .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-card .summary-item .icon {
+            margin-right: 8px;
+        }
+        
+        .summary-card .summary-item .highlight {
+            color: #FFB547;
+            font-weight: 600;
+        }
+        
+        .duty-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .duty-item {
+            background: #142238;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .duty-item .duty-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #E8EEF7;
+            margin-bottom: 4px;
+        }
+        
+        .duty-item .duty-label {
+            font-size: 10px;
+            color: #7A8AA3;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .duty-item .duty-status {
+            font-size: 11px;
+            color: #3DDC97;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .kpi-card {
+            background: #0F1A2C;
+            border: 1px solid #1F3350;
+            border-radius: 10px;
+            padding: 14px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .kpi-card.alert {
+            border-color: rgba(255,77,109,0.5);
+            box-shadow: 0 0 0 1px rgba(255,77,109,0.3), 0 0 20px rgba(255,77,109,0.2);
+        }
+        
+        .kpi-card.alert .kpi-value {
+            color: #FF4D6D;
+        }
+        
+        .kpi-tag {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #4E5E78;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        
+        .kpi-name {
+            font-size: 11px;
+            color: #B8C4D6;
+            line-height: 1.4;
+            min-height: 32px;
+            font-weight: 500;
+        }
+        
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #E8EEF7;
+            line-height: 1;
+            margin-top: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .kpi-change {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+        
+        .kpi-change.up {
+            color: #3DDC97;
+        }
+        
+        .kpi-change.down {
+            color: #FF4D6D;
+        }
+        
+        .kpi-spark {
+            margin-top: auto;
+            padding-top: 10px;
+        }
+        
+        .chart-card {
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-container {
+            flex: 1;
+            width: 100%;
+            height: 300px;
+        }
+        
+        .footer {
+            margin-top: 24px;
+            padding: 16px 20px;
+            background: #0F1A2C;
+            border: 1px solid #17263E;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #7A8AA3;
+            line-height: 1.6;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+        
+        .footer .divider {
+            margin: 0 8px;
+            color: #4E5E78;
+        }
+        
+        @media (max-width: 1400px) {
+            .kpi-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 1100px) {
+            .band-1, .band-2, .band-3 {
+                grid-template-columns: 1fr;
+            }
+            .band-4 {
+                grid-template-columns: 1fr;
+            }
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 700px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="brand">
+            <svg class="shield" viewBox="0 0 64 64" fill="none">
+                <path d="M32 4 L56 14 V32 C56 46 46 56 32 60 C18 56 8 46 8 32 V14 Z" fill="#0F1A2C" stroke="#5BA8FF" stroke-width="1.5"/>
+                <path d="M32 14 L44 19 V30 C44 38 39 44 32 46 C25 44 20 38 20 30 V19 Z" fill="none" stroke="#4FD1E0" stroke-width="1" opacity="0.6"/>
+                <text x="32" y="38" text-anchor="middle" fill="#5BA8FF" font-size="11" font-weight="700" font-family="sans-serif">PH</text>
+            </svg>
+            <div class="brand-text">
+                <h1 data-i18n="header_title">港口衞生科 · 管理層指揮中心</h1>
+                <div class="sub" data-i18n="header_sub">衞生署港口衞生科 · 香港特別行政區政府</div>
+            </div>
+            <div class="simulated-badge">
+                <span>⚠</span>
+                <span data-i18n="simulated">模擬數據</span>
+            </div>
+        </div>
+        <div class="status-bar">
+            <div class="capsule">
+                <span class="val" id="clock">10:41:00</span>
+            </div>
+            <div class="capsule">
+                <span class="lbl" data-i18n="updated">更新：</span>
+                <span class="val">11s ago</span>
+            </div>
+            <div class="lang-switch">
+                <button id="btn-zh" class="active">繁</button>
+                <button id="btn-en">EN</button>
+            </div>
+            <div class="control-buttons">
+                <button class="control-btn" data-i18n="refresh">⟳ 15s</button>
+                <button class="control-btn" data-i18n="pause">Pause</button>
+                <button class="control-btn" data-i18n="sound">Sound on</button>
+                <button class="control-btn" data-i18n="wall">Wall view</button>
+                <button class="control-btn export" data-i18n="export">Export brief</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" data-i18n="tab_overview">總覽 Overview</button>
+        <button class="nav-tab" data-i18n="tab_attention">需關注 Attention</button>
+        <button class="nav-tab" data-i18n="tab_service">核心服務 Service</button>
+        <button class="nav-tab" data-i18n="tab_crossings">邊境口岸 Crossings</button>
+        <button class="nav-tab" data-i18n="tab_demand">需求與資源 Demand</button>
+        <button class="nav-tab" data-i18n="tab_reference">參考資料 Reference</button>
+    </div>
+
+    <!-- Action Banner -->
+    <div class="action-banner">
+        <div class="alert-icon">⬣</div>
+        <div class="alert-text" data-i18n="action_banner">
+            <strong>ACTION:</strong> 落馬洲口岸篩查覆蓋率跌至 91% — 需從羅湖調派 6 名人員至 21:00 — 等候當值主管審批
+        </div>
+        <button class="action-btn" data-i18n="review_decide">審視並決定</button>
+    </div>
+
+    <!-- Band 1: Overview -->
+    <div class="band band-1">
+        <!-- Action Needed Card -->
+        <div class="card alert action-card">
+            <div class="action-header">
+                <span class="action-icon">⬣</span>
+                <span class="action-label" data-i18n="action_needed">需採取行動</span>
+            </div>
+            <div class="action-metric">
+                90.4% <span class="vs">vs</span> <span class="threshold">98%</span>
+            </div>
+            <div style="font-size: 11px; color: #B8C4D6; line-height: 1.5;" data-i18n="action_desc">
+                落馬洲口岸篩查覆蓋率低於安全線
+            </div>
+            <button class="action-btn" data-i18n="review_decide">審視並決定</button>
+        </div>
+
+        <!-- Today in One Minute -->
+        <div class="card summary-card">
+            <div class="card-title" data-i18n="today_summary">今日一分鐘速覽</div>
+            <ul class="summary-list">
+                <li class="summary-item">
+                    <span class="icon">⬣</span>
+                    <span data-i18n="summary_1">口岸篩查異常：落馬洲覆蓋率跌至 91%，需即時調配人手</span>
+                </li>
+                <li class="summary-item">
+                    <span class="icon">✓</span>
+                    <span data-i18n="summary_2">船隻檢疫效率：平均 21 分鐘完成，快於 30 分鐘承諾</span>
+                </li>
+                <li class="summary-item">
+                    <span class="icon">📢</span>
+                    <span data-i18n="summary_3">海外疫情通報：2 宗（東南亞登革熱、歐洲流感）</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Duty Picture -->
+        <div class="card">
+            <div class="card-title" data-i18n="duty_picture">值勤概況</div>
+            <div class="duty-grid">
+                <div class="duty-item">
+                    <div class="duty-value">514</div>
+                    <div class="duty-label" data-i18n="duty_staff">值勤人員</div>
+                </div>
+                <div class="duty-item">
+                    <div class="duty-value">14/14</div>
+                    <div class="duty-label" data-i18n="duty_ports">開放管制站</div>
+                </div>
+                <div class="duty-item">
+                    <div class="duty-value">6</div>
+                    <div class="duty-label" data-i18n="duty_vessels">待檢疫船隻</div>
+                </div>
+                <div class="duty-item">
+                    <div class="duty-value" style="font-size: 16px;">Ready · 24h</div>
+                    <div class="duty-label" data-i18n="duty_team">機場緊急應變隊</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-tag" data-i18n="k1_tag">檢疫</div>
+            <div class="kpi-name" data-i18n="k1_name">入境旅客篩查總數</div>
+            <div class="kpi-value">1,245,800</div>
+            <div class="kpi-change up">▲ +8.2%</div>
+            <div class="kpi-spark">
+                <svg width="100%" height="30" viewBox="0 0 180 30" preserveAspectRatio="none">
+                    <path d="M0,24 L18,22 L36,20 L54,22 L72,18 L90,16 L108,14 L126,16 L144,12 L162,10 L180,8" fill="none" stroke="#3DDC97" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="kpi-card alert">
+            <div class="kpi-tag" data-i18n="k2_tag">檢疫</div>
+            <div class="kpi-name" data-i18n="k2_name">攔截疑似傳染病個案</div>
+            <div class="kpi-value">312</div>
+            <div class="kpi-change down">▲ +24.8%</div>
+            <div class="kpi-spark">
+                <svg width="100%" height="30" viewBox="0 0 180 30" preserveAspectRatio="none">
+                    <path d="M0,24 L18,26 L36,22 L54,24 L72,20 L90,18 L108,16 L126,12 L144,10 L162,6 L180,4" fill="none" stroke="#FF4D6D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="180" cy="4" r="3" fill="#FF4D6D"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-tag" data-i18n="k3_tag">海港</div>
+            <div class="kpi-name" data-i18n="k3_name">獲發自由無疫通行證船隻</div>
+            <div class="kpi-value">1,890</div>
+            <div class="kpi-change up">▲ +1.5%</div>
+            <div class="kpi-spark">
+                <svg width="100%" height="30" viewBox="0 0 180 30" preserveAspectRatio="none">
+                    <path d="M0,16 L18,17 L36,16 L54,15 L72,16 L90,17 L108,16 L126,15 L144,16 L162,17 L180,16" fill="none" stroke="#3DDC97" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-tag" data-i18n="k4_tag">航空</div>
+            <div class="kpi-name" data-i18n="k4_name">檢查飛機架次</div>
+            <div class="kpi-value">4,520</div>
+            <div class="kpi-change up">▲ +3.2%</div>
+            <div class="kpi-spark">
+                <svg width="100%" height="30" viewBox="0 0 180 30" preserveAspectRatio="none">
+                    <path d="M0,20 L18,18 L36,16 L54,18 L72,14 L90,12 L108,14 L126,12 L144,10 L162,12 L180,10" fill="none" stroke="#3DDC97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-tag" data-i18n="k5_tag">疫苗</div>
+            <div class="kpi-name" data-i18n="k5_name">旅遊疫苗接種劑次</div>
+            <div class="kpi-value">9,760</div>
+            <div class="kpi-change up">▲ +11.2%</div>
+            <div class="kpi-spark">
+                <svg width="100%" height="30" viewBox="0 0 180 30" preserveAspectRatio="none">
+                    <path d="M0,24 L18,22 L36,20 L54,18 L72,16 L90,14 L108,12 L126,12 L144,10 L162,8 L180,8" fill="none" stroke="#3DDC97" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-tag" data-i18n="k6_tag">許可證</div>
+            <div class="kpi-name" data-i18n="k6_name">簽發許可證總數</div>
+            <div class="kpi-value">845</div>
+            <div class="kpi-change up">▲ +2.1%</div>
+            <div class="kpi-spark">
+                <svg width="100%" height="30" viewBox="0 0 180 30" preserveAspectRatio="none">
+                    <path d="M0,16 L18,17 L36,16 L54,15 L72,16 L90,17 L108,16 L126,15 L144,16 L162,17 L180,16" fill="none" stroke="#7A8AA3" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Band 2: Charts -->
+    <div class="band band-2">
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart1_title">海陸空管制站每月篩查人次</div>
+            <div id="chart1" class="chart-container"></div>
+        </div>
+
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart2_title">口岸風險矩陣（時段 × 管制站）</div>
+            <div id="chart2" class="chart-container"></div>
+        </div>
+
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart3_title">入境旅客量 vs 疑似個案（12 個月）</div>
+            <div id="chart3" class="chart-container"></div>
+        </div>
+    </div>
+
+    <!-- Band 3: Details -->
+    <div class="band band-3">
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart4_title">疑似個案來源地佔比</div>
+            <div id="chart4" class="chart-container"></div>
+        </div>
+
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart5_title">簽發許可證類別分佈</div>
+            <div id="chart5" class="chart-container"></div>
+        </div>
+
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart6_title">Top 5 旅遊接種疫苗排行</div>
+            <div id="chart6" class="chart-container"></div>
+        </div>
+    </div>
+
+    <!-- Band 4: LegCo & Media -->
+    <div class="band band-4">
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart7_title">人手編制與設備經常性開支</div>
+            <div class="card-sub" style="font-size: 10px; color: #4E5E78; margin-bottom: 10px;" data-i18n="proposed">模擬擴充數據 / Proposed Metric</div>
+            <div id="chart7" class="chart-container"></div>
+        </div>
+
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart8_title">疫症應變與醫管局轉介追蹤</div>
+            <div class="card-sub" style="font-size: 10px; color: #4E5E78; margin-bottom: 10px;" data-i18n="proposed">模擬擴充數據 / Proposed Metric</div>
+            <div id="chart8" class="chart-container"></div>
+        </div>
+
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart9_title">跨境聯防協作（GACC 聯合行動）</div>
+            <div class="card-sub" style="font-size: 10px; color: #4E5E78; margin-bottom: 10px;" data-i18n="proposed">模擬擴充數據 / Proposed Metric</div>
+            <div id="chart9" class="chart-container"></div>
+        </div>
+
+        <div class="card chart-card">
+            <div class="card-title" data-i18n="chart10_title">立法會及傳媒查詢趨勢</div>
+            <div class="card-sub" style="font-size: 10px; color: #4E5E78; margin-bottom: 10px;" data-i18n="proposed">模擬擴充數據 / Proposed Metric</div>
+            <div id="chart10" class="chart-container"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <span data-i18n="foot_1">管理層指揮視圖</span>
+        <span class="divider">·</span>
+        <span data-i18n="foot_2">權限分級</span>
+        <span class="divider">·</span>
+        <span data-i18n="foot_3">《個人資料（私隱）條例》（第 486 章）</span>
+        <span class="divider">·</span>
+        <span data-i18n="foot_4">《預防及控制疾病條例》（第 599 章）</span>
+        <span class="divider">·</span>
+        <span data-i18n="foot_5">衞生署港口衞生科</span>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const I18N = {
+            zh: {
+                header_title: "港口衞生科 · 管理層指揮中心",
+                header_sub: "衞生署港口衞生科 · 香港特別行政區政府",
+                simulated: "模擬數據",
+                updated: "更新：",
+                refresh: "⟳ 15s",
+                pause: "Pause",
+                sound: "Sound on",
+                wall: "Wall view",
+                export: "Export brief",
+                tab_overview: "總覽 Overview",
+                tab_attention: "需關注 Attention",
+                tab_service: "核心服務 Service",
+                tab_crossings: "邊境口岸 Crossings",
+                tab_demand: "需求與資源 Demand",
+                tab_reference: "參考資料 Reference",
+                action_banner: "ACTION: 落馬洲口岸篩查覆蓋率跌至 91% — 需從羅湖調派 6 名人員至 21:00 — 等候當值主管審批",
+                review_decide: "審視並決定",
+                action_needed: "需採取行動",
+                action_desc: "落馬洲口岸篩查覆蓋率低於安全線",
+                today_summary: "今日一分鐘速覽",
+                summary_1: "口岸篩查異常：落馬洲覆蓋率跌至 91%，需即時調配人手",
+                summary_2: "船隻檢疫效率：平均 21 分鐘完成，快於 30 分鐘承諾",
+                summary_3: "海外疫情通報：2 宗（東南亞登革熱、歐洲流感）",
+                duty_picture: "值勤概況",
+                duty_staff: "值勤人員",
+                duty_ports: "開放管制站",
+                duty_vessels: "待檢疫船隻",
+                duty_team: "機場緊急應變隊",
+                k1_tag: "檢疫", k1_name: "入境旅客篩查總數",
+                k2_tag: "檢疫", k2_name: "攔截疑似傳染病個案",
+                k3_tag: "海港", k3_name: "獲發自由無疫通行證船隻",
+                k4_tag: "航空", k4_name: "檢查飛機架次",
+                k5_tag: "疫苗", k5_name: "旅遊疫苗接種劑次",
+                k6_tag: "許可證", k6_name: "簽發許可證總數",
+                chart1_title: "海陸空管制站每月篩查人次",
+                chart2_title: "口岸風險矩陣（時段 × 管制站）",
+                chart3_title: "入境旅客量 vs 疑似個案（12 個月）",
+                chart4_title: "疑似個案來源地佔比",
+                chart5_title: "簽發許可證類別分佈",
+                chart6_title: "Top 5 旅遊接種疫苗排行",
+                chart7_title: "人手編制與設備經常性開支",
+                chart8_title: "疫症應變與醫管局轉介追蹤",
+                chart9_title: "跨境聯防協作（GACC 聯合行動）",
+                chart10_title: "立法會及傳媒查詢趨勢",
+                proposed: "模擬擴充數據 / Proposed Metric",
+                foot_1: "管理層指揮視圖", foot_2: "權限分級",
+                foot_3: "《個人資料（私隱）條例》（第 486 章）",
+                foot_4: "《預防及控制疾病條例》（第 599 章）",
+                foot_5: "衞生署港口衞生科"
+            },
+            en: {
+                header_title: "PORT HEALTH · EXECUTIVE COMMAND",
+                header_sub: "Port Health Division · Department of Health, HKSAR",
+                simulated: "SIMULATED DATA",
+                updated: "Updated:",
+                refresh: "⟳ 15s",
+                pause: "Pause",
+                sound: "Sound on",
+                wall: "Wall view",
+                export: "Export brief",
+                tab_overview: "Overview 總覽",
+                tab_attention: "Attention 需關注",
+                tab_service: "Service 核心服務",
+                tab_crossings: "Crossings 邊境口岸",
+                tab_demand: "Demand 需求與資源",
+                tab_reference: "Reference 參考資料",
+                action_banner: "ACTION: Lok Ma Chau screening coverage dropped to 91% — Redeploy 6 officers from Lo Wu until 21:00 — awaiting duty manager approval",
+                review_decide: "Review & decide",
+                action_needed: "ACTION NEEDED",
+                action_desc: "Lok Ma Chau screening coverage below safety threshold",
+                today_summary: "Today in one minute",
+                summary_1: "Screening anomaly: Lok Ma Chau coverage at 91%, immediate redeployment needed",
+                summary_2: "Vessel quarantine efficiency: 21 min average, ahead of 30 min commitment",
+                summary_3: "Overseas outbreak alerts: 2 cases (SE Asia dengue, Europe influenza)",
+                duty_picture: "Duty picture",
+                duty_staff: "On-duty staff",
+                duty_ports: "Open control points",
+                duty_vessels: "Vessels awaiting quarantine",
+                duty_team: "Airport emergency team",
+                k1_tag: "QUARANTINE", k1_name: "Inbound travellers screened",
+                k2_tag: "QUARANTINE", k2_name: "Suspected cases intercepted",
+                k3_tag: "MARITIME", k3_name: "Vessels cleared (Free Pratique)",
+                k4_tag: "AVIATION", k4_name: "Aircraft inspected",
+                k5_tag: "VACCINATION", k5_name: "Travel jabs administered",
+                k6_tag: "PERMITS", k6_name: "Permits issued",
+                chart1_title: "BOUNDARY CONTROL POINT SCREENING VOLUME",
+                chart2_title: "CONTROL POINT RISK MATRIX (Time × Port)",
+                chart3_title: "TRAVELERS vs SUSPECTED CASES (12 months)",
+                chart4_title: "SUSPECTED CASES BY ORIGIN",
+                chart5_title: "PERMIT DISTRIBUTION BY CATEGORY",
+                chart6_title: "TOP 5 ADMINISTERED VACCINES",
+                chart7_title: "MANPOWER & EQUIPMENT COST",
+                chart8_title: "OUTBREAK RESPONSE & HA REFERRAL",
+                chart9_title: "CROSS-BOUNDARY COLLABORATION (GACC)",
+                chart10_title: "LEGCO & MEDIA INQUIRIES TREND",
+                proposed: "Proposed Metric / 模擬擴充數據",
+                foot_1: "Executive Command View", foot_2: "RBAC",
+                foot_3: "PDPO (Cap. 486)",
+                foot_4: "Cap. 599 Prevention and Control of Disease Ordinance",
+                foot_5: "Port Health Division, DH"
+            }
+        };
+
+        let currentLang = 'zh';
+        let charts = {};
+
+        function applyLang(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang === 'zh' ? 'zh-HK' : 'en';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (I18N[lang] && I18N[lang][key] !== undefined) {
+                    el.textContent = I18N[lang][key];
+                }
+            });
+            document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            setTimeout(() => initCharts(), 100);
+        }
+
+        function initCharts() {
+            const textColor = '#B8C4D6';
+            const bgColor = 'transparent';
+
+            // Chart 1: Grouped Bar
+            if (charts.chart1) charts.chart1.dispose();
+            charts.chart1 = echarts.init(document.getElementById('chart1'));
+            charts.chart1.setOption({
+                backgroundColor: bgColor,
+                tooltip: { trigger: 'axis', backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor } },
+                legend: {
+                    data: [currentLang === 'zh' ? '機場 HKIA' : 'HKIA', currentLang === 'zh' ? '海港' : 'Seaport', currentLang === 'zh' ? '陸路口岸' : 'Land'],
+                    textStyle: { color: textColor, fontSize: 11 },
+                    top: 0
+                },
+                grid: { left: 50, right: 20, top: 40, bottom: 30 },
+                xAxis: {
+                    type: 'category',
+                    data: ['NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT'],
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 },
+                    splitLine: { lineStyle: { color: '#1F3350', opacity: 0.3 } }
+                },
+                series: [
+                    { name: currentLang === 'zh' ? '機場 HKIA' : 'HKIA', type: 'bar', data: [120000, 130000, 110000, 140000, 125000, 135000, 145000, 150000, 155000, 160000, 165000, 170000], itemStyle: { color: '#5BA8FF' } },
+                    { name: currentLang === 'zh' ? '海港' : 'Seaport', type: 'bar', data: [80000, 85000, 82000, 88000, 86000, 90000, 92000, 95000, 93000, 96000, 98000, 100000], itemStyle: { color: '#4FD1E0' } },
+                    { name: currentLang === 'zh' ? '陸路口岸' : 'Land', type: 'bar', data: [100000, 105000, 102000, 108000, 106000, 110000, 112000, 115000, 113000, 116000, 118000, 120000], itemStyle: { color: '#3DDC97' } }
+                ]
+            });
+
+            // Chart 2: Heatmap
+            if (charts.chart2) charts.chart2.dispose();
+            charts.chart2 = echarts.init(document.getElementById('chart2'));
+            const ports = ['HKIA', 'WKS', 'LMC', 'LUW', 'SZB', 'HZMB'];
+            const times = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'];
+            const heatmapData = [];
+            for (let i = 0; i < 6; i++) {
+                for (let j = 0; j < 6; j++) {
+                    heatmapData.push([j, i, Math.floor(Math.random() * 100)]);
+                }
+            }
+            charts.chart2.setOption({
+                backgroundColor: bgColor,
+                tooltip: { backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor } },
+                grid: { left: 60, right: 20, top: 10, bottom: 40 },
+                xAxis: {
+                    type: 'category',
+                    data: times,
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ports,
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 }
+                },
+                visualMap: {
+                    min: 0, max: 100,
+                    calculable: true,
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: 0,
+                    inRange: { color: ['#142238', '#1E4A8A', '#5BA8FF', '#FFB547', '#FF4D6D'] },
+                    textStyle: { color: textColor }
+                },
+                series: [{
+                    type: 'heatmap',
+                    data: heatmapData,
+                    label: { show: false },
+                    emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
+                }]
+            });
+
+            // Chart 3: Multi-Line
+            if (charts.chart3) charts.chart3.dispose();
+            charts.chart3 = echarts.init(document.getElementById('chart3'));
+            charts.chart3.setOption({
+                backgroundColor: bgColor,
+                tooltip: { trigger: 'axis', backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor } },
+                legend: {
+                    data: [currentLang === 'zh' ? '入境旅客' : 'Travelers', currentLang === 'zh' ? '疑似個案' : 'Suspected Cases'],
+                    textStyle: { color: textColor, fontSize: 11 },
+                    top: 0
+                },
+                grid: { left: 50, right: 50, top: 40, bottom: 30 },
+                xAxis: {
+                    type: 'category',
+                    data: ['NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT'],
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: currentLang === 'zh' ? '旅客量' : 'Travelers',
+                        axisLine: { lineStyle: { color: '#1F3350' } },
+                        axisLabel: { color: textColor, fontSize: 10 },
+                        splitLine: { lineStyle: { color: '#1F3350', opacity: 0.3 } }
+                    },
+                    {
+                        type: 'value',
+                        name: currentLang === 'zh' ? '個案數' : 'Cases',
+                        axisLine: { lineStyle: { color: '#1F3350' } },
+                        axisLabel: { color: textColor, fontSize: 10 },
+                        splitLine: { show: false }
+                    }
+                ],
+                series: [
+                    { name: currentLang === 'zh' ? '入境旅客' : 'Travelers', type: 'line', data: [1100000, 1150000, 1050000, 1200000, 1180000, 1220000, 1250000, 1280000, 1300000, 1320000, 1350000, 1380000], smooth: true, itemStyle: { color: '#5BA8FF' }, areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{offset: 0, color: 'rgba(91,168,255,0.3)'}, {offset: 1, color: 'rgba(91,168,255,0)'}]) } },
+                    { name: currentLang === 'zh' ? '疑似個案' : 'Suspected Cases', type: 'line', yAxisIndex: 1, data: [200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 312], smooth: true, itemStyle: { color: '#FF4D6D' } }
+                ]
+            });
+
+            // Chart 4: Donut
+            if (charts.chart4) charts.chart4.dispose();
+            charts.chart4 = echarts.init(document.getElementById('chart4'));
+            charts.chart4.setOption({
+                backgroundColor: bgColor,
+                tooltip: { trigger: 'item', backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor }, formatter: '{b}: {c} ({d}%)' },
+                legend: { orient: 'vertical', right: 10, top: 'center', textStyle: { color: textColor, fontSize: 11 } },
+                series: [{
+                    name: currentLang === 'zh' ? '來源地' : 'Origin',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['40%', '50%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: { borderRadius: 10, borderColor: '#0F1A2C', borderWidth: 2 },
+                    label: { show: false },
+                    emphasis: { label: { show: true, fontSize: 12, fontWeight: 'bold', color: textColor } },
+                    data: [
+                        { value: 150, name: currentLang === 'zh' ? '東南亞' : 'SE Asia', itemStyle: { color: '#FF4D6D' } },
+                        { value: 80, name: currentLang === 'zh' ? '歐洲' : 'Europe', itemStyle: { color: '#5BA8FF' } },
+                        { value: 50, name: currentLang === 'zh' ? '內地及澳門' : 'Mainland & Macao', itemStyle: { color: '#4FD1E0' } },
+                        { value: 20, name: currentLang === 'zh' ? '其他' : 'Others', itemStyle: { color: '#FFB547' } }
+                    ]
+                }]
+            });
+
+            // Chart 5: Donut
+            if (charts.chart5) charts.chart5.dispose();
+            charts.chart5 = echarts.init(document.getElementById('chart5'));
+            charts.chart5.setOption({
+                backgroundColor: bgColor,
+                tooltip: { trigger: 'item', backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor }, formatter: '{b}: {c} ({d}%)' },
+                legend: { orient: 'vertical', right: 10, top: 'center', textStyle: { color: textColor, fontSize: 11 } },
+                series: [{
+                    name: currentLang === 'zh' ? '許可證類別' : 'Category',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['40%', '50%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: { borderRadius: 10, borderColor: '#0F1A2C', borderWidth: 2 },
+                    label: { show: false },
+                    emphasis: { label: { show: true, fontSize: 12, fontWeight: 'bold', color: textColor } },
+                    data: [
+                        { value: 450, name: currentLang === 'zh' ? '火葬許可證' : 'Cremation', itemStyle: { color: '#5BA8FF' } },
+                        { value: 280, name: currentLang === 'zh' ? '人類屍體' : 'Human Corpse', itemStyle: { color: '#4FD1E0' } },
+                        { value: 115, name: currentLang === 'zh' ? '生物/傳染性物質' : 'Bio/Infectious', itemStyle: { color: '#FFB547' } }
+                    ]
+                }]
+            });
+
+            // Chart 6: Bar
+            if (charts.chart6) charts.chart6.dispose();
+            charts.chart6 = echarts.init(document.getElementById('chart6'));
+            charts.chart6.setOption({
+                backgroundColor: bgColor,
+                tooltip: { trigger: 'axis', backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor } },
+                grid: { left: 80, right: 20, top: 20, bottom: 30 },
+                xAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 },
+                    splitLine: { lineStyle: { color: '#1F3350', opacity: 0.3 } }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: [currentLang === 'zh' ? '其他' : 'Others', currentLang === 'zh' ? '無類別' : 'No Category', currentLang === 'zh' ? '流感' : 'Influenza', currentLang === 'zh' ? '甲型肝炎' : 'Hep A', currentLang === 'zh' ? '傷寒' : 'Typhoid', currentLang === 'zh' ? '黃熱病' : 'Yellow Fever'],
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 11 }
+                },
+                series: [{
+                    type: 'bar',
+                    data: [40, 50, 100, 180, 250, 350],
+                    itemStyle: {
+                        color: function(params) {
+                            var colors = ['#7A8AA3', '#4FD1E0', '#3DDC97', '#5BA8FF', '#FFB547', '#FF4D6D'];
+                            return colors[params.dataIndex];
+                        }
+                    }
+                }]
+            });
+
+            // Chart 7: Combo Bar + Line
+            if (charts.chart7) charts.chart7.dispose();
+            charts.chart7 = echarts.init(document.getElementById('chart7'));
+            charts.chart7.setOption({
+                backgroundColor: bgColor,
+                tooltip: { trigger: 'axis', backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor } },
+                legend: {
+                    data: [currentLang === 'zh' ? '編制人數' : 'Establishment', currentLang === 'zh' ? '實際在崗' : 'On-duty', currentLang === 'zh' ? '設備成本' : 'Equipment Cost'],
+                    textStyle: { color: textColor, fontSize: 11 },
+                    top: 0
+                },
+                grid: { left: 50, right: 50, top: 40, bottom: 30 },
+                xAxis: {
+                    type: 'category',
+                    data: [currentLang === 'zh' ? '機場' : 'Airport', currentLang === 'zh' ? '陸路口岸' : 'Land', currentLang === 'zh' ? '海港' : 'Seaport', currentLang === 'zh' ? '旅遊健康中心' : 'THC'],
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: currentLang === 'zh' ? '人數' : 'Staff',
+                        axisLine: { lineStyle: { color: '#1F3350' } },
+                        axisLabel: { color: textColor, fontSize: 10 },
+                        splitLine: { lineStyle: { color: '#1F3350', opacity: 0.3 } }
+                    },
+                    {
+                        type: 'value',
+                        name: currentLang === 'zh' ? '成本 (HK$M)' : 'Cost (HK$M)',
+                        axisLine: { lineStyle: { color: '#1F3350' } },
+                        axisLabel: { color: textColor, fontSize: 10 },
+                        splitLine: { show: false }
+                    }
+                ],
+                series: [
+                    { name: currentLang === 'zh' ? '編制人數' : 'Establishment', type: 'bar', data: [200, 180, 80, 50], itemStyle: { color: '#5BA8FF' } },
+                    { name: currentLang === 'zh' ? '實際在崗' : 'On-duty', type: 'bar', data: [185, 174, 76, 48], itemStyle: { color: '#4FD1E0' } },
+                    { name: currentLang === 'zh' ? '設備成本' : 'Equipment Cost', type: 'line', yAxisIndex: 1, data: [2.5, 1.8, 1.2, 0.8], smooth: true, itemStyle: { color: '#FFB547' } }
+                ]
+            });
+
+            // Chart 8: Funnel
+            if (charts.chart8) charts.chart8.dispose();
+            charts.chart8 = echarts.init(document.getElementById('chart8'));
+            charts.chart8.setOption({
+                backgroundColor: bgColor,
+                tooltip: { trigger: 'item', backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor } },
+                series: [{
+                    name: currentLang === 'zh' ? '轉介追蹤' : 'Referral Tracking',
+                    type: 'funnel',
+                    left: '10%',
+                    top: 20,
+                    bottom: 20,
+                    width: '80%',
+                    min: 0,
+                    max: 100,
+                    minSize: '0%',
+                    maxSize: '100%',
+                    sort: 'descending',
+                    gap: 2,
+                    label: { show: true, position: 'inside', color: '#fff', fontSize: 11 },
+                    itemStyle: { borderColor: '#0F1A2C', borderWidth: 2 },
+                    data: [
+                        { value: 100, name: currentLang === 'zh' ? '疑似攔截' : 'Intercepted', itemStyle: { color: '#5BA8FF' } },
+                        { value: 60, name: currentLang === 'zh' ? '啟動戒備' : 'Alert Activated', itemStyle: { color: '#4FD1E0' } },
+                        { value: 30, name: currentLang === 'zh' ? '轉介 HA IDC' : 'Referred to HA IDC', itemStyle: { color: '#3DDC97' } },
+                        { value: 10, name: currentLang === 'zh' ? '確診追蹤' : 'Confirmed', itemStyle: { color: '#FFB547' } }
+                    ]
+                }]
+            });
+
+            // Chart 9: Grouped Bar
+            if (charts.chart9) charts.chart9.dispose();
+            charts.chart9 = echarts.init(document.getElementById('chart9'));
+            charts.chart9.setOption({
+                backgroundColor: bgColor,
+                tooltip: { trigger: 'axis', backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor } },
+                legend: {
+                    data: [currentLang === 'zh' ? '聯合演習' : 'Joint Drills', currentLang === 'zh' ? '健康申報核查' : 'Health Declaration', currentLang === 'zh' ? '聯防通報' : 'Cross-border Alerts'],
+                    textStyle: { color: textColor, fontSize: 11 },
+                    top: 0
+                },
+                grid: { left: 50, right: 20, top: 40, bottom: 30 },
+                xAxis: {
+                    type: 'category',
+                    data: ['MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT'],
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 },
+                    splitLine: { lineStyle: { color: '#1F3350', opacity: 0.3 } }
+                },
+                series: [
+                    { name: currentLang === 'zh' ? '聯合演習' : 'Joint Drills', type: 'bar', data: [2, 3, 2, 4, 3, 2], itemStyle: { color: '#5BA8FF' } },
+                    { name: currentLang === 'zh' ? '健康申報核查' : 'Health Declaration', type: 'bar', data: [15, 18, 20, 22, 19, 21], itemStyle: { color: '#4FD1E0' } },
+                    { name: currentLang === 'zh' ? '聯防通報' : 'Cross-border Alerts', type: 'bar', data: [8, 10, 12, 11, 14, 13], itemStyle: { color: '#3DDC97' } }
+                ]
+            });
+
+            // Chart 10: Stacked Area
+            if (charts.chart10) charts.chart10.dispose();
+            charts.chart10 = echarts.init(document.getElementById('chart10'));
+            charts.chart10.setOption({
+                backgroundColor: bgColor,
+                tooltip: { trigger: 'axis', backgroundColor: '#0F1A2C', borderColor: '#1F3350', textStyle: { color: textColor } },
+                legend: {
+                    data: [currentLang === 'zh' ? '篩查負荷' : 'Screening', currentLang === 'zh' ? '核心衞生' : 'Core Health', currentLang === 'zh' ? '旅遊健康' : 'Travel Health', currentLang === 'zh' ? '疫症應變' : 'Outbreak', currentLang === 'zh' ? '跨境協作' : 'Cross-boundary', currentLang === 'zh' ? '人手成本' : 'Manpower'],
+                    textStyle: { color: textColor, fontSize: 10 },
+                    top: 0
+                },
+                grid: { left: 50, right: 20, top: 50, bottom: 30 },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['NOV', 'DEC', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT'],
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: '#1F3350' } },
+                    axisLabel: { color: textColor, fontSize: 10 },
+                    splitLine: { lineStyle: { color: '#1F3350', opacity: 0.3 } }
+                },
+                series: [
+                    { name: currentLang === 'zh' ? '篩查負荷' : 'Screening', type: 'line', stack: 'Total', areaStyle: {}, data: [12, 14, 13, 15, 16, 18, 17, 19, 20, 22, 21, 23], itemStyle: { color: '#5BA8FF' } },
+                    { name: currentLang === 'zh' ? '核心衞生' : 'Core Health', type: 'line', stack: 'Total', areaStyle: {}, data: [8, 9, 8, 10, 9, 11, 10, 12, 11, 13, 12, 14], itemStyle: { color: '#4FD1E0' } },
+                    { name: currentLang === 'zh' ? '旅遊健康' : 'Travel Health', type: 'line', stack: 'Total', areaStyle: {}, data: [5, 6, 5, 7, 6, 8, 7, 9, 8, 10, 9, 11], itemStyle: { color: '#3DDC97' } },
+                    { name: currentLang === 'zh' ? '疫症應變' : 'Outbreak', type: 'line', stack: 'Total', areaStyle: {}, data: [3, 4, 3, 5, 4, 6, 5, 7, 6, 8, 7, 9], itemStyle: { color: '#FFB547' } },
+                    { name: currentLang === 'zh' ? '跨境協作' : 'Cross-boundary', type: 'line', stack: 'Total', areaStyle: {}, data: [2, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6, 8], itemStyle: { color: '#B794F6' } },
+                    { name: currentLang === 'zh' ? '人手成本' : 'Manpower', type: 'line', stack: 'Total', areaStyle: {}, data: [1, 2, 1, 3, 2, 4, 3, 5, 4, 6, 5, 7], itemStyle: { color: '#FF4D6D' } }
+                ]
+            });
+        }
+
+        document.getElementById('btn-zh').addEventListener('click', () => applyLang('zh'));
+        document.getElementById('btn-en').addEventListener('click', () => applyLang('en'));
+
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Clock update
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+        }
+        setInterval(updateClock, 1000);
+
+        applyLang('zh');
+
+        window.addEventListener('resize', function() {
+            Object.values(charts).forEach(chart => chart && chart.resize());
+        });
+    });
+    </script>
+</body>
+</html>
